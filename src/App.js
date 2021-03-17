@@ -5,7 +5,6 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-     
       <Button type="primary">ANT DESIGN BUTTON</Button>
     </div>
   );
