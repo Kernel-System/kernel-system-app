@@ -1,10 +1,10 @@
-import "./App.css";
-import React, { useState } from "react";
-import { Layout } from "antd";
-import Header from "./components/layout/header";
-import Content from "./components/layout/content";
-import Footer from "./components/footer";
-import Sider from "./components/layout/sider";
+import './App.css';
+import React, { useState } from 'react';
+import { Layout } from 'antd';
+import Header from './components/layout/Header';
+import Content from './components/layout/Content';
+import Footer from './components/layout/Footer';
+import Sider from './components/layout/Sider';
 
 function App() {
   const [collapsed, useCollapsed] = useState(true);
