@@ -152,21 +152,21 @@ const Index = () => {
         return editable ? (
           <span>
             <Button
-              type="link"
+              type='link'
               onClick={() => save(record.key)}
               icon={<CheckOutlined />}
               style={{
                 marginRight: 8,
               }}
             />
-            <Popconfirm title="¿Estas seguro de cancelar?" onConfirm={cancel}>
+            <Popconfirm title='¿Estas seguro de cancelar?' onConfirm={cancel}>
               <CloseOutlined />
             </Popconfirm>
           </span>
         ) : (
           <Button
             icon={<EditOutlined />}
-            type="link"
+            type='link'
             disabled={editingKey !== ''}
             onClick={() => edit(record)}
           >
@@ -206,7 +206,7 @@ const Index = () => {
         scroll={{ x: 1500, y: 400 }}
         dataSource={data}
         columns={mergedColumns}
-        rowClassName="editable-row"
+        rowClassName='editable-row'
         pagination={{
           onChange: cancel,
         }}

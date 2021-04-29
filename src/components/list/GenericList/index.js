@@ -33,8 +33,8 @@ const Index = () => {
 
   return (
     <List
-      itemLayout="vertical"
-      size="default"
+      itemLayout='vertical'
+      size='default'
       pagination={{
         onChange: (page) => {
           console.log(page);
