@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './styles.css';
-import { List, Avatar, Space } from 'antd';
+import { List } from 'antd';
 
 const Index = () => {
   const [data, setData] = useState([]);
@@ -11,8 +11,8 @@ const Index = () => {
       data2.push({
         href: 'https://ant.design',
         nombre: `nombre ${i + 1}`,
-        avatar:
-          'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+        /*avatar:
+          'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',*/
         description: 'Soy una descripcion',
         content: 'Soy un contenido',
       });
@@ -24,12 +24,12 @@ const Index = () => {
     setData(addData());
   }, []);
 
-  const IconText = ({ icon, text }) => (
+  /*const IconText = ({ icon, text }) => (
     <Space>
       {React.createElement(icon)}
       {text}
     </Space>
-  );
+  );*/
 
   return (
     <List

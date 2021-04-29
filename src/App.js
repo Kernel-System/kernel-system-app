@@ -2,6 +2,8 @@ import './App.css';
 import Layout from './pages/Layout/index';
 //import Table from "./components/table/GenericTable";
 import List from './components/list/GenericList';
+//import List from './components/list/PedidoList';
+//import Summary from './components/table/Summary';
 
 function App() {
   return (
