@@ -1,37 +1,31 @@
+import { Route, Switch } from 'react-router';
+import asyncComponent from './hoc/asyncComponent';
+import Home from './pages/Home';
+import Login from './pages/Login';
+
 import './App.css';
-import React, { useState } from 'react';
-import { Layout } from 'antd';
-import Header from './components/layout/Header';
-import Content from './components/layout/Content';
-import Footer from './components/layout/Footer';
-import Sider from './components/layout/Sider';
+import Layout from './pages/Layout';
+//import Table from "./components/table/GenericTable";
+import List from './components/list/GenericList';
 
-function App() {
-  const [collapsed, useCollapsed] = useState(true);
+const asyncForgotPassword = asyncComponent(() =>
+  import('./pages/ForgotPassword')
+);
 
-  const ToggleCollapsed = () => {
-    useCollapsed(!collapsed);
-  };
-
+const App = () => {
   return (
-    <div className="App">
-      <Layout>
-        <Header
-          collapsed={collapsed}
-          ToggleCollapsed={() => {
-            ToggleCollapsed();
-          }}
+    <Layout>
+      <Switch>
+        <Route path='/' exact component={Home} />
+        <Route path='/iniciar-sesion' exact component={Login} />
+        <Route
+          path='/recuperar-contrasena'
+          exact
+          component={asyncForgotPassword}
         />
-        <Layout>
-          <Layout>
-            <Sider collapsed={collapsed} />
-            <Content />
-          </Layout>
-        </Layout>
-        <Footer />
-      </Layout>
-    </div>
+      </Switch>
+    </Layout>
   );
-}
+};
 
 export default App;
