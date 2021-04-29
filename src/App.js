@@ -4,6 +4,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 
 import './App.css';
+import Layout from './pages/Layout';
+//import Table from "./components/table/GenericTable";
+import List from './components/list/GenericList';
 
 const asyncForgotPassword = asyncComponent(() =>
   import('./pages/ForgotPassword')
@@ -11,15 +14,17 @@ const asyncForgotPassword = asyncComponent(() =>
 
 const App = () => {
   return (
-    <Switch>
-      <Route path='/' exact component={Home} />
-      <Route path='/iniciar-sesion' exact component={Login} />
-      <Route
-        path='/recuperar-contrasena'
-        exact
-        component={asyncForgotPassword}
-      />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path='/' exact component={Home} />
+        <Route path='/iniciar-sesion' exact component={Login} />
+        <Route
+          path='/recuperar-contrasena'
+          exact
+          component={asyncForgotPassword}
+        />
+      </Switch>
+    </Layout>
   );
 };
 
