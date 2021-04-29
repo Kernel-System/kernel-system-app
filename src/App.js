@@ -6,8 +6,10 @@ import Login from './pages/Login';
 import './App.css';
 import Layout from './pages/Layout';
 //import Table from "./components/table/GenericTable";
-import List from './components/list/GenericList';
+//import List from './components/list/GenericList';
 //import List from './components/list/PedidoList';
+import List from './components/list/ProveedorList';
+
 //import Summary from './components/table/Summary';
 
 const asyncForgotPassword = asyncComponent(() =>
@@ -15,6 +17,18 @@ const asyncForgotPassword = asyncComponent(() =>
 );
 
 const App = () => {
+  const lista = [
+    {
+      rfc: 'EJEMPLO RFC1',
+      nombre: 'Proveedor chiludo 1',
+      razon: 'soy una razon 1',
+    },
+    {
+      rfc: 'EJEMPLO RFC2',
+      nombre: 'Proveedor chiludo 2',
+      razon: 'soy una razon 2',
+    },
+  ];
   return (
     <Layout>
       <Switch>
@@ -25,6 +39,9 @@ const App = () => {
           exact
           component={asyncForgotPassword}
         />
+        <Route path='/ejemplo' exact>
+          <List list={lista} />
+        </Route>
       </Switch>
     </Layout>
   );

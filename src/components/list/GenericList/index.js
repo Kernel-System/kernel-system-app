@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './styles.css';
-import { List } from 'antd';
+import { List, Avatar, Space } from 'antd';
 
 const Index = () => {
   const [data, setData] = useState([]);
