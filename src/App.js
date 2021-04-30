@@ -6,9 +6,7 @@ import Login from './pages/Login';
 import './App.css';
 import Layout from './pages/Layout';
 //import Table from "./components/table/GenericTable";
-//import List from './components/list/GenericList';
-//import List from './components/list/PedidoList';
-import List from './components/list/ProveedorList';
+import List from './components/list/EnsambleList';
 
 //import Summary from './components/table/Summary';
 
@@ -19,14 +17,16 @@ const asyncForgotPassword = asyncComponent(() =>
 const App = () => {
   const lista = [
     {
-      rfc: 'EJEMPLO RFC1',
-      nombre: 'Proveedor chiludo 1',
-      razon: 'soy una razon 1',
+      folio: 'EJEMPLO FOLIO1',
+      fechaorden: '01/01/2020',
+      descripcion: 'Para el ingeniero chiludo 1',
+      estado: 'Creado',
     },
     {
-      rfc: 'EJEMPLO RFC2',
-      nombre: 'Proveedor chiludo 2',
-      razon: 'soy una razon 2',
+      folio: 'EJEMPLO FOLIO2',
+      fechaorden: '02/01/2020',
+      descripcion: 'Para el cliente chiludo 2',
+      estado: 'En ensamble',
     },
   ];
   return (
