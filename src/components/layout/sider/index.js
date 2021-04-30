@@ -12,7 +12,12 @@ const { Sider } = Layout;
 
 const Index = ({ collapsed }) => {
   return (
-    <Sider className='site-layout-background' collapsed={collapsed}>
+    <Sider
+      className='site-layout-background'
+      collapsed={collapsed}
+      collapsedWidth={window.screen.width >= 768 ? 80 : 0}
+      width={window.screen.width >= 768 ? 200 : '100%'}
+    >
       <Menu
         //defaultSelectedKeys={["1"]}
         //defaultOpenKeys={["sub1"]}

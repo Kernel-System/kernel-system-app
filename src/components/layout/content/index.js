@@ -12,6 +12,7 @@ const Index = ({ children }) => {
           padding: 24,
           margin: 0,
           minHeight: 'calc(100vh - 70px)',
+          position: 'relative',
         }}
       >
         {children}
