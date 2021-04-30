@@ -1,12 +1,7 @@
 import './style.css';
 import { Layout } from 'antd';
-import LectorProveedores from 'components/util/facturas/LectorFacturas';
 
 const { Content } = Layout;
-
-const imprimirProveedores = (factura) => {
-  console.log(factura['cfdi:Emisor'][0].$);
-};
 
 const Index = ({ children }) => {
   return (
