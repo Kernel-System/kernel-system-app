@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Ensambles from './pages/ensamble/Ensambles';
 import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
+import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
 
 import './App.css';
 import Layout from './pages/Layout';
@@ -15,28 +16,6 @@ const asyncForgotPassword = asyncComponent(() =>
 );
 
 const App = () => {
-  const listaProductos = [
-    [
-      {
-        idComponenteEnsamble: '1',
-        codigo: '1',
-        descripcion: 'Tarjeta Madre 1',
-        nota: '',
-        cantidad: 1,
-        series: { idSerieComponente: '1', serie: '00001' },
-      },
-    ],
-    [
-      {
-        idComponenteEnsamble: '2',
-        codigo: '2',
-        descripcion: 'Disco Duro 1',
-        nota: '',
-        cantidad: 1,
-        series: { idSerieComponente: '2', serie: '00002' },
-      },
-    ],
-  ];
   return (
     <Layout>
       <Switch>
@@ -53,7 +32,9 @@ const App = () => {
           exact
           component={AgregarEnsambles}
         ></Route>
-        <Route path='/ensambles/:id' exact component={AgregarEnsambles}></Route>
+        <Route path='/ensambles/:id' exact>
+          <ModificarEnsambles />
+        </Route>
         <Route path='/ejemplo' exact></Route>
       </Switch>
     </Layout>

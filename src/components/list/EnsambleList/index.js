@@ -35,14 +35,16 @@ const Index = ({ list }) => {
         dataSource={list}
         renderItem={(item) => (
           <Badge.Ribbon text={item.estado}>
-            <List.Item key={item.folio} /*onClick={() => {}}*/>
-              <List.Item.Meta
-                //avatar={<Avatar src={item.avatar} />}
-                title={item.folio}
-                description={item.fechaorden}
-              />
-              {item.descripcion}
-            </List.Item>
+            <Link to={`/ensambles/${item.folio}`}>
+              <List.Item key={item.folio}>
+                <List.Item.Meta
+                  //avatar={<Avatar src={item.avatar} />}
+                  title={`Folio ${item.folio}`}
+                  description={item.fechaorden}
+                />
+                {item.descripcion}
+              </List.Item>
+            </Link>
           </Badge.Ribbon>
         )}
       />
