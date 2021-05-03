@@ -1,6 +1,7 @@
 import './styles.css';
 import { List, Typography, Button, Badge, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
@@ -46,9 +47,11 @@ const Index = ({ list }) => {
         )}
       />
       <br />
-      <Button type='primary' size='large' icon={<PlusOutlined />}>
-        Añadir Nueva Orden de Ensamble
-      </Button>
+      <Link to='/ensambles/nuevo'>
+        <Button type='primary' size='large' icon={<PlusOutlined />}>
+          Añadir Nueva Orden de Ensamble
+        </Button>
+      </Link>
     </>
   );
 };
