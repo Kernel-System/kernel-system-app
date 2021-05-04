@@ -18,7 +18,7 @@ const Index = () => {
           codigo: '01',
           cantidad: 1,
           descripcion: 'tarjeta madre',
-          series: [],
+          series: [{ id: 1, serie: 1212121212 }],
         },
       ],
       procesador: [
@@ -103,6 +103,7 @@ const Index = () => {
   const changeSeries = (serie, title, indice, number) => {
     const lista = JSON.parse(JSON.stringify(list));
     lista.productos[title][indice].series[number] = serie;
+    //console.log(lista.productos[title][indice]);
     setList(JSON.parse(JSON.stringify(lista)));
   };
 

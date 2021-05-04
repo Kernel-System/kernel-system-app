@@ -7,16 +7,28 @@ const Index = ({ filas, titulo, tag, onChanged }) => {
   const breakpoint = useBreakpoint();
   const [longitud] = useState(filas.length);
 
-  const inputs = (cod, numero, indice) => {
+  const changeSerie = (fila, value, tag, indice, actual) => {
+    if (value.split(' ').join('') !== '') {
+      const lista = JSON.parse(JSON.stringify(fila));
+      lista.series[actual] = { ...lista.series[actual], serie: value };
+      //console.log(lista.series[actual])
+      onChanged({ ...lista.series[actual] }, tag, indice, actual);
+    }
+  };
+
+  const inputs = (fila, numero, indice) => {
     const arreglo = Array.from(Array(numero).keys());
     const numeros = arreglo.map((actual) => {
       return (
         <Input
-          key={`${cod}${actual}`}
+          key={`${fila.id}${actual}`}
           placeholder='Número de Serie'
           style={{ width: '100%' }}
+          defaultValue={
+            fila.series[actual] !== undefined ? fila.series[actual].serie : ''
+          }
           onBlur={(e) => {
-            onChanged(e.target.value, tag, indice, actual);
+            changeSerie(fila, e.target.value, tag, indice, actual);
           }}
           disabled={false}
         />
@@ -40,7 +52,7 @@ const Index = ({ filas, titulo, tag, onChanged }) => {
           </Col>
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Space direction='vertical' style={{ width: '100%' }}>
-              {inputs(fila.id, fila.cantidad, indice)}
+              {inputs(fila, fila.cantidad, indice)}
             </Space>
           </Col>
         </Row>
