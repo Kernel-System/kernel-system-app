@@ -19,7 +19,7 @@ const Index = ({ list }) => {
       <Title>Compras</Title>
       <Select
         showSearch
-        style={{ width: 100% }}
+        style={{ width: '100%' }}
         placeholder='Selecciona un proveedor'
         optionFilterProp='children'
         onSearch={onSearch}
