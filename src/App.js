@@ -9,7 +9,7 @@ import Layout from './pages/Layout';
 //import Table from "./components/table/GenericTable";
 //import List from './components/list/GenericList';
 //import List from './components/list/PedidoList';
-import List from './components/list/ProveedorList';
+import ProveedorList from './components/list/ProveedorList';
 
 //import Summary from './components/table/Summary';
 
@@ -20,14 +20,19 @@ const asyncForgotPassword = asyncComponent(() =>
 const App = () => {
   const lista = [
     {
-      rfc: 'EJEMPLO RFC1',
-      nombre: 'Proveedor chiludo 1',
-      razon: 'soy una razon 1',
+      rfc: 'ARR-860120',
+      nombre: 'LA @ S.A. DE C.V',
+      razon_social: 'soy una razon 1',
     },
     {
-      rfc: 'EJEMPLO RFC2',
-      nombre: 'Proveedor chiludo 2',
-      razon: 'soy una razon 2',
+      rfc: 'APO-830120',
+      nombre: 'LA @ DEL % SA DE CV',
+      razon_social: 'soy una razon 2',
+    },
+    {
+      rfc: 'ACO-800210',
+      nombre: '@ COMER.COM',
+      razon_social: 'soy una razon 3',
     },
   ];
   return (
@@ -41,8 +46,8 @@ const App = () => {
           exact
           component={asyncForgotPassword}
         />
-        <Route path='/ejemplo' exact>
-          <List list={lista} />
+        <Route path='/proveedores' exact>
+          <ProveedorList list={lista} />
         </Route>
       </Switch>
     </Layout>
