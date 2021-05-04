@@ -23,6 +23,7 @@ const Index = ({ filas, titulo, tag, onChanged }) => {
         <Input
           key={`${fila.id}${actual}`}
           placeholder='Número de Serie'
+          size='large'
           style={{ width: '100%' }}
           defaultValue={
             fila.series[actual] !== undefined ? fila.series[actual].serie : ''
@@ -47,6 +48,7 @@ const Index = ({ filas, titulo, tag, onChanged }) => {
               placeholder='Producto'
               style={{ width: '100%' }}
               disabled={true}
+              size='large'
               value={fila.descripcion}
             />
           </Col>

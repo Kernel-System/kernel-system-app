@@ -68,6 +68,7 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
               <Select
                 showSearch
                 key={fila.id}
+                size='large'
                 style={{ width: '100%' }}
                 placeholder='Buscar producto'
                 optionFilterProp='children'
@@ -90,6 +91,7 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Input
               placeholder='Número de Serie'
+              size='large'
               style={{ width: '100%' }}
               disabled={true}
             />

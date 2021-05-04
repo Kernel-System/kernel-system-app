@@ -6,6 +6,7 @@ import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
 import Ensambles from './pages/ensamble/Ensambles';
 import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
 import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
+import FacturarTicket from './pages/FacturarTicket';
 
 import './App.css';
 import Layout from './pages/Layout';
@@ -28,6 +29,7 @@ const App = () => {
           exact
           component={asyncForgotPassword}
         />
+        {/* ensambles */}
         <Route path='/ensambles' exact component={Ensambles}></Route>
         <Route
           path='/ensambles/nuevo'
@@ -37,7 +39,8 @@ const App = () => {
         <Route path='/ensambles/:id' exact>
           <ModificarEnsambles />
         </Route>
-        <Route path='/ejemplo' exact></Route>
+        {/* facturar ticket */}
+        <Route path='/facturar_ticket' exact component={FacturarTicket}></Route>
       </Switch>
     </Layout>
   );
