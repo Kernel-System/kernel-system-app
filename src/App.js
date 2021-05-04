@@ -3,13 +3,12 @@ import asyncComponent from './hoc/asyncComponent';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
+import Ensambles from './pages/ensamble/Ensambles';
+import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
+import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
 
 import './App.css';
 import Layout from './pages/Layout';
-//import Table from "./components/table/GenericTable";
-//import List from './components/list/GenericList';
-//import List from './components/list/PedidoList';
-import List from './components/list/ProveedorList';
 
 //import Summary from './components/table/Summary';
 
@@ -18,18 +17,6 @@ const asyncForgotPassword = asyncComponent(() =>
 );
 
 const App = () => {
-  const lista = [
-    {
-      rfc: 'EJEMPLO RFC1',
-      nombre: 'Proveedor chiludo 1',
-      razon: 'soy una razon 1',
-    },
-    {
-      rfc: 'EJEMPLO RFC2',
-      nombre: 'Proveedor chiludo 2',
-      razon: 'soy una razon 2',
-    },
-  ];
   return (
     <Layout>
       <Switch>
@@ -41,9 +28,16 @@ const App = () => {
           exact
           component={asyncForgotPassword}
         />
-        <Route path='/ejemplo' exact>
-          <List list={lista} />
+        <Route path='/ensambles' exact component={Ensambles}></Route>
+        <Route
+          path='/ensambles/nuevo'
+          exact
+          component={AgregarEnsambles}
+        ></Route>
+        <Route path='/ensambles/:id' exact>
+          <ModificarEnsambles />
         </Route>
+        <Route path='/ejemplo' exact></Route>
       </Switch>
     </Layout>
   );
