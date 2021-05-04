@@ -3,15 +3,13 @@ import asyncComponent from './hoc/asyncComponent';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
+import Ensambles from './pages/ensamble/Ensambles';
+import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
+import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
 
 import './App.css';
 import Layout from './pages/Layout';
-//import Table from "./components/table/GenericTable";
-//import List from './components/list/GenericList';
-//import List from './components/list/PedidoList';
 import ProveedorList from './components/list/ProveedorList';
-
-//import Summary from './components/table/Summary';
 
 const asyncForgotPassword = asyncComponent(() =>
   import('./pages/ForgotPassword')
@@ -49,6 +47,16 @@ const App = () => {
         <Route path='/proveedores' exact>
           <ProveedorList list={lista} />
         </Route>
+        <Route path='/ensambles' exact component={Ensambles}></Route>
+        <Route
+          path='/ensambles/nuevo'
+          exact
+          component={AgregarEnsambles}
+        ></Route>
+        <Route path='/ensambles/:id' exact>
+          <ModificarEnsambles />
+        </Route>
+        <Route path='/ejemplo' exact></Route>
       </Switch>
     </Layout>
   );

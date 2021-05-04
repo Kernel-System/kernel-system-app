@@ -1,5 +1,7 @@
 import './style.css';
 import { Layout, Menu } from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+
 import {
   AppstoreOutlined,
   PieChartOutlined,
@@ -11,19 +13,15 @@ const { SubMenu } = Menu;
 const { Sider } = Layout;
 
 const Index = ({ collapsed }) => {
+  const breakpoint = useBreakpoint();
   return (
     <Sider
       className='site-layout-background'
       collapsed={collapsed}
-      collapsedWidth={window.screen.width >= 768 ? 80 : 0}
-      width={window.screen.width >= 768 ? 200 : '100%'}
+      collapsedWidth={breakpoint.lg ? 80 : 0}
+      width={breakpoint.lg ? 200 : '100%'}
     >
-      <Menu
-        //defaultSelectedKeys={["1"]}
-        //defaultOpenKeys={["sub1"]}
-        mode='inline'
-        //inlineCollapsed={collapsed}
-      >
+      <Menu mode='inline'>
         <Menu.Item key='1' icon={<PieChartOutlined />}>
           Option 1
         </Menu.Item>
