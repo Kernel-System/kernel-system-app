@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import 'antd/dist/antd.css';
 import { Form, Input, Button } from 'antd';
 import { Typography } from 'antd';
@@ -178,13 +178,21 @@ const Index = (props) => {
     </>
   );
 
+  const changeFormValue = useCallback(
+    (value) => {
+      form.setFieldsValue(value);
+    },
+    [form]
+  );
+
   useEffect(() => {
+    console.log('Se ejecutó');
     for (const dato in props.datosProveedor) {
-      form.setFieldsValue({
+      changeFormValue({
         [dato]: props.datosProveedor[dato],
       });
     }
-  }, [props.datosProveedor]);
+  }, [props.datosProveedor, changeFormValue]);
 
   return (
     <>
