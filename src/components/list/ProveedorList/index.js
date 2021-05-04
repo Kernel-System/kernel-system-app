@@ -1,34 +1,44 @@
 import './styles.css';
 import { useState } from 'react';
-import { List, Typography, Button, Modal } from 'antd';
+import { List, Typography, Button, Modal, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import ProveedorForm from 'components/forms/ProveedorForm';
+
 const { Title } = Typography;
 
 const Index = ({ list }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [elementList, setelementList] = useState({});
+  const [listElement, setListElement] = useState({});
+  const [listToShow, setListToShow] = useState(list);
 
-  const showModal = (elementList) => {
+  const showModal = (listElement) => {
     setIsModalVisible(true);
-    setelementList(elementList);
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
+    setListElement(listElement);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
+  const proveedorActualizado = () => {};
+
+  const buscarProveedor = (e) => {
+    setListToShow(
+      list.filter((item) => item.rfc.includes(e.target.value.toUpperCase()))
+    );
+  };
+
   return (
     <>
       <Title>Lista de Proveedores</Title>
-      buscador por rfc
+      <Input.Search
+        onChange={buscarProveedor}
+        placeholder='Buscar por RFC'
+      ></Input.Search>
       <br />
-      combobox
       <List
-        itemLayout='vertical'
+        itemLayout='horizontal'
         size='default'
         pagination={{
           onChange: (page) => {
@@ -36,35 +46,45 @@ const Index = ({ list }) => {
           },
           pageSize: 10,
         }}
-        dataSource={list}
+        dataSource={listToShow}
         renderItem={(item) => (
-          <List.Item
-            key={item.rfc}
-            onClick={() => {
-              showModal(item);
-            }}
-          >
+          <List.Item key={item.rfc}>
             <List.Item.Meta
-              //avatar={<Avatar src={item.avatar} />}
-              title={item.rfc}
+              title={
+                <p
+                  onClick={() => {
+                    showModal(item);
+                  }}
+                  style={{
+                    cursor: 'pointer',
+                    margin: 0,
+                  }}
+                >
+                  {item.rfc}
+                </p>
+              }
               description={item.nombre}
             />
           </List.Item>
         )}
       />
       <br />
-      <Button type='primary' size='large' icon={<PlusOutlined />}>
-        Añadir Nuevo Proveedor
-      </Button>
+      <Link to='/añadir-proveedor'>
+        <Button type='primary' size='large' icon={<PlusOutlined />}>
+          Añadir Nuevo Proveedor
+        </Button>
+      </Link>
       <Modal
-        title={elementList.rfc}
+        title={listElement.rfc}
         visible={isModalVisible}
-        onOk={handleOk}
+        footer={null}
         onCancel={handleCancel}
       >
-        <p>{elementList.nombre}</p>
-        <p>{elementList.razon}</p>
-        <p>Lo que falta...</p>
+        <ProveedorForm
+          onSubmit={proveedorActualizado}
+          submitText='Guardar cambios'
+          datosProveedor={listElement}
+        />
       </Modal>
     </>
   );
