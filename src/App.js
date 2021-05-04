@@ -10,14 +10,30 @@ import FacturarTicket from './pages/FacturarTicket';
 
 import './App.css';
 import Layout from './pages/Layout';
-
-//import Summary from './components/table/Summary';
+import ProveedorList from './components/list/ProveedorList';
 
 const asyncForgotPassword = asyncComponent(() =>
   import('./pages/ForgotPassword')
 );
 
 const App = () => {
+  const lista = [
+    {
+      rfc: 'ARR-860120',
+      nombre: 'LA @ S.A. DE C.V',
+      razon_social: 'soy una razon 1',
+    },
+    {
+      rfc: 'APO-830120',
+      nombre: 'LA @ DEL % SA DE CV',
+      razon_social: 'soy una razon 2',
+    },
+    {
+      rfc: 'ACO-800210',
+      nombre: '@ COMER.COM',
+      razon_social: 'soy una razon 3',
+    },
+  ];
   return (
     <Layout>
       <Switch>
@@ -30,6 +46,9 @@ const App = () => {
           component={asyncForgotPassword}
         />
         {/* ensambles */}
+        <Route path='/proveedores' exact>
+          <ProveedorList list={lista} />
+        </Route>
         <Route path='/ensambles' exact component={Ensambles}></Route>
         <Route
           path='/ensambles/nuevo'
