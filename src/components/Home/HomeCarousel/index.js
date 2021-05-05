@@ -2,11 +2,11 @@ import { Carousel } from 'antd';
 import HomeCarouselItem from './HomeCarouselItem';
 
 const HomeCarousel = () => (
-  <Carousel autoplay>
-    <HomeCarouselItem url={1} />
-    <HomeCarouselItem url={2} />
-    <HomeCarouselItem url={3} />
-    <HomeCarouselItem url={4} />
+  <Carousel autoplay style={{ marginBottom: '1em' }}>
+    <HomeCarouselItem url={'www.google.com'} />
+    <HomeCarouselItem url={'www.google.com'} />
+    <HomeCarouselItem url={'www.google.com'} />
+    <HomeCarouselItem url={'www.google.com'} />
   </Carousel>
 );
 

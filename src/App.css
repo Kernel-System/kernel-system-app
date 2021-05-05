@@ -1,1 +1,5 @@
 @import '~antd/dist/antd.css';
+
+.ant-statistic-content-value {
+  font-size: 0.75em;
+}

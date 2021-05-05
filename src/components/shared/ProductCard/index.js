@@ -1,16 +1,28 @@
 import { PercentageOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { Badge, Button, Card, Col, Divider, Image, Typography } from 'antd';
-import { formatPrice } from '../../../lib/utility';
+import { Badge, Button, Card, Image, Space, Typography } from 'antd';
+import { formatPrice } from 'utils';
+import { useHistory } from 'react-router-dom';
 
 const { Title, Paragraph, Text } = Typography;
 
-const ProductCard = ({ product, descuento }) => (
-  <Col xs={24} sm={12} lg={6} xl={4}>
+const ProductCard = ({ product, descuento = 0.5 }) => {
+  const history = useHistory();
+
+  const goToProduct = (productId) => {
+    history.push(`/p/${productId}`);
+  };
+
+  const addToCart = (e, productId) => {
+    e.stopPropagation();
+    console.log('Producto:', productId);
+  };
+
+  return (
     <Badge.Ribbon
       color='magenta'
       style={{ display: descuento ? 'block' : 'none' }}
       text={
-        <Text strong style={{ color: '#fff' }}>
+        <Text style={{ color: '#fff' }}>
           <PercentageOutlined /> Oferta!
         </Text>
       }
@@ -22,28 +34,37 @@ const ProductCard = ({ product, descuento }) => (
             preview={false}
             width='100%'
             height={200}
-            style={{ objectFit: 'contain', padding: 16 }}
+            style={{ objectFit: 'contain', padding: '24px 24px 0' }}
             alt={product.title}
             src={product.image}
             fallback='https://st4.depositphotos.com/17828278/24401/v/600/depositphotos_244011872-stock-illustration-no-image-vector-symbol-missing.jpg'
           />
         }
+        onClick={() => goToProduct(product.id)}
       >
-        <Paragraph ellipsis={{ rows: 2 }} style={{ minHeight: 44 }}>
+        <Paragraph type='secondary' style={{ marginBottom: 0 }}>
+          {product.category.toUpperCase()}
+        </Paragraph>
+        <Paragraph strong ellipsis={{ rows: 2 }} style={{ minHeight: 44 }}>
           {product.title}
         </Paragraph>
-        <Title level={3} style={{ display: 'inline' }}>
-          {formatPrice(product.price * descuento)}{' '}
-        </Title>
-        <Text type={'secondary'} delete>
-          {formatPrice(product.price)}
-        </Text>
-        <Divider style={{ margin: '16px 0' }} />
-        <Button block type='primary' icon={<ShoppingCartOutlined />}>
+        <Space align='center'>
+          <Title level={3}>{formatPrice(product.price * descuento)}</Title>
+          <Paragraph type={'secondary'} delete>
+            {formatPrice(product.price)}
+          </Paragraph>
+        </Space>
+        <Button
+          block
+          type='primary'
+          icon={<ShoppingCartOutlined />}
+          onClick={(e) => addToCart(e, product.id)}
+        >
           Añadir a la lista
         </Button>
       </Card>
     </Badge.Ribbon>
-  </Col>
-);
+  );
+};
+
 export default ProductCard;
