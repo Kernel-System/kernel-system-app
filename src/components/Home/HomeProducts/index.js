@@ -1,28 +1,28 @@
-import { Row, Typography } from 'antd';
-import { useEffect, useState } from 'react';
+import { Col, Row } from 'antd';
+import { fetchProducts } from 'api/shared/products';
+import CenteredSpinner from 'components/UI/CenteredSpinner';
+import Heading from 'components/UI/Heading';
+import { useQuery } from 'react-query';
 import ProductCard from '../../shared/ProductCard';
-const { Title } = Typography;
 
 const HomeProducts = () => {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const getProducts = async () => {
-      await fetch('https://fakestoreapi.com/products')
-        .then((res) => res.json())
-        .then((json) => setProducts(json));
-    };
-    getProducts();
-  }, []);
+  const { isLoading, data } = useQuery('products', fetchProducts);
 
   return (
     <>
-      <Title level={3}>Productos destacados</Title>
-      <Row gutter={[16, 16]}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} descuento={0.5} />
-        ))}
-      </Row>
+      <Heading title='Productos destacados' />
+
+      {isLoading ? (
+        <CenteredSpinner />
+      ) : (
+        <Row gutter={[16, 16]}>
+          {data.map((product) => (
+            <Col xs={24} sm={12} lg={6} key={product.id}>
+              <ProductCard product={product} />
+            </Col>
+          ))}
+        </Row>
+      )}
     </>
   );
 };
