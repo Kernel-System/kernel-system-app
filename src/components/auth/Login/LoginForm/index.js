@@ -1,7 +1,7 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Typography } from 'antd';
+import Heading from 'components/UI/Heading';
 import { Link } from 'react-router-dom';
-const { Title, Paragraph } = Typography;
 
 const LoginForm = () => {
   const onFinish = (values) => {
@@ -10,35 +10,46 @@ const LoginForm = () => {
 
   return (
     <>
-      <Title level={3}>Clientes registrados</Title>
-      <Paragraph>
-        Si tiene una cuenta, ingrese con su correo electrónico.
-      </Paragraph>
+      <Heading
+        title='Clientes registrados'
+        subtitle='Si tiene una cuenta, ingrese con su correo electrónico.'
+      />
 
-      <Form name='loginForm' onFinish={onFinish}>
+      <Form
+        name='loginForm'
+        layout='vertical'
+        requiredMark={false}
+        onFinish={onFinish}
+      >
         <Form.Item
           name='email'
+          label='Correo electrónico'
           rules={[
             {
               required: true,
               message: 'Por favor introduzca su correo electrónico.',
             },
+            {
+              type: 'email',
+              message: 'El correo electrónico no tiene un formato válido',
+            },
           ]}
         >
-          <Input prefix={<MailOutlined />} placeholder='Correo electrónico' />
+          <Input prefix={<MailOutlined />} />
         </Form.Item>
 
         <Form.Item
           name='password'
+          label='Contraseña'
           rules={[
             { required: true, message: 'Por favor introduzca su contraseña.' },
           ]}
         >
-          <Input.Password prefix={<LockOutlined />} placeholder='Contraseña' />
+          <Input.Password prefix={<LockOutlined />} />
         </Form.Item>
 
         <Form.Item>
-          <Space direction='vertical'>
+          <Space direction='vertical' size='middle'>
             <Button type='primary' htmlType='submit'>
               Iniciar sesión
             </Button>
