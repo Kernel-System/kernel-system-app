@@ -53,7 +53,7 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
       </Title>
       {filas.map((fila) => (
         <Row key={fila.id} gutter={[16, 24]} style={{ marginBottom: '10px' }}>
-          <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
+          <Col className='gutter-row' xs={24} lg={12}>
             <Form.Item
               name={`${titulo}${fila.id}`}
               rules={[

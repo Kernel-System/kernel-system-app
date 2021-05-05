@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import LectorProveedores from 'components/util/facturas/LectorFacturas';
+import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import { Typography,  Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,6 @@ const { Title } = Typography;
 const Index = () => {
     const onFacturaLeida = (factura) => {
         const emisor = factura['cfdi:Emisor'][0].$;
-        console.log({ emisor });
         setProveedor((prev) => ({
             ...prev,
             rfc: emisor.Rfc,
@@ -33,7 +32,7 @@ const Index = () => {
                 <Breadcrumb.Item>Agregar proveedor</Breadcrumb.Item>
             </Breadcrumb>
             <Title>Nuevo proveedor</Title>
-            <LectorProveedores onSuccess={onFacturaLeida} />
+            <LectorFacturas onSuccess={onFacturaLeida} />
             <Title level={2}>Datos del proveedor</Title>
             <ProveedorForm
                 datosProveedor={proveedor}
