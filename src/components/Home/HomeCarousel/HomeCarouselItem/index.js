@@ -1,8 +1,11 @@
 import { Image } from 'antd';
+import { useHistory } from 'react-router';
 
 const HomeCarouselItem = ({ url }) => {
+  const history = useHistory();
+
   const goToOffer = () => {
-    console.log('Ruta:', url);
+    history.push(url);
   };
 
   return (

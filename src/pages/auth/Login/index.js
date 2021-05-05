@@ -1,10 +1,10 @@
 import { Col, Row } from 'antd';
-import LoginForm from '../../components/Login/LoginForm';
-import SignUp from '../../components/Login/SignUp';
+import LoginForm from 'components/auth/Login/LoginForm';
+import SignUp from 'components/auth/Login/SignUp';
 
 const Login = () => {
   return (
-    <Row gutter={{ xs: 0, md: 32 }}>
+    <Row gutter={24}>
       <Col xs={24} md={12}>
         <LoginForm />
       </Col>
