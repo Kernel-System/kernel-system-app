@@ -2,10 +2,15 @@ import './styles.css';
 import { List, Typography, Button, Badge, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import ModalMovimiento from 'components/almacen/ModalMovimiento';
+import { useState } from 'react';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const Index = ({ list }) => {
+  const [visible, setVisible] = useState(false);
+  const [clave, setClave] = useState('');
+
   function handleChange(value) {
     console.log(`selected ${value}`);
   }
@@ -31,25 +36,37 @@ const Index = ({ list }) => {
         dataSource={list}
         renderItem={(item) => (
           <Badge.Ribbon text={item.concepto}>
-            <Link to={`/ensambles/${item.clave}`}>
-              <List.Item key={item.clave}>
-                <List.Item.Meta
-                  //avatar={<Avatar src={item.avatar} />}
-                  title={`Transferencia No. ${item.clave}`}
-                  description={item.fecha}
-                />
-                {`${item.comentario}`}
-              </List.Item>
-            </Link>
+            <List.Item
+              key={item.clave}
+              onClick={() => {
+                setVisible(true);
+                setClave(item.clave);
+              }}
+            >
+              <List.Item.Meta
+                //avatar={<Avatar src={item.avatar} />}
+                title={`Movimiento No. ${item.clave}`}
+                description={item.fecha}
+              />
+              {`${item.comentario}`}
+            </List.Item>
           </Badge.Ribbon>
         )}
       />
       <br />
       <Link to='/almacen/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Nueva Transferencia
+          Añadir Nueva Movimiento
         </Button>
       </Link>
+      <ModalMovimiento
+        visible={visible}
+        clave={clave}
+        setVis={() => {
+          setVisible(false);
+          setClave('');
+        }}
+      />
     </>
   );
 };
