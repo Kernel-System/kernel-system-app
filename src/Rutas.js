@@ -116,6 +116,7 @@ const Rutas = () => {
 
       <Route path='/transferencia/' exact component={Tranferencias} />
       <Route path='/transferencia/nuevo' exact component={NuevaTrasferencia} />
+      <Route path='/transferencia/:id' exact component={NuevaTrasferencia} />
 
       {/* Not Found */}
       <Route component={NotFound} />
