@@ -1,7 +1,10 @@
 import ShowProduct from 'components/ensamble/ShowProduct';
 import { useState, useEffect } from 'react';
 import { Typography, Input, Space, Button, Form } from 'antd';
-const { Title, Text } = Typography;
+import HeadingBack from 'components/UI/HeadingBack';
+import TextLabel from 'components/UI/TextLabel';
+
+const { Title } = Typography;
 const { TextArea } = Input;
 
 const Index = () => {
@@ -122,11 +125,12 @@ const Index = () => {
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
     >
-      <Title>Mostrar Ensamble {list.folio}</Title>
-      <Title level={4}>Estado</Title>
-      <Text>{list.estado}</Text>
-      <Title level={4}>Empleado de Ensamble</Title>
-      <Text>{list.empleado_orden}</Text>
+      <HeadingBack title={`Mostrar Ensamble ${list.folio}`} />
+      <TextLabel title='Estado' description={list.estado} />
+      <TextLabel
+        title='Empleado de Ensamble'
+        description={list.empleado_orden}
+      />
       <ShowProduct
         titulo='Tarjeta Madre'
         tag='tarjeta_madre'
@@ -187,12 +191,9 @@ const Index = () => {
         filas={list.productos.sistema_operativo}
         onChanged={changeSeries}
       />
-      <Title level={4}>Descripción</Title>
       <Space direction='vertical' style={{ width: '100%' }}>
-        <Text>{list.descripcion}</Text>
-        <Title level={4} style={{ marginTop: '20px' }}>
-          Observaciones
-        </Title>
+        <TextLabel title='Descripción' description={list.descripcion} />
+        <Title level={5}>Observaciones</Title>
         <Form.Item
           name='observacion'
           rules={[
