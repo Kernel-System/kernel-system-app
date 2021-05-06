@@ -1,5 +1,5 @@
 import { Col, Pagination, Row, Select, Space, Typography } from 'antd';
-import Order from 'components/Orders/Order';
+import Order from 'components/Orders/OrderCard';
 import Heading from 'components/UI/Heading';
 const { Text } = Typography;
 
@@ -16,7 +16,7 @@ const Orders = () => {
   return (
     <>
       <Heading title='Mis pedidos' />
-      <Row justify='space-between'>
+      <Row justify='space-between' gutter={[16, 16]}>
         <Col>
           <Space>
             <Text>Ordenes realizadas en:</Text>
@@ -31,14 +31,15 @@ const Orders = () => {
           <Text>Mostrando 2 de 2 pedidos</Text>
         </Col>
       </Row>
-      <Space direction='vertical' size='large' style={{ width: '100%' }}>
-        <div>
-          <Order data={data} />
-          <Order data={data} />
-          <Order data={data} />
-        </div>
-        <Pagination defaultCurrent={1} total={50} />
+      <Space
+        direction='vertical'
+        style={{ width: '100%', marginBottom: '1em' }}
+      >
+        <Order data={data} />
+        <Order data={data} />
+        <Order data={data} />
       </Space>
+      <Pagination defaultCurrent={1} total={50} />
     </>
   );
 };

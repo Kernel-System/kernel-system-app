@@ -14,7 +14,7 @@ import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { formatPrice } from 'utils';
 const { Title, Paragraph } = Typography;
 
-const Order = ({ data }) => {
+const OrderCard = ({ data }) => {
   const breakpoint = useBreakpoint();
 
   return (
@@ -80,4 +80,4 @@ const Order = ({ data }) => {
   );
 };
 
-export default Order;
+export default OrderCard;
