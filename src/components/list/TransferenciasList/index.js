@@ -11,7 +11,7 @@ const Index = ({ list }) => {
   }
   return (
     <>
-      <Title>Transferencias</Title>
+      <Title level={3}>Transferencias</Title>
       <Text>Filtrar por:</Text>
       <br />
       <Select
