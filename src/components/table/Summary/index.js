@@ -1,8 +1,8 @@
-import './styles.css';
-import { Card, Button, Typography } from 'antd';
-const { Text } = Typography;
+import { Card, Button, Typography, Row, Divider } from 'antd';
+import { formatPrice } from 'utils';
+const { Title, Paragraph } = Typography;
 
-const Index = ({ list }) => {
+const Summary = ({ list }) => {
   const lista = [
     {
       nombre: '',
@@ -21,71 +21,83 @@ const Index = ({ list }) => {
   ];
 
   return (
-    <div className='site-card-border-less-wrapper'>
-      <Card style={{ width: 300, position: 'absolute', bottom: 10, right: 10 }}>
-        <Text style={{ float: 'left' }}>Subtotal</Text>
-        <Text style={{ float: 'right' }}>
-          {lista.reduce(
-            (total, product) => total + product.precio * product.cantidad,
-            0
+    <Card>
+      <Row justify='space-between'>
+        <Paragraph>Subtotal</Paragraph>
+        <Paragraph>
+          {formatPrice(
+            lista.reduce(
+              (total, product) => total + product.precio * product.cantidad,
+              0
+            )
           )}
-        </Text>
-        <br />
-        <Text style={{ float: 'left' }}>Descuento</Text>
-        <Text style={{ float: 'right' }}>
-          {lista.reduce(
-            (total, product) =>
-              total +
-              (product.descuento !== 0
-                ? product.precio * product.cantidad * (product.descuento / 100)
-                : 0),
-            0
+        </Paragraph>
+      </Row>
+      <Row justify='space-between'>
+        <Paragraph>IVA</Paragraph>
+        <Paragraph>
+          {formatPrice(
+            lista.reduce(
+              (total, product) =>
+                total +
+                (product.iva !== 0
+                  ? product.precio *
+                    product.cantidad *
+                    ((100 - product.descuento) / 100) *
+                    (product.iva / 100)
+                  : 0),
+              0
+            )
           )}
-        </Text>
-        <br />
-        <Text style={{ float: 'left' }}>IVA</Text>
-        <Text style={{ float: 'right' }}>
-          {lista.reduce(
-            (total, product) =>
-              total +
-              (product.iva !== 0
-                ? product.precio *
+        </Paragraph>
+      </Row>
+      <Row justify='space-between'>
+        <Paragraph>Descuento</Paragraph>
+        <Paragraph>
+          -
+          {formatPrice(
+            lista.reduce(
+              (total, product) =>
+                total +
+                (product.descuento !== 0
+                  ? product.precio *
+                    product.cantidad *
+                    (product.descuento / 100)
+                  : 0),
+              0
+            )
+          )}
+        </Paragraph>
+      </Row>
+      <Row justify='space-between'>
+        <Paragraph>Envío</Paragraph>
+        <Paragraph>{formatPrice(0)}</Paragraph>
+      </Row>
+      {/* <Divider /> */}
+      <Row justify='space-between'>
+        <Title level={4} style={{ margin: 0 }}>
+          Total
+        </Title>
+        <Title level={4} style={{ margin: 0 }}>
+          {formatPrice(
+            lista.reduce(
+              (total, product) =>
+                total +
+                product.precio *
                   product.cantidad *
                   ((100 - product.descuento) / 100) *
-                  (product.iva / 100)
-                : 0),
-            0
+                  ((100 + product.iva) / 100),
+              0
+            )
           )}
-        </Text>
-        <br />
-        <Text style={{ float: 'left' }}>Envío</Text>
-        <Text style={{ float: 'right' }}>0</Text>
-        <br />
-        <Text strong style={{ float: 'left' }}>
-          Total
-        </Text>
-        <Text strong style={{ float: 'right' }}>
-          {lista.reduce(
-            (total, product) =>
-              total +
-              product.precio *
-                product.cantidad *
-                ((100 - product.descuento) / 100) *
-                ((100 + product.iva) / 100),
-            0
-          )}
-        </Text>
-        <br />
-        <br />
-        <Button
-          type='primary'
-          style={{ display: 'flex', justifyContent: 'center' }}
-        >
-          SOLICITAR ORDEN DE COMPRA
-        </Button>
-      </Card>
-    </div>
+        </Title>
+      </Row>
+      <Divider />
+      <Button type='primary' block>
+        Solicitar orden de compra
+      </Button>
+    </Card>
   );
 };
 
-export default Index;
+export default Summary;
