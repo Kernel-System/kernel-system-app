@@ -8,12 +8,11 @@ import {
   Select,
   message,
   DatePicker,
-  PageHeader,
 } from 'antd';
+import HeadingBack from 'components/UI/HeadingBack';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import InputForm from 'components/shared/InputForm';
 import CantidadTable from 'components/table/CantidadTable';
-import { useHistory } from 'react-router-dom';
 const { Search } = Input;
 const { Option } = Select;
 
@@ -21,12 +20,12 @@ const { Title } = Typography;
 
 const Index = () => {
   const breakpoint = useBreakpoint();
-  const history = useHistory();
 
   const onFinish = (values: any) => {
     console.log(values);
     message.success('Success');
   };
+
   const onFinishFailed = (errorInfo: any) => {
     message.error('Error al llenar los datos.');
   };
@@ -39,14 +38,7 @@ const Index = () => {
 
   return (
     <div>
-      <PageHeader
-        className='site-page-header'
-        onBack={() => {
-          history.goBack();
-        }}
-        title={<Title level={3}>Transferencia</Title>}
-        style={{ padding: 0, marginBottom: '10px' }}
-      />
+      <HeadingBack title='Transferencia' />
       <Form
         name='nueva_transferencia'
         initialValues={{
