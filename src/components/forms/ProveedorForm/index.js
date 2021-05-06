@@ -2,44 +2,11 @@ import React, { useEffect, useCallback } from 'react';
 import 'antd/dist/antd.css';
 import { Form, Input, Button } from 'antd';
 import { Typography } from 'antd';
-import { Row, Col } from 'antd';
+
+import { itemsToGrid } from 'utils/gridUtils';
 
 const { Item } = Form;
 const { Title } = Typography;
-
-const itemsToGrid = (array, nRows, nCols, colSpan, horizGutter) => {
-  const grid = [];
-  let index = 0;
-  let rowIdx = 0;
-
-  while (rowIdx < nRows || nRows === 'auto') {
-    if (index >= array.length) break;
-
-    let colIdx = 0;
-    const cols = [];
-
-    while (colIdx < nCols) {
-      const element = array[index];
-      cols.push(
-        <Col xs={colSpan * nCols} xl={colSpan} key={colIdx}>
-          {element}
-        </Col>
-      );
-
-      colIdx++;
-      index++;
-    }
-
-    const row = (
-      <Row gutter={[horizGutter]} key={rowIdx}>
-        {cols}
-      </Row>
-    );
-    grid.push(row);
-    rowIdx++;
-  }
-  return grid;
-};
 
 const Index = (props) => {
   const [form] = Form.useForm();
@@ -196,14 +163,13 @@ const Index = (props) => {
 
   return (
     <>
-      <Title level={2}>Datos del proveedor</Title>
       <Form form={form} name='proveedor-form'>
         <Title level={4}>General</Title>
-        {itemsToGrid(camposGeneral.props.children, 'auto', 2, 8, 16)}
+        {itemsToGrid(camposGeneral.props.children, 'auto', 2, 16)}
         <Title level={4}>Info. de cuenta</Title>
-        {itemsToGrid(camposCuenta.props.children, 'auto', 2, 8, 16)}
+        {itemsToGrid(camposCuenta.props.children, 'auto', 2, 16)}
         <Title level={4}>Domicilio</Title>
-        {itemsToGrid(camposDomicilio.props.children, 'auto', 2, 8, 16)}
+        {itemsToGrid(camposDomicilio.props.children, 'auto', 2, 16)}
         <Form.Item>
           <Button type='primary' htmlType='submit'>
             {props.submitText}

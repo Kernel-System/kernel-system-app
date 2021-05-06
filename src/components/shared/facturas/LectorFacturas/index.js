@@ -52,13 +52,13 @@ const Index = ({ onSuccess }) => {
   return (
     <div>
       <Dragger {...props}>
-        <p className="ant-upload-drag-icon">
+        <p className='ant-upload-drag-icon'>
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">
+        <p className='ant-upload-text'>
           Haga clic o arrastre un archivo a esta area para subirlo
         </p>
-        <p className="ant-upload-hint">
+        <p className='ant-upload-hint'>
           Suba una factura en formato .xml para leer los datos del comprobante.
         </p>
       </Dragger>

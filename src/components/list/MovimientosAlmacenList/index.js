@@ -45,7 +45,7 @@ const Index = ({ list }) => {
         )}
       />
       <br />
-      <Link to='/ensambles/nuevo'>
+      <Link to='/almacen/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nueva Transferencia
         </Button>
