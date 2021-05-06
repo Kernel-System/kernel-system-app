@@ -8,6 +8,9 @@ import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
 import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
 import FacturarTicket from './pages/FacturarTicket';
 
+import MovimientosAlmacen from './pages/almacen/MovimientosAlmacen';
+import NuevoMovimiento from './pages/almacen/NuevoMovimiento';
+
 import './App.css';
 import Layout from './pages/Layout';
 import ProveedorList from './components/list/ProveedorList';
@@ -60,6 +63,9 @@ const App = () => {
         </Route>
         {/* facturar ticket */}
         <Route path='/facturar_ticket' exact component={FacturarTicket}></Route>
+        {/* Movimientos de almacen */}
+        <Route path='/almacen' exact component={MovimientosAlmacen} />
+        <Route path='/almacen/nuevo' exact component={NuevoMovimiento} />
       </Switch>
     </Layout>
   );
