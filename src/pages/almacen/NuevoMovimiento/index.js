@@ -1,6 +1,8 @@
 import { Input, Button, Typography, Form, Select, message } from 'antd';
 import InputForm from 'components/shared/InputForm';
 import AlmacenTable from 'components/table/NuevoAlmacenTable';
+import HeadingBack from 'components/UI/HeadingBack';
+
 const { Search } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -55,8 +57,8 @@ const index = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <Title>Almacén</Title>
-        <Title level={4}>Concepto</Title>
+        <HeadingBack title='Almacén' />
+        <Title level={5}>Concepto</Title>
         <Form.Item
           key='concepto'
           name='concepto'
@@ -72,7 +74,6 @@ const index = () => {
             style={{ width: '50%' }}
             placeholder='Concepto'
             optionFilterProp='children'
-            size='large'
             onChange={(value) => {
               handleChange(value);
             }}
@@ -89,47 +90,47 @@ const index = () => {
             <Option value='2'>XD</Option>
           </Select>
         </Form.Item>
-        <Title level={2}>Justificación</Title>
+        <Title level={4}>Justificación</Title>
         <Text type='secondary'>
           Debe llenar mínimo 1 de los campos a continuación.
         </Text>
 
-        <Title level={4}>Folio de RMA</Title>
+        <Title level={5}>Folio de RMA</Title>
         <InputForm
           titulo='rma'
           mensaje='Asignar RMA.'
           placeholder='RMA'
           required={false}
         />
-        <Title level={4}>Número de Factura</Title>
+        <Title level={5}>Número de Factura</Title>
         <InputForm
           titulo='no_factura'
           mensaje='Asignar un número de factura.'
           placeholder='Número de factura'
           required={false}
         />
-        <Title level={4}>Número de Devolución</Title>
+        <Title level={5}>Número de Devolución</Title>
         <InputForm
           titulo='no_devolucion'
           mensaje='Asignar un número de devolución.'
           placeholder='Número de devolución'
           required={false}
         />
-        <Title level={4}>Número de Ensamble</Title>
+        <Title level={5}>Número de Ensamble</Title>
         <InputForm
           titulo='no_ensamble'
           mensaje='Asignar un número de ensamble.'
           placeholder='Número de ensamble'
           required={false}
         />
-        <Title level={4}>Solicitud de Transferencia</Title>
+        <Title level={5}>Solicitud de Transferencia</Title>
         <InputForm
           titulo='no_transferencia'
           mensaje='Asignar una solicitud de transferencia.'
           placeholder='Solicitud de transferencia.'
           required={false}
         />
-        <Title level={4}>Comentario</Title>
+        <Title level={5}>Comentario</Title>
         <Form.Item
           name='comentario'
           rules={[
@@ -150,12 +151,11 @@ const index = () => {
             style={{ fontSize: '20' }}
           />
         </Form.Item>
-        <Title level={4}>Productos</Title>
+        <Title level={5}>Productos</Title>
         <Search
           placeholder='Ingrese nombre del producto/codigo.'
           allowClear
           enterButton='Buscar'
-          size='large'
           onSearch={onSearch}
         />
 
