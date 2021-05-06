@@ -42,14 +42,14 @@ const Index = ({ list }) => {
                   title={`Transferencia No. ${item.id}`}
                   description={item.fechasolicitud}
                 />
-                {`De ${item.almacen_origen} a ${item.almacen_destino}`}
+                {`Del almacen ${item.almacen_origen}, al almacen ${item.almacen_destino}`}
               </List.Item>
             </Link>
           </Badge.Ribbon>
         )}
       />
       <br />
-      <Link to='/ensambles/nuevo'>
+      <Link to='/transferencia/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nueva Transferencia
         </Button>

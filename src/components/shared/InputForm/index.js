@@ -1,6 +1,15 @@
 import { Input, Form } from 'antd';
 
-const Index = ({ titulo, mensaje, placeholder, type, required, onBlurred }) => {
+const Index = ({
+  titulo,
+  mensaje,
+  placeholder,
+  type,
+  required = true,
+  onBlurred,
+  valueDef = '',
+  enable = false,
+}) => {
   return (
     <div>
       <Form.Item
@@ -29,9 +38,11 @@ const Index = ({ titulo, mensaje, placeholder, type, required, onBlurred }) => {
       >
         <Input
           key={`${titulo}input`}
-          size='large'
+          //size='large'
           placeholder={placeholder}
           style={{ width: '100%' }}
+          defaultValue={valueDef}
+          disabled={enable}
         />
       </Form.Item>
     </div>

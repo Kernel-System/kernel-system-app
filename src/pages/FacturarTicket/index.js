@@ -3,7 +3,6 @@ import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import InputForm from 'components/shared/InputForm';
 const { Search } = Input;
 const { Option } = Select;
-
 const { Title } = Typography;
 
 const Index = () => {
