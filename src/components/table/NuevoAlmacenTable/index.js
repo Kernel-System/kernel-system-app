@@ -88,7 +88,6 @@ const Index = () => {
         <Input
           key={`${fila.key}${actual}`}
           placeholder='Número de Serie'
-          size='large'
           style={{ width: '100%', marginBottom: '10px' }}
           onBlur={(e) => {
             changeSerie(e.target.value, indice, actual);

@@ -115,7 +115,7 @@ const Index = () => {
 
   const columns = [
     {
-      title: 'Imagen',
+      title: 'IMAGEN',
       dataIndex: 'image',
       width: '40px',
       //fixed: "left",
