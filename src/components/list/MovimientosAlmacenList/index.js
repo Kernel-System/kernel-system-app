@@ -11,7 +11,7 @@ const Index = ({ list }) => {
   }
   return (
     <>
-      <Title>Movimientos de almacén</Title>
+      <Title level={3}>Movimientos de almacén</Title>
       <Text>Filtrar por Concepto:</Text>
       <br />
       <Select defaultValue='1' style={{ width: 120 }} onChange={handleChange}>
