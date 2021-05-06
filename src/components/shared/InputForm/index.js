@@ -1,16 +1,21 @@
 import { Input, Form } from 'antd';
 
-const Index = ({ titulo, mensaje, placeholder, type, onBlurred }) => {
+const Index = ({ titulo, mensaje, placeholder, type, required, onBlurred }) => {
   return (
     <div>
       <Form.Item
         key={titulo}
         name={titulo}
         rules={[
-          {
-            required: true,
-            message: `${mensaje}`,
-          },
+          required === false
+            ? {
+                required: false,
+                message: `${mensaje}`,
+              }
+            : {
+                required: true,
+                message: `${mensaje}`,
+              },
           type === 'email'
             ? {
                 type: 'email',
