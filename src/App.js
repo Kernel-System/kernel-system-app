@@ -7,12 +7,14 @@ import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
 import Home from 'pages/Home';
 import Layout from 'pages/Layout';
 import NotFound from 'pages/NotFound';
-import Orders from 'pages/Orders';
+import Order from 'pages/orders/Order';
+import Orders from 'pages/orders/Orders';
 import Product from 'pages/Product';
 import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
+import PuntoDeVenta from 'pages/PuntoDeVenta';
 import Search from 'pages/Search';
 import { Route, Switch } from 'react-router';
 import './App.css';
@@ -74,7 +76,7 @@ const App = () => {
         {/* Search Product */}
         <Route path='/b/:query' exact component={Search} />
         <Route path='/c/:query' exact component={Search} />
-        <Route path='/p/:id' exact component={Product} />
+        <Route path='/producto/:id' exact component={Product} />
 
         {/* Cart */}
         <Route path='/lista-de-compra' exact component={Cart} />
@@ -84,17 +86,24 @@ const App = () => {
 
         {/* Orders */}
         <Route path='/mis-pedidos' exact component={Orders} />
+        <Route path='/pedido/:id' exact component={Order} />
 
-        {/* Ensambles */}
+        {/* Proveedores */}
         <Route path='/proveedores' exact>
           <ProveedorList list={lista} />
         </Route>
+
+        {/* Ensambles */}
         <Route path='/ensambles' exact component={Ensambles} />
         <Route path='/ensambles/nuevo' exact component={AgregarEnsambles} />
         <Route path='/ensambles/:id' exact component={ModificarEnsambles} />
 
         {/* Facturar ticket */}
         <Route path='/facturar_ticket' exact component={FacturarTicket} />
+
+        {/* Punto de venta */}
+        <Route path='/venta' exact component={PuntoDeVenta} />
+        <Route path='/venta/nueva' exact component={PuntoDeVenta} />
 
         {/* Not Found */}
         <Route component={NotFound} />
