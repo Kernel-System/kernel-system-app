@@ -1,6 +1,6 @@
 import { Input, Button, Typography, Row, Col, Form, Select, Alert } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import InputForm from 'components/shared/ProductCard/InputForm';
+import InputForm from 'components/shared/InputForm';
 const { Search } = Input;
 const { Option } = Select;
 

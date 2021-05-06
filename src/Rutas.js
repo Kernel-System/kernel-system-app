@@ -19,6 +19,8 @@ import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
 import Ensambles from './pages/ensamble/Ensambles';
 import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
 import FacturarTicket from './pages/FacturarTicket';
+import MovimientosAlmacen from './pages/almacen/MovimientosAlmacen';
+import NuevoMovimiento from './pages/almacen/NuevoMovimiento';
 
 const asyncForgotPassword = asyncComponent(() =>
   import('pages/auth/ForgotPassword')
@@ -95,6 +97,13 @@ const Rutas = () => {
 
       {/* Facturar ticket */}
       <Route path='/facturar_ticket' exact component={FacturarTicket} />
+
+      {/* Almacen */}
+      <Route path='/facturar_ticket' exact component={FacturarTicket}></Route>
+
+      {/* Movimientos de almacen */}
+      <Route path='/almacen' exact component={MovimientosAlmacen} />
+      <Route path='/almacen/nuevo' exact component={NuevoMovimiento} />
 
       {/* Not Found */}
       <Route component={NotFound} />
