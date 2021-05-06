@@ -35,7 +35,7 @@ const Index = ({ list }) => {
         dataSource={list}
         renderItem={(item) => (
           <Badge.Ribbon text={item.estado}>
-            <Link to={`/ensambles/${item.id}`}>
+            <Link to={`/transferencia/${item.id}`}>
               <List.Item key={item.id}>
                 <List.Item.Meta
                   //avatar={<Avatar src={item.avatar} />}
