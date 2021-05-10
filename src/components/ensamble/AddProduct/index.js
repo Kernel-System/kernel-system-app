@@ -1,9 +1,9 @@
-import { Select, Input, Button, Typography, Space, Row, Col, Form } from 'antd';
+import { Select, Input, Button, Space, Row, Col, Form } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import TextLabel from 'components/UI/TextLabel';
 const { Option } = Select;
-const { Title } = Typography;
 
 const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
   const breakpoint = useBreakpoint();
@@ -48,9 +48,9 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
 
   return (
     <div style={{ marginBottom: '20px' }}>
-      <Title level={4}>
-        {isNeeded === false ? `${titulo} (Opcional)` : `${titulo}`}
-      </Title>
+      <TextLabel
+        title={isNeeded === false ? `${titulo} (Opcional)` : `${titulo}`}
+      />
       {filas.map((fila) => (
         <Row key={fila.id} gutter={[16, 24]} style={{ marginBottom: '10px' }}>
           <Col className='gutter-row' xs={24} lg={12}>
@@ -68,7 +68,6 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
               <Select
                 showSearch
                 key={fila.id}
-                size='large'
                 style={{ width: '100%' }}
                 placeholder='Buscar producto'
                 optionFilterProp='children'
@@ -91,7 +90,6 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Input
               placeholder='Número de Serie'
-              size='large'
               style={{ width: '100%' }}
               disabled={true}
             />
