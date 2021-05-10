@@ -1,5 +1,6 @@
-import { Button, Card, Col, Radio, Row, Space, Typography } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Radio, Row, Space, Typography } from 'antd';
+import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';
 import { useState } from 'react';
 const { Paragraph } = Typography;
@@ -16,7 +17,9 @@ const Cart = () => {
       <Button danger icon={<DeleteOutlined />}>
         Vaciar Lista
       </Button>
-      TABLE
+
+      <div>TABLE</div>
+
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12} lg={6}>
           <Card size='small' title='Tipo de entrega'>
@@ -80,7 +83,7 @@ const Cart = () => {
           </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
-          SUMMARY
+          <Summary />
         </Col>
       </Row>
     </>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
-import Header from '../../components/layout/Header';
-import Content from '../../components/layout/Content';
-import Footer from '../../components/layout/Footer';
-import Sider from '../../components/layout/Sider';
+import Header from 'components/layout/Header';
+import Content from 'components/layout/Content';
+import Footer from 'components/layout/Footer';
+import Sider from 'components/layout/Sider';
 
 const Index = ({ children }) => {
   const [collapsed, useCollapsed] = useState(true);

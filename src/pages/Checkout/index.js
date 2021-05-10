@@ -7,12 +7,10 @@ import {
 } from '@ant-design/icons';
 import {
   Alert,
-  Avatar,
   Button,
   Col,
   Divider,
   Image,
-  List,
   message,
   Row,
   Steps,
@@ -21,7 +19,9 @@ import {
 } from 'antd';
 import LoginForm from 'components/auth/Login/LoginForm';
 import AddressCard from 'components/shared/AddressCard';
+import BoughtProductsList from 'components/shared/BoughtProductsList';
 import Heading from 'components/UI/Heading';
+import TextLabel from 'components/UI/TextLabel';
 import { useEffect, useState } from 'react';
 import { formatPrice } from 'utils';
 const { Title, Paragraph } = Typography;
@@ -94,6 +94,9 @@ const Checkout = () => {
             <Col xs={24} md={12} lg={8}>
               <AddressCard />
             </Col>
+            <Col xs={24} md={12} lg={8}>
+              <AddressCard nueva />
+            </Col>
           </Row>
         </Tabs.TabPane>
         <Tabs.TabPane key='2'>Lo mismo que la 2</Tabs.TabPane>
@@ -134,43 +137,15 @@ const Checkout = () => {
           <Heading title='Gracias, has realizado tu pedido' />
           <Row>
             <Col xs={24} md={12}>
-              <Title level={5} orientation='left'>
-                Número de pedido
-              </Title>
-              <Paragraph type='secondary'>1237578</Paragraph>
-              <Title level={5} orientation='left'>
-                Factura electrónica (CFDI)
-              </Title>
-              <Paragraph type='secondary'>
-                Tendrás 24 horas después de realizar tu pedido para solicitar tu
-                factura electrónica (CFDI) a través de “Mis pedidos”.
-              </Paragraph>
-              <Title level={5} orientation='left'>
-                Total
-              </Title>
-              <Paragraph type='secondary'>{formatPrice(420)}</Paragraph>
-              <Title level={5} orientation='left'>
-                Productos adquiridos
-              </Title>
-              <List
-                dataSource={data}
-                renderItem={(item) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          size='large'
-                          shape='square'
-                          src='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
-                        />
-                      }
-                      title={<a href='https://ant.design'>{item}</a>}
-                      description={formatPrice(420)}
-                    />
-                    <Paragraph>x1</Paragraph>
-                  </List.Item>
-                )}
+              <TextLabel title='Número de pedido' description='1237578' />
+              <TextLabel
+                title='Factura electrónica (CFDI)'
+                description='Tendrás 24 horas después de realizar tu pedido para solicitar tu
+                factura electrónica (CFDI) a través de “Mis pedidos”.'
               />
+              <TextLabel title='Total' description={formatPrice(420)} />
+              <TextLabel title='Productos adquiridos' />
+              <BoughtProductsList data={data} />
             </Col>
             <Col
               xs={24}

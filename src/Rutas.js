@@ -1,25 +1,33 @@
-import { Route, Switch } from 'react-router';
 import asyncComponent from 'hoc/asyncComponent';
+import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
+import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Login from 'pages/auth/Login';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
+import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
+import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
+import Ensambles from 'pages/ensamble/Ensambles';
+import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
+import FacturarTicket from 'pages/FacturarTicket';
 import Home from 'pages/Home';
 import NotFound from 'pages/NotFound';
-import Orders from 'pages/Orders';
+import Order from 'pages/orders/Order';
+import Orders from 'pages/orders/Orders';
 import Product from 'pages/Product';
 import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
-import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
 import ProveedorList from './components/list/ProveedoresList';
 import ComprasList from 'components/list/ComprasList';
-import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
-import Ensambles from './pages/ensamble/Ensambles';
-import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
-import FacturarTicket from './pages/FacturarTicket';
+import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
+import Venta from 'pages/ventas/Venta';
+import { Route, Switch } from 'react-router';
+
+import Tranferencias from './pages/almacen/Transferencias';
+import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 
 const asyncForgotPassword = asyncComponent(() =>
   import('pages/auth/ForgotPassword')
@@ -62,9 +70,9 @@ const Rutas = () => {
       <Route path='/direcciones/nueva' exact component={NewAddress} />
 
       {/* Profile */}
-      <Route path='/u/:id' exact component={Profile} />
+      <Route path='/perfil' exact component={Profile} />
       <Route
-        path='/u/:id/cambiar-contrasena'
+        path='/perfil/cambiar-contrasena'
         exact
         component={ChangePassword}
       />
@@ -81,7 +89,19 @@ const Rutas = () => {
       <Route path='/checkout' exact component={Checkout} />
 
       {/* Orders */}
-      <Route path='/mis-pedidos' exact component={Orders} />
+      <Route path='/pedidos' exact component={Orders} />
+      <Route path='/pedidos/:id' exact component={Order} />
+
+      {/* Punto de venta */}
+      <Route path='/venta' exact component={PuntoDeVenta} />
+      <Route path='/venta/nueva' exact component={Venta} />
+
+      {/* Proveedores */}
+      <Route path='/registrar-compra' exact component={RegistrarCompra} />
+      <Route path='/proveedores' exact>
+        <ProveedorList list={listaProveedores} />
+      </Route>
+      <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
 
       {/* Proveedores */}
       <Route path='/proveedores' exact>
@@ -102,6 +122,14 @@ const Rutas = () => {
 
       {/* Facturar ticket */}
       <Route path='/facturar_ticket' exact component={FacturarTicket} />
+
+      {/* Movimientos de almacen */}
+      <Route path='/almacen' exact component={MovimientosAlmacen} />
+      <Route path='/almacen/nuevo' exact component={NuevoMovimiento} />
+
+      <Route path='/transferencia/' exact component={Tranferencias} />
+      <Route path='/transferencia/nuevo' exact component={NuevaTrasferencia} />
+      <Route path='/transferencia/:id' exact component={NuevaTrasferencia} />
 
       {/* Not Found */}
       <Route component={NotFound} />

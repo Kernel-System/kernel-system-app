@@ -1,5 +1,4 @@
 import 'App.css';
-
 import Layout from 'pages/Layout';
 import Rutas from 'Rutas';
 
