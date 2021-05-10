@@ -1,10 +1,8 @@
-import { PageHeader } from 'antd';
 import React, { useState } from 'react';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
-import { Typography, Breadcrumb } from 'antd';
-import { Link } from 'react-router-dom';
 import CompraForm from 'components/forms/CompraForm';
-import { useHistory } from 'react-router';
+import Header from 'components/UI/HeadingBack';
+import { Typography } from 'antd';
 
 const { Title } = Typography;
 
@@ -38,24 +36,10 @@ const Index = () => {
     metodo_pago: '',
   };
   const [compra, setCompra] = useState(compraInicial);
-  const history = useHistory();
 
   return (
     <>
-      <PageHeader
-        className='site-page-header'
-        onBack={() => history.goBack()}
-        title='Registrar compra'
-        subTitle={null}
-        style={{ padding: '0 0 12px 0' }}
-      />
-      {/* <Breadcrumb>
-        <Link to='/compras'>
-          <Breadcrumb.Item>Compras</Breadcrumb.Item>
-        </Link>
-        <Breadcrumb.Item>Registrar compra</Breadcrumb.Item>
-      </Breadcrumb> */}
-      {/* <Title>Registrar compra</Title> */}
+      <Header title='Registrar compra' />
       <LectorFacturas onSuccess={onFacturaLeida} />
       <br />
       <Title level={4}>Datos de compra</Title>
