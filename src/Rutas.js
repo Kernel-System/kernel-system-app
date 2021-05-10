@@ -27,6 +27,9 @@ import { Route, Switch } from 'react-router';
 
 import Tranferencias from './pages/almacen/Transferencias';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
+import Cuentas from './pages/pagos/Cuentas';
+import Pagos from './pages/pagos/Pagos';
+import PagoNuevo from './pages/pagos/PagoNuevo';
 
 const asyncForgotPassword = asyncComponent(() =>
   import('pages/auth/ForgotPassword')
@@ -117,6 +120,11 @@ const Rutas = () => {
       <Route path='/transferencia/' exact component={Tranferencias} />
       <Route path='/transferencia/nuevo' exact component={NuevaTrasferencia} />
       <Route path='/transferencia/:id' exact component={NuevaTrasferencia} />
+
+      {/* pagos */}
+      <Route path='/cuentas/' exact component={Cuentas} />
+      <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
+      <Route path='/cuentas/pagos/:id' exact component={Pagos} />
 
       {/* Not Found */}
       <Route component={NotFound} />
