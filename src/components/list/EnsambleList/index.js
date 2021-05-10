@@ -11,7 +11,7 @@ const Index = ({ list }) => {
   }
   return (
     <>
-      <Title>Órdenes de Ensamble</Title>
+      <Title level={3}>Órdenes de Ensamble</Title>
       <Text>Ordenar por Estado:</Text>
       <br />
       <Select
