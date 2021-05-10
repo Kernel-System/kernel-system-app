@@ -1,6 +1,7 @@
 import AddProduct from 'components/ensamble/AddProduct';
 import { useState } from 'react';
 import { Typography, Input, Space, Button, Form, Select } from 'antd';
+import HeadingBack from 'components/UI/HeadingBack';
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -52,8 +53,8 @@ const Index = () => {
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
     >
-      <Title>Nuevo Ensamble</Title>
-      <Title level={4}>Empleado de Ensamble</Title>
+      <HeadingBack title='Nuevo Ensamble' />
+      <Title level={5}>Empleado de Ensamble</Title>
       <Form.Item
         name='ensamblador asignado'
         rules={[
@@ -134,7 +135,7 @@ const Index = () => {
         noAdd={true}
         onChanged={changeProducts}
       />
-      <Title level={4}>Descripción</Title>
+      <Title level={5}>Descripción</Title>
       <Space direction='vertical' style={{ width: '100%' }}>
         <Form.Item
           name='descripcion'
@@ -157,7 +158,7 @@ const Index = () => {
             style={{ fontSize: '20' }}
           />
         </Form.Item>
-        <Title level={4}>Observaciones</Title>
+        <Title level={5}>Observaciones</Title>
         <Form.Item
           name='observacion'
           rules={[
