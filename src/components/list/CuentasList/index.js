@@ -17,27 +17,12 @@ const Index = ({ list }) => {
   // Por verificar
   return (
     <>
-      <Title>Cuentas</Title>
-      <Select
-        showSearch
-        style={{ width: '100%' }}
-        placeholder='Selecciona un proveedor'
-        optionFilterProp='children'
-        onSearch={onSearch}
-        filterOption={(input, option) =>
-          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-        }
-      >
-        <Option value='1'>Trabajador 1</Option>
-        <Option value='2'>Trabajador 2</Option>
-        <Option value='3'>Trabajador 3</Option>
-      </Select>
-      <br />
+      <Title level={3}>Cuentas</Title>
       <Text>Ordenar por:</Text>
       <br />
       <Select defaultValue='1' style={{ width: 120 }} onChange={handleChange}>
-        <Option value='1'>Opcion 1</Option>
-        <Option value='2'>Opcion 2</Option>
+        <Option value='1'>Sin finalizar</Option>
+        <Option value='2'>Finalizada</Option>
       </Select>
       <List
         itemLayout='vertical'
@@ -50,24 +35,24 @@ const Index = ({ list }) => {
         }}
         dataSource={list}
         renderItem={(item) => (
-          <Badge.Ribbon text={item.fecha_entrega}>
-            <Link to={`/ensambles/${item.noCompra}`}>
-              <List.Item key={item.noCompra}>
+          <Badge.Ribbon text={item.estado}>
+            <Link to={`/cuentas/pagos/${item.id_factura}`}>
+              <List.Item key={item.id_factura}>
                 <List.Item.Meta
                   //avatar={<Avatar src={item.avatar} />}
-                  title={`Compra No. ${item.noCompra}`}
-                  description={item.fecha_compra}
+                  title={`Cuenta No. ${item.id_factura}`}
+                  description={`Folio de Factura no. ${item.folio}`}
                 />
-                {`${item.proveedor} $`}
+                {`${item.fecha} $`}
               </List.Item>
             </Link>
           </Badge.Ribbon>
         )}
       />
       <br />
-      <Link to='/ensambles/nuevo'>
+      <Link to='/cuentas/pagos/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Compra
+          Añadir Pago
         </Button>
       </Link>
     </>
