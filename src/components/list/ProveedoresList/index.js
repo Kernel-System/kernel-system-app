@@ -1,11 +1,10 @@
 import './styles.css';
 import { useState } from 'react';
-import { List, Typography, Button, Modal, Input } from 'antd';
+import { List, Button, Modal, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import ProveedorForm from 'components/forms/ProveedorForm';
-
-const { Title } = Typography;
+import Header from 'components/UI/Heading';
 
 const Index = ({ list }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -31,7 +30,7 @@ const Index = ({ list }) => {
 
   return (
     <>
-      <Title>Lista de Proveedores</Title>
+      <Header title='Proveedores' />
       <Input.Search
         onChange={buscarProveedor}
         placeholder='Buscar por RFC'

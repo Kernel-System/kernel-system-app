@@ -5,8 +5,9 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { Row, Col } from 'antd';
 import CompraForm from 'components/forms/CompraForm';
+import Header from 'components/UI/Heading';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 const Index = ({ list }) => {
@@ -99,7 +100,7 @@ const Index = ({ list }) => {
 
   return (
     <>
-      <Title level={2}>Compras</Title>
+      <Header title='Compras' />
       <Row gutter={[16, 12]}>
         <Col xs={24} lg={12}>
           <Select
