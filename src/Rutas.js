@@ -14,7 +14,8 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
-import ProveedorList from './components/list/ProveedorList';
+import ProveedorList from './components/list/ProveedoresList';
+import ComprasList from 'components/list/ComprasList';
 import AgregarEnsambles from './pages/ensamble/AgregarEnsambles';
 import Ensambles from './pages/ensamble/Ensambles';
 import ModificarEnsambles from './pages/ensamble/ModificarEnsamble';
@@ -68,12 +69,6 @@ const Rutas = () => {
         component={ChangePassword}
       />
 
-      <Route path='/registrar-compra' exact component={RegistrarCompra} />
-      <Route path='/proveedores' exact>
-        <ProveedorList list={listaProveedores} />
-      </Route>
-      <Route path='/añadir-proveedor' exact component={AñadirProveedor} />
-
       {/* Search Product */}
       <Route path='/b/:query' exact component={Search} />
       <Route path='/c/:query' exact component={Search} />
@@ -87,6 +82,18 @@ const Rutas = () => {
 
       {/* Orders */}
       <Route path='/mis-pedidos' exact component={Orders} />
+
+      {/* Proveedores */}
+      <Route path='/proveedores' exact>
+        <ProveedorList list={listaProveedores} />
+      </Route>
+      <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
+
+      {/* Compras */}
+      <Route path='/compras' exact>
+        <ComprasList list={listaProveedores} />
+      </Route>
+      <Route path='/compras/registrar' exact component={RegistrarCompra} />
 
       {/* Ensambles */}
       <Route path='/ensambles' exact component={Ensambles} />

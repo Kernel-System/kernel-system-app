@@ -12,9 +12,9 @@ const Index = ({ list }) => {
   const [listElement, setListElement] = useState({});
   const [listToShow, setListToShow] = useState(list);
 
-  const showModal = (listElement) => {
+  const showModal = (listElemenToShow) => {
     setIsModalVisible(true);
-    setListElement(listElement);
+    setListElement(listElemenToShow);
   };
 
   const handleCancel = () => {
@@ -69,7 +69,7 @@ const Index = ({ list }) => {
         )}
       />
       <br />
-      <Link to='/añadir-proveedor'>
+      <Link to='/proveedores/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nuevo Proveedor
         </Button>
