@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
-import { Typography,  Breadcrumb } from 'antd';
+import { Typography,  Breadcrumb , PageHeader} from 'antd';
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
 const { Title } = Typography;
 
@@ -22,18 +23,27 @@ const Index = () => {
         razon_social: '',
     };
     const [proveedor, setProveedor] = useState(proveedorInicial);
+    const history = useHistory();
 
     return (
         <>
-            <Breadcrumb>
+            <PageHeader
+                className='site-page-header'
+                onBack={() => history.goBack()}
+                title="Nuevo proveedor"
+                subTitle={null}
+                style={{ padding: "0 0 12px 0" }}
+            />
+            {/* <Breadcrumb>
                 <Link to='/proveedores'>
                     <Breadcrumb.Item>Proveedores</Breadcrumb.Item>
                 </Link>
                 <Breadcrumb.Item>Agregar proveedor</Breadcrumb.Item>
             </Breadcrumb>
-            <Title>Nuevo proveedor</Title>
+            <Title>Nuevo proveedor</Title> */}
             <LectorFacturas onSuccess={onFacturaLeida} />
-            <Title level={2}>Datos del proveedor</Title>
+            <br/>
+            <Title level={4}>Datos del proveedor</Title>
             <ProveedorForm
                 datosProveedor={proveedor}
                 submitText='AÑADIR PROVEEDOR'
