@@ -1,20 +1,19 @@
 import './styles.css';
 import { useState } from 'react';
-import { List, Typography, Button, Modal, Input } from 'antd';
+import { List, Button, Modal, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import ProveedorForm from 'components/forms/ProveedorForm';
-
-const { Title } = Typography;
+import Header from 'components/UI/Heading';
 
 const Index = ({ list }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
   const [listToShow, setListToShow] = useState(list);
 
-  const showModal = (listElement) => {
+  const showModal = (listElemenToShow) => {
     setIsModalVisible(true);
-    setListElement(listElement);
+    setListElement(listElemenToShow);
   };
 
   const handleCancel = () => {
@@ -31,7 +30,7 @@ const Index = ({ list }) => {
 
   return (
     <>
-      <Title>Lista de Proveedores</Title>
+      <Header title='Proveedores' />
       <Input.Search
         onChange={buscarProveedor}
         placeholder='Buscar por RFC'
@@ -69,7 +68,7 @@ const Index = ({ list }) => {
         )}
       />
       <br />
-      <Link to='/añadir-proveedor'>
+      <Link to='/proveedores/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nuevo Proveedor
         </Button>

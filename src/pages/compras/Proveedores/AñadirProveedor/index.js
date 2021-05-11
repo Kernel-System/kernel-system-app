@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
-import { Typography,  Breadcrumb } from 'antd';
-import { Link } from 'react-router-dom';
+import Header from 'components/UI/HeadingBack'
+import { Typography} from 'antd';
 
 const { Title } = Typography;
 
@@ -25,15 +25,12 @@ const Index = () => {
 
     return (
         <>
-            <Breadcrumb>
-                <Link to='/proveedores'>
-                    <Breadcrumb.Item>Proveedores</Breadcrumb.Item>
-                </Link>
-                <Breadcrumb.Item>Agregar proveedor</Breadcrumb.Item>
-            </Breadcrumb>
-            <Title>Nuevo proveedor</Title>
+            <Header
+                title="Nuevo proveedor"
+            />
             <LectorFacturas onSuccess={onFacturaLeida} />
-            <Title level={2}>Datos del proveedor</Title>
+            <br/>
+            <Title level={4}>Datos del proveedor</Title>
             <ProveedorForm
                 datosProveedor={proveedor}
                 submitText='AÑADIR PROVEEDOR'

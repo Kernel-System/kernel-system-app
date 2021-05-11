@@ -1,4 +1,3 @@
-import ProveedorList from 'components/list/ProveedorList';
 import asyncComponent from 'hoc/asyncComponent';
 import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
@@ -21,6 +20,8 @@ import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
+import ProveedorList from './components/list/ProveedoresList';
+import ComprasList from 'components/list/ComprasList';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import Venta from 'pages/ventas/Venta';
 import { Route, Switch } from 'react-router';
@@ -104,6 +105,18 @@ const Rutas = () => {
         <ProveedorList list={listaProveedores} />
       </Route>
       <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
+
+      {/* Proveedores */}
+      <Route path='/proveedores' exact>
+        <ProveedorList list={listaProveedores} />
+      </Route>
+      <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
+
+      {/* Compras */}
+      <Route path='/compras' exact>
+        <ComprasList list={listaProveedores} />
+      </Route>
+      <Route path='/compras/registrar' exact component={RegistrarCompra} />
 
       {/* Ensambles */}
       <Route path='/ensambles' exact component={Ensambles} />

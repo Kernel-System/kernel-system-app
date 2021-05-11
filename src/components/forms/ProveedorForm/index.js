@@ -15,6 +15,7 @@ const Index = (props) => {
     <>
       <Item
         name='rfc'
+        label='RFC'
         rules={[
           {
             required: true,
@@ -24,11 +25,12 @@ const Index = (props) => {
       >
         <Input placeholder='RFC' />
       </Item>
-      <Form.Item name='nombre'>
+      <Form.Item name='nombre' label='Nombre'>
         <Input placeholder='Nombre' />
       </Form.Item>
       <Form.Item
         name='regimen_fiscal'
+        label='Régimen fiscal'
         rules={[
           {
             required: true,
@@ -40,6 +42,7 @@ const Index = (props) => {
       </Form.Item>
       <Form.Item
         name='razon_social'
+        label='Razón social'
         rules={[
           {
             required: true,
@@ -51,6 +54,7 @@ const Index = (props) => {
       </Form.Item>
       <Form.Item
         name='correo'
+        label='Correo'
         rules={[
           {
             required: true,
@@ -60,11 +64,12 @@ const Index = (props) => {
       >
         <Input placeholder='Correo' />
       </Form.Item>
-      <Form.Item name='sucursal'>
+      <Form.Item name='sucursal' label='Sucursal'>
         <Input placeholder='Sucursal' />
       </Form.Item>
       <Form.Item
         name='telefono'
+        label='Teléfono 1'
         rules={[
           {
             required: true,
@@ -74,72 +79,72 @@ const Index = (props) => {
       >
         <Input placeholder='Teléfono 1' />
       </Form.Item>
-      <Form.Item name='telefono_2'>
+      <Form.Item name='telefono_2' label='Teléfono 2'>
         <Input placeholder='Teléfono 2' />
       </Form.Item>
-      <Form.Item name='tipo'>
+      <Form.Item name='tipo' label='Tipo'>
         <Input placeholder='Tipo' />
       </Form.Item>
-      <Form.Item name='categoria'>
+      <Form.Item name='categoria' label='Categoría'>
         <Input placeholder='Categoría' />
       </Form.Item>
-      <Form.Item name='necesita_orden_compra'>
+      <Form.Item name='necesita_orden_compra' label='Necesita Orden de Compra'>
         <Input placeholder='Necesita Orden de Compra' />
       </Form.Item>
-      <Form.Item name='comentarios'>
+      <Form.Item name='comentarios' label='Comentarios'>
         <Input placeholder='Comentarios' />
       </Form.Item>
     </>
   );
   const camposCuenta = (
     <>
-      <Form.Item name='cuenta_contable'>
+      <Form.Item name='cuenta_contable' label='Cuenta contable'>
         <Input placeholder='Cuenta contable' />
       </Form.Item>
-      <Form.Item name='banco'>
+      <Form.Item name='banco' label='Banco'>
         <Input placeholder='Banco' />
       </Form.Item>
-      <Form.Item name='cuenta'>
+      <Form.Item name='cuenta' label='Cuenta'>
         <Input placeholder='Cuenta' />
       </Form.Item>
-      <Form.Item name='dias_credito'>
+      <Form.Item name='dias_credito' label='Días crédito'>
         <Input placeholder='Días crédito' />
       </Form.Item>
-      <Form.Item name='monto_credito'>
+      <Form.Item name='monto_credito' label='Monto crédito'>
         <Input placeholder='Monto crédito' />
       </Form.Item>
     </>
   );
   const camposDomicilio = (
     <>
-      <Form.Item name='calle'>
+      <Form.Item name='calle' label='Calle'>
         <Input placeholder='Calle' />
       </Form.Item>
-      <Form.Item name='entre_calle_1'>
+      <Form.Item name='entre_calle_1' label='Entre calle 1'>
         <Input placeholder='Entre calle 1' />
       </Form.Item>
-      <Form.Item name='entre_calle_2'>
+      <Form.Item name='entre_calle_2' label='Entre calle 2'>
         <Input placeholder='Entre calle 2' />
       </Form.Item>
-      <Form.Item name='no_interior'>
+      <Form.Item name='no_interior' label='No. interior'>
         <Input placeholder='No. interior' />
       </Form.Item>
-      <Form.Item name='no_exterior'>
+      <Form.Item name='no_exterior' label='No. exterior'>
         <Input placeholder='No. exterior' />
       </Form.Item>
-      <Form.Item name='cp'>
+      <Form.Item name='cp' label='C.P'>
         <Input placeholder='C.P' />
       </Form.Item>
-      <Form.Item name='localidad'>
+      <Form.Item name='localidad' label='Localidad'>
         <Input placeholder='Localidad' />
       </Form.Item>
-      <Form.Item name='municipio'>
+      <Form.Item name='municipio' label='Municipio'>
         <Input placeholder='Municipio' />
       </Form.Item>
-      <Form.Item name='estado'>
+      <Form.Item name='estado' label='Estado'>
         <Input placeholder='Estado' />
       </Form.Item>
-      <Form.Item name='pais'>
+      <Form.Item name='pais' label='País'>
         <Input placeholder='País' />
       </Form.Item>
     </>
@@ -163,12 +168,12 @@ const Index = (props) => {
 
   return (
     <>
-      <Form form={form} name='proveedor-form'>
-        <Title level={4}>General</Title>
+      <Form form={form} name='proveedor-form' layout='vertical'>
+        <Title level={5}>General</Title>
         {itemsToGrid(camposGeneral.props.children, 'auto', 2, 16)}
-        <Title level={4}>Info. de cuenta</Title>
+        <Title level={5}>Info. de cuenta</Title>
         {itemsToGrid(camposCuenta.props.children, 'auto', 2, 16)}
-        <Title level={4}>Domicilio</Title>
+        <Title level={5}>Domicilio</Title>
         {itemsToGrid(camposDomicilio.props.children, 'auto', 2, 16)}
         <Form.Item>
           <Button type='primary' htmlType='submit'>
