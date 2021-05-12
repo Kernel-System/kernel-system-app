@@ -1,15 +1,16 @@
 import './styles.css';
-import { useState } from 'react';
-import { List, Button, Modal, Input } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
+import { Popconfirm, message, List, Button, Modal, Input } from 'antd';
+import { PlusOutlined, DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/Heading';
+import axios from 'axios';
 
 const Index = ({ list }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
-  const [listToShow, setListToShow] = useState(list);
+  const [listToShow, setListToShow] = useState([]);
 
   const showModal = (listElemenToShow) => {
     setIsModalVisible(true);
@@ -20,13 +21,38 @@ const Index = ({ list }) => {
     setIsModalVisible(false);
   };
 
-  const proveedorActualizado = () => {};
+  const actualizarProveedores = (values) => {
+    axios
+      .patch(
+        'https://kernel-system-api.herokuapp.com/items/proveedores/' +
+          values.rfc,
+        values
+      )
+      .then((result) => {
+        console.log(result.data.data);
+      });
+  };
 
   const buscarProveedor = (e) => {
     setListToShow(
       list.filter((item) => item.rfc.includes(e.target.value.toUpperCase()))
     );
   };
+
+  const eliminarProveedor = (values) => {
+    axios.delete(
+      'https://kernel-system-api.herokuapp.com/items/proveedores/' + values.rfc
+    );
+  };
+
+  useEffect(() => {
+    axios
+      .get('https://kernel-system-api.herokuapp.com/items/proveedores')
+      .then((result) => {
+        console.log(result.data.data);
+        setListToShow(result.data.data);
+      });
+  }, []);
 
   return (
     <>
@@ -47,7 +73,27 @@ const Index = ({ list }) => {
         }}
         dataSource={listToShow}
         renderItem={(item) => (
-          <List.Item key={item.rfc}>
+          <List.Item
+            key={item.rfc}
+            actions={[
+              <Button
+                icon={<EditFilled />}
+                onClick={() => showModal(item)}
+              ></Button>,
+              <Popconfirm
+                placement='left'
+                title='¿Está seguro de querer borrar este registro?'
+                okText='Sí'
+                cancelText='No'
+              >
+                <Button
+                  danger
+                  icon={<DeleteFilled />}
+                  onClick={() => eliminarProveedor(item)}
+                ></Button>
+              </Popconfirm>,
+            ]}
+          >
             <List.Item.Meta
               title={
                 <p
@@ -78,9 +124,10 @@ const Index = ({ list }) => {
         visible={isModalVisible}
         footer={null}
         onCancel={handleCancel}
+        width='50%'
       >
         <ProveedorForm
-          onSubmit={proveedorActualizado}
+          onSubmit={actualizarProveedores}
           submitText='Guardar cambios'
           datosProveedor={listElement}
         />
