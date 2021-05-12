@@ -100,13 +100,6 @@ const Rutas = () => {
       <Route path='/venta/nueva' exact component={Venta} />
 
       {/* Proveedores */}
-      <Route path='/registrar-compra' exact component={RegistrarCompra} />
-      <Route path='/proveedores' exact>
-        <ProveedorList list={listaProveedores} />
-      </Route>
-      <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
-
-      {/* Proveedores */}
       <Route path='/proveedores' exact>
         <ProveedorList list={listaProveedores} />
       </Route>
