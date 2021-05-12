@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Button, List } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 
@@ -29,10 +29,8 @@ const AddressesList = () => {
       renderItem={(item) => (
         <List.Item
           actions={[
-            <Button icon={<EditOutlined />}>Editar</Button>,
-            <Button danger icon={<DeleteOutlined />}>
-              Eliminar
-            </Button>,
+            <Button icon={<EditFilled />}></Button>,
+            <Button danger icon={<DeleteFilled />}></Button>,
           ]}
         >
           <List.Item.Meta
