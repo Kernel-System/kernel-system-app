@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/HeadingBack';
-import { Typography } from 'antd';
+import { message, Typography } from 'antd';
 import axios from 'axios';
 
 const { Title } = Typography;
@@ -24,12 +24,19 @@ const Index = () => {
     };
     const [proveedor, setProveedor] = useState(proveedorInicial);
 
-    const agregarProveedor = (values) => {
-        // console.log(values);
-        axios.post(
-            'https://kernel-system-api.herokuapp.com/items/proveedores',
-            values
-        );
+    const insertItem = (values) => {
+       axios
+            .post(
+                'https://kernel-system-api.herokuapp.com/items/proveedores',
+                values
+            )
+            .then(() => {
+                onInserted();
+            });
+    };
+
+    const onInserted = () => {
+        message.success('El Proveedor ha sido registrado exitosamente');
     };
 
     return (
@@ -42,7 +49,7 @@ const Index = () => {
                 datosProveedor={proveedor}
                 submitText='AÑADIR PROVEEDOR'
                 cleanOnSubmit
-                onSubmit={agregarProveedor}
+                onSubmit={insertItem}
             ></ProveedorForm>
         </>
     );
