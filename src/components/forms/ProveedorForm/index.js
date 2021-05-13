@@ -303,10 +303,9 @@ const Index = (props) => {
     [form]
   );
 
-  const onFinish = (values) => {
-    props.onSubmit(values);
-    // if (props.cleanOnSubmit)
-    //     form.resetFields();
+  const onFinish = async (values) => {
+    await props.onSubmit(values);
+    if (props.cleanOnSubmit) form.resetFields();
   };
 
   useEffect(() => {
