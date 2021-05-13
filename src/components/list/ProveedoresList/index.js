@@ -1,17 +1,14 @@
 import './styles.css';
-import { useState, useEffect } from 'react';
-import { Popconfirm, message, List, Button, Modal, Input } from 'antd';
+import axios from 'axios';
+import { useState } from 'react';
+import { Popconfirm, List, Button, Modal, Input, message } from 'antd';
 import { PlusOutlined, DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/Heading';
-import axios from 'axios';
 
-const Index = ({ list }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [listElement, setListElement] = useState({});
-  const [listToShow, setListToShow] = useState([]);
-
+const Index = () => {
   const showModal = (listElemenToShow) => {
     setIsModalVisible(true);
     setListElement(listElemenToShow);
@@ -21,7 +18,7 @@ const Index = ({ list }) => {
     setIsModalVisible(false);
   };
 
-  const actualizarProveedores = (values) => {
+  const updateItem = (values, onUpdated) => {
     axios
       .patch(
         'https://kernel-system-api.herokuapp.com/items/proveedores/' +
@@ -29,30 +26,104 @@ const Index = ({ list }) => {
         values
       )
       .then((result) => {
-        console.log(result.data.data);
+        refetch();
+        onUpdated();
       });
   };
 
-  const buscarProveedor = (e) => {
-    setListToShow(
-      list.filter((item) => item.rfc.includes(e.target.value.toUpperCase()))
-    );
+  const deleteItem = (values, onDeleted) => {
+    axios
+      .delete(
+        'https://kernel-system-api.herokuapp.com/items/proveedores/' +
+          values.rfc
+      )
+      .then(() => {
+        onDeleted();
+      });
   };
 
-  const eliminarProveedor = (values) => {
-    axios.delete(
-      'https://kernel-system-api.herokuapp.com/items/proveedores/' + values.rfc
-    );
-  };
-
-  useEffect(() => {
+  const fetchItems = () => {
     axios
       .get('https://kernel-system-api.herokuapp.com/items/proveedores')
       .then((result) => {
-        console.log(result.data.data);
         setListToShow(result.data.data);
       });
-  }, []);
+  };
+
+  const onConfirmDelete = (item) => {
+    deleteItem(item, () => message.success('Registro eliminado exitosamente'));
+  };
+
+  const onSaveChanges = (values) => {
+    updateItem(values, () => message.success('Cambios guardados exitosamente'));
+  };
+
+  const buscarProveedor = (e) => {
+    console.log(dataList);
+    // setListToShow(
+    //     dataList.filter((item) =>
+    //         item.rfc.includes(e.target.value.toUpperCase())
+    //     )
+    // );
+  };
+
+  const { status, data: dataList, refetch } = useQuery('data', () =>
+    fetchItems()
+  );
+  const [listToShow, setListToShow] = useState(dataList);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [listElement, setListElement] = useState({});
+
+  const list = (
+    <List
+      itemLayout='horizontal'
+      size='default'
+      pagination={{
+        onChange: (page) => {
+          console.log(page);
+        },
+        pageSize: 10,
+      }}
+      dataSource={listToShow}
+      renderItem={(item) => (
+        <List.Item
+          key={item.rfc}
+          actions={[
+            <Button
+              icon={<EditFilled />}
+              onClick={() => showModal(item)}
+            ></Button>,
+            <Popconfirm
+              placement='left'
+              title='¿Está seguro de querer borrar este registro?'
+              okText='Sí'
+              cancelText='No'
+              onConfirm={() => onConfirmDelete(item)}
+            >
+              <Button danger icon={<DeleteFilled />}></Button>
+            </Popconfirm>,
+          ]}
+        >
+          <List.Item.Meta
+            title={
+              <p
+                onClick={() => {
+                  showModal(item);
+                }}
+                style={{
+                  cursor: 'pointer',
+                  margin: 0,
+                }}
+              >
+                {item.rfc}
+              </p>
+            }
+            description={item.nombre}
+          />
+        </List.Item>
+      )}
+    />
+  );
 
   return (
     <>
@@ -62,57 +133,7 @@ const Index = ({ list }) => {
         placeholder='Buscar por RFC'
       ></Input.Search>
       <br />
-      <List
-        itemLayout='horizontal'
-        size='default'
-        pagination={{
-          onChange: (page) => {
-            console.log(page);
-          },
-          pageSize: 10,
-        }}
-        dataSource={listToShow}
-        renderItem={(item) => (
-          <List.Item
-            key={item.rfc}
-            actions={[
-              <Button
-                icon={<EditFilled />}
-                onClick={() => showModal(item)}
-              ></Button>,
-              <Popconfirm
-                placement='left'
-                title='¿Está seguro de querer borrar este registro?'
-                okText='Sí'
-                cancelText='No'
-              >
-                <Button
-                  danger
-                  icon={<DeleteFilled />}
-                  onClick={() => eliminarProveedor(item)}
-                ></Button>
-              </Popconfirm>,
-            ]}
-          >
-            <List.Item.Meta
-              title={
-                <p
-                  onClick={() => {
-                    showModal(item);
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                    margin: 0,
-                  }}
-                >
-                  {item.rfc}
-                </p>
-              }
-              description={item.nombre}
-            />
-          </List.Item>
-        )}
-      />
+      {list}
       <br />
       <Link to='/proveedores/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
@@ -127,7 +148,7 @@ const Index = ({ list }) => {
         width='50%'
       >
         <ProveedorForm
-          onSubmit={actualizarProveedores}
+          onSubmit={onSaveChanges}
           submitText='Guardar cambios'
           datosProveedor={listElement}
         />
