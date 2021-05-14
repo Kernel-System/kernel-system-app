@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Popconfirm, List, Button, Modal, Input, message } from 'antd';
 import { PlusOutlined, DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, QueryClient } from 'react-query';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/Heading';
 
@@ -18,17 +18,11 @@ const Index = () => {
     setIsModalVisible(false);
   };
 
-  const updateItem = (values, onUpdated) => {
-    axios
-      .patch(
-        'https://kernel-system-api.herokuapp.com/items/proveedores/' +
-          values.rfc,
-        values
-      )
-      .then((result) => {
-        refetch();
-        onUpdated();
-      });
+  const updateItem = (values) => {
+    return axios.patch(
+      'https://kernel-system-api.herokuapp.com/items/proveedores/' + values.rfc,
+      values
+    );
   };
 
   const deleteItem = (values, onDeleted) => {
@@ -38,16 +32,16 @@ const Index = () => {
           values.rfc
       )
       .then(() => {
+        refetch();
         onDeleted();
       });
   };
 
-  const fetchItems = () => {
-    axios
-      .get('https://kernel-system-api.herokuapp.com/items/proveedores')
-      .then((result) => {
-        setListToShow(result.data.data);
-      });
+  const fetchItems = async () => {
+    const { data } = await axios.get(
+      'https://kernel-system-api.herokuapp.com/items/proveedores'
+    );
+    return data.data;
   };
 
   const onConfirmDelete = (item) => {
@@ -55,22 +49,39 @@ const Index = () => {
   };
 
   const onSaveChanges = (values) => {
-    updateItem(values, () => message.success('Cambios guardados exitosamente'));
+    mutation.mutate(values);
   };
 
-  const buscarProveedor = (e) => {
-    console.log(dataList);
-    // setListToShow(
-    //     dataList.filter((item) =>
-    //         item.rfc.includes(e.target.value.toUpperCase())
-    //     )
-    // );
+  const onSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    filtrarProveedoresPorRFC(data, value);
   };
 
-  const { status, data: dataList, refetch } = useQuery('data', () =>
-    fetchItems()
-  );
-  const [listToShow, setListToShow] = useState(dataList);
+  const filtrarProveedoresPorRFC = async (proveedores, value) => {
+    if (proveedores)
+      setListToShow(
+        proveedores.filter((item) => item.rfc.includes(value.toUpperCase()))
+      );
+  };
+
+  const queryClient = new QueryClient();
+
+  const [searchValue, setSearchValue] = useState('');
+  const { status, data, refetch } = useQuery('proveedores', async () => {
+    const result = await fetchItems();
+    setListToShow(result);
+    filtrarProveedoresPorRFC(result, searchValue);
+    return result;
+  });
+  const mutation = useMutation((formData) => updateItem(formData), {
+    onSuccess: () => {
+      message.success('Cambios guardados exitosamente');
+      queryClient.invalidateQueries('proveedores');
+      refetch();
+    },
+  });
+  const [listToShow, setListToShow] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
 
@@ -129,8 +140,9 @@ const Index = () => {
     <>
       <Header title='Proveedores' />
       <Input.Search
-        onChange={buscarProveedor}
+        onChange={onSearchChange}
         placeholder='Buscar por RFC'
+        value={searchValue}
       ></Input.Search>
       <br />
       {list}
