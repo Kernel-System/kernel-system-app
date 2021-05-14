@@ -2,6 +2,7 @@ import AddProduct from 'components/ensamble/AddProduct';
 import { useState } from 'react';
 import { Typography, Input, Space, Button, Form, Select } from 'antd';
 import HeadingBack from 'components/UI/HeadingBack';
+import { http } from 'api';
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -10,7 +11,9 @@ const Index = () => {
   const [list, setList] = useState({
     descripcion: '',
     observaciones: '',
-    empleado_orden: '',
+    rfc_empleado_ensamble: '',
+    codigo_ensamble: '',
+    estado: 'Ordenado',
     productos: {
       //{ codigo: '', cantidad: 0, descripcion: '' }
       tarjeta_madre: [],
@@ -39,6 +42,41 @@ const Index = () => {
   };
 
   const onFinish = () => {
+    http
+      .post('/items/ordenes_ensamble', {
+        fecha_orden: new Date().toLocaleDateString(),
+        fecha_inicio_ensamble: null,
+        fecha_fin_ensamble: null,
+        estado: 'Ordenado',
+        descripcion: list.descripcion,
+        observaciones: list.observaciones,
+        codigo_ensamble: list.codigo_ensamble,
+        rfc_empleado_ensamble: list.rfc_empleado_ensamble,
+        rfc_empleado_orden: 'Empleado Actual',
+      })
+      .then((result) => {
+        const lista = JSON.parse(JSON.stringify(list.productos));
+        let productos = [];
+        for (const key in list.productos) {
+          const material = [];
+          material.push(
+            ...lista[key].map((producto) => {
+              return {
+                codigo: producto.codigo,
+                etiqueta: producto.etiqueta,
+                cantidad: producto.cantidad,
+                descripcion: producto.descripcion,
+                orden_ensamble: result.data.data.folio,
+              };
+            })
+          );
+          productos.push(...material);
+        }
+        console.log(productos);
+        http.post('/items/componentes_ensamble', productos).then((result2) => {
+          console.log(result2);
+        });
+      });
     console.log('Success:', list);
   };
 
@@ -54,6 +92,35 @@ const Index = () => {
       onFinishFailed={onFinishFailed}
     >
       <HeadingBack title='Nuevo Ensamble' />
+      <Title level={5}>Componente a ensamblar</Title>
+      <Form.Item
+        name='codigo_ensamble'
+        rules={[
+          {
+            required: true,
+            message: `Asigna un codigo`,
+          },
+        ]}
+      >
+        <Select
+          showSearch
+          style={{ width: '100%' }}
+          placeholder='Buscando producto a ensamblar'
+          optionFilterProp='children'
+          //onChange={onChange}
+          //onFocus={onFocus}
+          onChange={(value) => {
+            changeElements(value, 'codigo_ensamble');
+          }}
+          //onSearch={onSearch}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().iOf(input.toLowerCase()) >= 0
+          }
+        >
+          <Option value='Producto 1'>Compu 1</Option>
+          <Option value='Producto 2'>Compu 2</Option>
+        </Select>
+      </Form.Item>
       <Title level={5}>Empleado de Ensamble</Title>
       <Form.Item
         name='ensamblador asignado'
@@ -72,7 +139,7 @@ const Index = () => {
           //onChange={onChange}
           //onFocus={onFocus}
           onChange={(value) => {
-            changeElements(value, 'empleado_orden');
+            changeElements(value, 'rfc_empleado_ensamble');
           }}
           //onSearch={onSearch}
           filterOption={(input, option) =>

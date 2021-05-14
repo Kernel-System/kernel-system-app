@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const Index = ({ list }) => {
+const Index = ({ list, changePag }) => {
   function handleChange(value) {
     console.log(`selected ${value}`);
   }
@@ -28,9 +28,9 @@ const Index = ({ list }) => {
         size='default'
         pagination={{
           onChange: (page) => {
-            console.log(page);
+            changePag(page);
           },
-          pageSize: 10,
+          pageSize: 5,
         }}
         dataSource={list}
         renderItem={(item) => (
@@ -40,7 +40,7 @@ const Index = ({ list }) => {
                 <List.Item.Meta
                   //avatar={<Avatar src={item.avatar} />}
                   title={`Folio ${item.folio}`}
-                  description={item.fechaorden}
+                  description={item.fecha_orden}
                 />
                 {item.descripcion}
               </List.Item>
