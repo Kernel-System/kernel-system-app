@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { Popconfirm, List, Button, Modal, Input, message } from 'antd';
 import { PlusOutlined, DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation, QueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/Heading';
+import CsvReader from 'components/shared/CsvReader';
 
 const Index = () => {
   const showModal = (listElemenToShow) => {
@@ -25,16 +26,10 @@ const Index = () => {
     );
   };
 
-  const deleteItem = (values, onDeleted) => {
-    axios
-      .delete(
-        'https://kernel-system-api.herokuapp.com/items/proveedores/' +
-          values.rfc
-      )
-      .then(() => {
-        refetch();
-        onDeleted();
-      });
+  const deleteItem = (values) => {
+    return axios.delete(
+      'https://kernel-system-api.herokuapp.com/items/proveedores/' + values.rfc
+    );
   };
 
   const fetchItems = async () => {
@@ -44,12 +39,19 @@ const Index = () => {
     return data.data;
   };
 
+  const insertItems = (items) => {
+    return axios.post(
+      'https://kernel-system-api.herokuapp.com/items/proveedores',
+      items
+    );
+  };
+
   const onConfirmDelete = (item) => {
-    deleteItem(item, () => message.success('Registro eliminado exitosamente'));
+    deleteMutation.mutate(item);
   };
 
   const onSaveChanges = (values) => {
-    mutation.mutate(values);
+    updateMutation.mutate(values);
   };
 
   const onSearchChange = (e) => {
@@ -65,24 +67,40 @@ const Index = () => {
       );
   };
 
-  const queryClient = new QueryClient();
+  const importarProveedores = (datos) => {
+    const hide = message.loading('Importando proveedores..', 0);
+    insertMutation.mutate(datos, { onSuccess: hide });
+  };
+
+  const queryClient = useQueryClient();
 
   const [searchValue, setSearchValue] = useState('');
-  const { status, data, refetch } = useQuery('proveedores', async () => {
+  const { data } = useQuery('proveedores', async () => {
     const result = await fetchItems();
     setListToShow(result);
     filtrarProveedoresPorRFC(result, searchValue);
     return result;
   });
-  const mutation = useMutation((formData) => updateItem(formData), {
+  const updateMutation = useMutation((formData) => updateItem(formData), {
     onSuccess: () => {
       message.success('Cambios guardados exitosamente');
       queryClient.invalidateQueries('proveedores');
-      refetch();
     },
   });
-  const [listToShow, setListToShow] = useState([]);
+  const deleteMutation = useMutation((formData) => deleteItem(formData), {
+    onSuccess: () => {
+      message.success('Registro eliminado exitosamente');
+      queryClient.invalidateQueries('proveedores');
+    },
+  });
+  const insertMutation = useMutation((formData) => insertItems(formData), {
+    onSuccess: () => {
+      message.success('Proveedores importados exitosamente');
+      queryClient.invalidateQueries('proveedores');
+    },
+  });
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [listToShow, setListToShow] = useState([]);
   const [listElement, setListElement] = useState({});
 
   const list = (
@@ -129,7 +147,7 @@ const Index = () => {
                 {item.rfc}
               </p>
             }
-            description={item.nombre}
+            description={item.razon_social}
           />
         </List.Item>
       )}
@@ -148,10 +166,15 @@ const Index = () => {
       {list}
       <br />
       <Link to='/proveedores/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' icon={<PlusOutlined />}>
           Añadir Nuevo Proveedor
         </Button>
       </Link>
+      <CsvReader
+        hideMessage
+        onSuccess={importarProveedores}
+        text='Importar desde archivo .csv'
+      ></CsvReader>
       <Modal
         title={listElement.rfc}
         visible={isModalVisible}
