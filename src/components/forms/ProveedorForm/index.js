@@ -30,8 +30,8 @@ const Index = (props) => {
       >
         <Input maxLength={13} placeholder='RFC' />
       </Item>
-      <Form.Item name='nombre' label='Nombre'>
-        <Input maxLength={254} placeholder='Nombre' />
+      <Form.Item name='contacto' label='Contacto'>
+        <Input maxLength={150} placeholder='Contacto' />
       </Form.Item>
       <Form.Item
         name='regimen_fiscal'
@@ -74,7 +74,7 @@ const Index = (props) => {
       </Form.Item>
       <Form.Item
         name='telefono'
-        label='Teléfono 1'
+        label='Teléfono'
         rules={[
           {
             required: true,
@@ -85,15 +85,15 @@ const Index = (props) => {
         <InputNumber
           min={1000000000}
           max={9999999999}
-          placeholder='Teléfono 1'
+          placeholder='Teléfono'
           style={{ width: '100%' }}
         />
       </Form.Item>
-      <Form.Item name='telefono_2' label='Teléfono 2'>
+      <Form.Item name='whatsapp' label='Whatsapp'>
         <InputNumber
           min={1000000000}
           max={9999999999}
-          placeholder='Teléfono 2'
+          placeholder='Whatsapp'
           style={{ width: '100%' }}
         />
       </Form.Item>
@@ -143,7 +143,7 @@ const Index = (props) => {
       </Form.Item>
       <Form.Item
         name='cuenta'
-        label='Cuenta'
+        label='Cuenta/CLABE'
         rules={[
           {
             pattern: '[A-Z0-9_]{10,50}',
