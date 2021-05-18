@@ -58,11 +58,10 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
     rows[id] = {
       id: id,
       codigo: value,
-      etiqueta: tag,
       cantidad: 1,
       descripcion: descripcion,
     };
-    onChanged(rows, tag);
+    onChanged(rows);
     setFilas(rows);
   };
 

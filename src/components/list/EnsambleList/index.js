@@ -1,28 +1,12 @@
 import './styles.css';
-import { List, Typography, Button, Badge, Select } from 'antd';
+import { List, Button, Badge } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-const { Title, Text } = Typography;
-const { Option } = Select;
 
 const Index = ({ list, changePag }) => {
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+  console.log(list);
   return (
     <>
-      <Title level={3}>Órdenes de Ensamble</Title>
-      <Text>Ordenar por Estado:</Text>
-      <br />
-      <Select
-        defaultValue='Creado'
-        style={{ width: 120 }}
-        onChange={handleChange}
-      >
-        <Option value='Creado'>Creado</Option>
-        <Option value='En ensamble'>En ensamble</Option>
-        <Option value='Finalizado'>Finalizado</Option>
-      </Select>
       <List
         itemLayout='vertical'
         size='default'
