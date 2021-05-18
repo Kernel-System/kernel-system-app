@@ -14,24 +14,15 @@ const Index = () => {
     rfc_empleado_ensamble: '',
     codigo_ensamble: '',
     estado: 'Ordenado',
-    productos: {
+    productos:
       //{ codigo: '', cantidad: 0, descripcion: '' }
-      tarjeta_madre: [],
-      procesador: [],
-      ram: [],
-      disco_duro: [],
-      tarjeta_video: [],
-      gabinete: [],
-      fuente_poder: [],
-      disco_optico: [],
-      perifericos: [],
-      sistema_operativo: [],
-    },
+      [],
   });
 
-  const changeProducts = (element, title) => {
+  const changeProducts = (element) => {
     const lista = JSON.parse(JSON.stringify(list));
-    lista.productos[title] = element;
+    lista.productos = element;
+    console.log(lista);
     setList(JSON.parse(JSON.stringify(lista)));
   };
 
@@ -42,6 +33,18 @@ const Index = () => {
   };
 
   const onFinish = () => {
+    /*http
+      .post('/items/movimientos_almacen', {
+        fecha: obtenerFecha(),
+        concepto: 'Componente de ensamble',
+        comentario: list.observaciones,
+        folio_ensamble: result_ens.data.data.folio,
+        rfc_empleado: 'Empleado de Almacen',
+        clave_almacen: 1,
+        mostrar: false,
+      })
+      .then((result_mov) => {});*/
+
     http
       .post('/items/ordenes_ensamble', {
         fecha_orden: new Date().toLocaleDateString(),
@@ -54,24 +57,28 @@ const Index = () => {
         rfc_empleado_ensamble: list.rfc_empleado_ensamble,
         rfc_empleado_orden: 'Empleado Actual',
       })
-      .then((result) => {
+      .then((result_ens) => {
         const lista = JSON.parse(JSON.stringify(list.productos));
         let productos = [];
-        for (const key in list.productos) {
-          const material = [];
-          material.push(
-            ...lista[key].map((producto) => {
-              return {
-                codigo: producto.codigo,
-                etiqueta: producto.etiqueta,
-                cantidad: producto.cantidad,
-                descripcion: producto.descripcion,
-                orden_ensamble: result.data.data.folio,
-              };
-            })
-          );
-          productos.push(...material);
-        }
+        //let productosMovimiento = [];
+        list.productos.map((producto) => {
+          productos.push({
+            codigo: producto.codigo,
+            cantidad: producto.cantidad,
+            descripcion: producto.descripcion,
+            orden_ensamble: result_ens.data.data.folio,
+          });
+          /*productosMovimiento.push({
+            codigo: producto.codigo,
+            clave: '',
+            cantidad: producto.cantidad,
+            descripcion: producto.descripcion,
+            unidad: '',
+            clave_unidad: '',
+            nota: '',
+            id_movimiento: '1',
+          });*/
+        });
         console.log(productos);
         http.post('/items/componentes_ensamble', productos).then((result2) => {
           console.log(result2);
@@ -151,55 +158,8 @@ const Index = () => {
         </Select>
       </Form.Item>
       <AddProduct
-        titulo='Tarjeta Madre'
-        tag='tarjeta_madre'
-        noAdd={true}
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Procesador'
-        tag='procesador'
-        onChanged={changeProducts}
-      />
-      <AddProduct titulo='Memoria RAM' tag='ram' onChanged={changeProducts} />
-      <AddProduct
-        titulo='Disco Duro'
-        tag='disco_duro'
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Tarjeta de Video'
-        tag='tarjeta_video'
-        isNeeded={false}
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Gabinete'
-        tag='gabinete'
-        noAdd={true}
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Fuente de Poder'
-        tag='fuente_poder'
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Unidad de disco óptico'
-        tag='disco_optico'
-        isNeeded={false}
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Periféricos'
-        tag='perifericos'
-        isNeeded={false}
-        onChanged={changeProducts}
-      />
-      <AddProduct
-        titulo='Sistema Operativo'
-        tag='sistema_operativo'
-        noAdd={true}
+        titulo='Componentes'
+        tag='componentes'
         onChanged={changeProducts}
       />
       <Title level={5}>Descripción</Title>
