@@ -20,7 +20,7 @@ import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
-import ProveedorList from './components/list/ProveedoresList';
+import Proveedores from 'pages/compras/Proveedores';
 import ComprasList from 'components/list/ComprasList';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import Venta from 'pages/ventas/Venta';
@@ -35,24 +35,6 @@ import PagoNuevo from './pages/pagos/PagoNuevo';
 const asyncForgotPassword = asyncComponent(() =>
   import('pages/auth/ForgotPassword')
 );
-
-const listaProveedores = [
-  {
-    rfc: 'ARR-860120',
-    nombre: 'LA @ S.A. DE C.V',
-    razon_social: 'soy una razon 1',
-  },
-  {
-    rfc: 'APO-830120',
-    nombre: 'LA @ DEL % SA DE CV',
-    razon_social: 'soy una razon 2',
-  },
-  {
-    rfc: 'ACO-800210',
-    nombre: '@ COMER.COM',
-    razon_social: 'soy una razon 3',
-  },
-];
 
 const Rutas = () => {
   return (
@@ -101,13 +83,13 @@ const Rutas = () => {
 
       {/* Proveedores */}
       <Route path='/proveedores' exact>
-        <ProveedorList list={listaProveedores} />
+        <Proveedores />
       </Route>
       <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
 
       {/* Compras */}
       <Route path='/compras' exact>
-        <ComprasList list={listaProveedores} />
+        <ComprasList />
       </Route>
       <Route path='/compras/registrar' exact component={RegistrarCompra} />
 
