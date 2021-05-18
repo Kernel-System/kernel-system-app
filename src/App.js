@@ -1,3 +1,4 @@
+import { BackTop } from 'antd';
 import 'App.css';
 import Layout from 'pages/Layout';
 import Rutas from 'Rutas';
@@ -5,6 +6,7 @@ import Rutas from 'Rutas';
 const App = () => {
   return (
     <Layout>
+      <BackTop />
       <Rutas />
     </Layout>
   );

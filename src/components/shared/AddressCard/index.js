@@ -1,4 +1,5 @@
 import { Typography, Card } from 'antd';
+import TextLabel from 'components/UI/TextLabel';
 import { Link } from 'react-router-dom';
 const { Title } = Typography;
 
@@ -27,14 +28,19 @@ const AddressCard = ({ nueva }) => {
         <Card
           hoverable
           size='small'
-          title='Nombre Apellido'
+          title={
+            <TextLabel
+              title='Nombre Apellido'
+              subtitle='Teléfono: (612) 420-6900'
+            />
+          }
           actions={[
             <Link key='selectAddress' type='link'>
               Seleccionar
             </Link>,
           ]}
         >
-          Dirección piraña 1
+          Calle No. int. No. ext. Colonia, Estado, Municipio, Localidad, C.P.
         </Card>
       )}
     </>

@@ -1,11 +1,11 @@
 import { Typography } from 'antd';
 const { Title, Paragraph } = Typography;
 
-const TextLabel = ({ title, description }) => {
+const TextLabel = ({ title, subtitle }) => {
   return (
     <>
       <Title level={5}>{title}</Title>
-      {description && <Paragraph type='secondary'>{description}</Paragraph>}
+      {subtitle && <Paragraph type='secondary'>{subtitle}</Paragraph>}
     </>
   );
 };
