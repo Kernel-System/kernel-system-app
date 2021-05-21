@@ -1,5 +1,6 @@
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Radio, Row, Space, Typography } from 'antd';
+import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';
 import { useState } from 'react';
@@ -14,13 +15,15 @@ const Cart = () => {
   return (
     <>
       <Heading title='Lista de compra' />
-      <Button danger icon={<DeleteOutlined />}>
-        Vaciar Lista
-      </Button>
-
-      <div>TABLE</div>
-
       <Row gutter={[16, 16]}>
+        <Col xs={24}>
+          <Button danger icon={<DeleteOutlined />}>
+            Vaciar Lista
+          </Button>
+        </Col>
+        <Col xs={24}>
+          <ProductsTable />
+        </Col>
         <Col xs={24} md={12} lg={6}>
           <Card size='small' title='Tipo de entrega'>
             <Space direction='vertical'>
@@ -83,7 +86,10 @@ const Cart = () => {
           </Card>
         </Col>
         <Col xs={24} md={12} lg={6}>
-          <Summary />
+          <Summary
+            buttonLabel='Solicitar orden de compra'
+            buttonAction={() => console.log('Haciendo orden de compra')}
+          />
         </Col>
       </Row>
     </>
