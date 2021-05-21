@@ -1,11 +1,33 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space, Typography } from 'antd';
+import { Alert, Button, Form, Input, message, Space, Typography } from 'antd';
+import { getToken } from 'api/auth';
 import Heading from 'components/UI/Heading';
-import { Link } from 'react-router-dom';
+import { useStoreActions } from 'easy-peasy';
+import { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { emailRules } from 'utils/validations/auth';
 
 const LoginForm = () => {
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
+  const history = useHistory();
+  const login = useStoreActions((actions) => actions.user.login);
+  const [loading, setLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  const onSubmit = ({ email, password }) => {
+    setLoading(true);
+    getToken(email, password)
+      .then(({ data: { data } }) => {
+        setLoading(false);
+        login(data);
+        history.push('/');
+      })
+      .catch(({ response: { status } }) => {
+        if (status !== 401) {
+          message.error(`Lo sentimos, ha ocurrido un error`);
+        }
+        setLoading(false);
+        setHasError(true);
+      });
   };
 
   return (
@@ -14,27 +36,30 @@ const LoginForm = () => {
         title='Clientes registrados'
         subtitle='Si tiene una cuenta, ingrese con su correo electrónico.'
       />
-
       <Form
         name='loginForm'
         layout='vertical'
         requiredMark={false}
-        onFinish={onFinish}
+        onFinish={onSubmit}
+        onValuesChange={() => setHasError(false)}
       >
-        <Form.Item
-          name='email'
-          label='Correo electrónico'
-          rules={[
-            {
-              required: true,
-              message: 'Por favor introduzca su correo electrónico.',
-            },
-            {
-              type: 'email',
-              message: 'El correo electrónico no tiene un formato válido',
-            },
-          ]}
-        >
+        {hasError && (
+          <Form.Item>
+            <Alert
+              type='error'
+              description={
+                <>
+                  Contraseña incorrecta. Reinténtalo o{' '}
+                  <Link to='/recuperar-cuenta' component={Typography.Link}>
+                    restablece la contraseña
+                  </Link>
+                  .
+                </>
+              }
+            />
+          </Form.Item>
+        )}
+        <Form.Item name='email' label='Correo electrónico' rules={emailRules}>
           <Input prefix={<MailOutlined />} />
         </Form.Item>
 
@@ -42,7 +67,7 @@ const LoginForm = () => {
           name='password'
           label='Contraseña'
           rules={[
-            { required: true, message: 'Por favor introduzca su contraseña.' },
+            { required: true, message: 'Por favor introduzca su contraseña' },
           ]}
         >
           <Input.Password prefix={<LockOutlined />} />
@@ -50,10 +75,10 @@ const LoginForm = () => {
 
         <Form.Item>
           <Space direction='vertical' size='middle'>
-            <Button type='primary' htmlType='submit'>
+            <Button type='primary' htmlType='submit' loading={loading}>
               Iniciar sesión
             </Button>
-            <Link to='/recuperar-contrasena' component={Typography.Link}>
+            <Link to='/recuperar-cuenta' component={Typography.Link}>
               ¿Olvidaste tú contraseña?
             </Link>
           </Space>
