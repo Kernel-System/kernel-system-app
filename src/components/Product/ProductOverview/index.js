@@ -1,6 +1,6 @@
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Button, Form, InputNumber, Space, Typography } from 'antd';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 const { Title, Paragraph, Text } = Typography;
 
 const ProductOverview = ({ product, addToCart, isAuth }) => {

@@ -1,5 +1,5 @@
 import { Avatar, List, Typography } from 'antd';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 const { Paragraph } = Typography;
 
 const BoughtProductsList = ({ data }) => {

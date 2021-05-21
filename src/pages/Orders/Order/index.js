@@ -4,7 +4,7 @@ import Heading from 'components/UI/Heading';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 
 // TEMPORAL
 const data = [

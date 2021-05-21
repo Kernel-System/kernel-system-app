@@ -1,8 +1,8 @@
-import { Card, Button, Typography, Row, Divider } from 'antd';
-import { formatPrice } from 'utils';
+import { Button, Card, Divider, Row, Typography } from 'antd';
+import { formatPrice } from 'utils/functions';
 const { Title, Paragraph } = Typography;
 
-const Summary = ({ list }) => {
+const Summary = ({ list, buttonLabel, buttonAction }) => {
   const lista = [
     {
       nombre: '',
@@ -93,8 +93,8 @@ const Summary = ({ list }) => {
         </Title>
       </Row>
       <Divider />
-      <Button type='primary' block>
-        Solicitar orden de compra
+      <Button type='primary' block onClick={buttonAction}>
+        {buttonLabel}
       </Button>
     </Card>
   );

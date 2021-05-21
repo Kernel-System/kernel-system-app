@@ -2,7 +2,7 @@ import { Button, Card, Modal, Select, Typography } from 'antd';
 import { useState } from 'react';
 const { Text } = Typography;
 
-const AssignAddressCard = ({ tipo }) => {
+const AssignAddressCard = ({ tipo, addresses }) => {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -42,8 +42,12 @@ const AssignAddressCard = ({ tipo }) => {
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
-        <Select defaultValue='lucy' style={{ width: '100%' }}>
-          <Select.Option value='lucy'>Lucy</Select.Option>
+        <Select style={{ width: '100%' }}>
+          {addresses?.data?.data.map((address) => (
+            <Select.Option key={address.id} value={address.id}>
+              {address.calle} {address.no_ext}
+            </Select.Option>
+          ))}
         </Select>
       </Modal>
     </>

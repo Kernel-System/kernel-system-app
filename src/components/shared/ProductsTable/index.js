@@ -1,7 +1,7 @@
 import { Image, InputNumber, Table } from 'antd';
 import Column from 'antd/lib/table/Column';
 import { Link } from 'react-router-dom';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 
 const data = [
   {

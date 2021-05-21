@@ -1,7 +1,7 @@
 import { PercentageOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Badge, Button, Card, Image, Space, Typography } from 'antd';
-import { formatPrice } from 'utils';
 import { useHistory } from 'react-router-dom';
+import { formatPrice } from 'utils/functions';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -9,7 +9,7 @@ const ProductCard = ({ product, descuento = 0.5 }) => {
   const history = useHistory();
 
   const goToProduct = (productId) => {
-    history.push(`/p/${productId}`);
+    history.push(`/producto/${productId}`);
   };
 
   const addToCart = (e, productId) => {

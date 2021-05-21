@@ -23,7 +23,7 @@ import BoughtProductsList from 'components/shared/BoughtProductsList';
 import Heading from 'components/UI/Heading';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect, useState } from 'react';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 const { Title, Paragraph } = Typography;
 
 // TEMPORAL
@@ -62,7 +62,7 @@ const Checkout = () => {
         <Steps.Step title='Pago' icon={<DollarOutlined />} />
         <Steps.Step title='¡Gracias por tu compra!' icon={<LikeOutlined />} />
       </Steps>
-      <br />
+      <Divider />
       <Tabs
         activeKey={step.toString()}
         defaultActiveKey={step.toString()}
