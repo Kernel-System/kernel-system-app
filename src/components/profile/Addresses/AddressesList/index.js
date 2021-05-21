@@ -1,43 +1,45 @@
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Button, List } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import Text from 'antd/lib/typography/Text';
+import { useHistory } from 'react-router';
 
-const AddressesList = () => {
+const AddressesList = ({ addresses, deleteUserDireccion }) => {
   const breakpoint = useBreakpoint();
-
-  // TEMPORAL
-  const data = [
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-  ];
+  const history = useHistory();
 
   return (
     <List
-      className='addressesList'
       itemLayout={breakpoint.md ? 'horizontal' : 'vertical'}
-      dataSource={data}
-      renderItem={(item) => (
+      dataSource={addresses?.data?.data?.data}
+      loading={addresses.isLoading}
+      renderItem={(address) => (
         <List.Item
           actions={[
-            <Button icon={<EditOutlined />}>Editar</Button>,
-            <Button danger icon={<DeleteOutlined />}>
-              Eliminar
-            </Button>,
+            <Button
+              onClick={() => history.push(`/direcciones/${address.id}`)}
+              icon={<EditFilled />}
+            ></Button>,
+            <Button
+              danger
+              icon={<DeleteFilled />}
+              onClick={() => deleteUserDireccion.mutate(address.id)}
+            ></Button>,
           ]}
         >
           <List.Item.Meta
-            title={<a href='https://ant.design'>{item.title}</a>}
-            description='Ant Design, a design language for background applications, is refined by Ant UED Team'
+            description={
+              <Text>
+                {address.calle} No. {address.no_ext}
+                {address.no_int && `-${address.no_int}`}
+                {address.entre_calle_1 && `, entre ${address.entre_calle_1}`}
+                {address.entre_calle_2 &&
+                  ` y ${address.entre_calle_2}`} Col. {address.colonia}{' '}
+                {address.cp}
+                {address.localidad && ` - ${address.localidad}`},{' '}
+                {address.municipio}, {address.estado}, {address.pais}
+              </Text>
+            }
           />
         </List.Item>
       )}

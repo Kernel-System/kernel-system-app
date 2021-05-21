@@ -1,7 +1,8 @@
 import { Col, Descriptions, Typography } from 'antd';
+import { formatPhoneNumber } from 'utils/functions';
 const { Title } = Typography;
 
-const ProfileOverview = () => {
+const ProfileOverview = ({ user }) => {
   return (
     <>
       <Col xs={24} lg={12}>
@@ -17,17 +18,19 @@ const ProfileOverview = () => {
           labelStyle={{ fontWeight: 500 }}
         >
           <Descriptions.Item label='Nombre'>
-            Edson David Puente Guerrero
+            {user.nombre} {user.apellidos}
           </Descriptions.Item>
           <Descriptions.Item label='Correo electrónico'>
-            johndoe@email.com
+            {user.correo}
           </Descriptions.Item>
           <Descriptions.Item label='Número telefónico'>
-            (612) 323-1267
+            {formatPhoneNumber(user.cliente.telefono)}
           </Descriptions.Item>
-          <Descriptions.Item label='Número telefónico 2'>
-            (664) 420-6901
-          </Descriptions.Item>
+          {user.cliente.telefono_2 && (
+            <Descriptions.Item label='Número telefónico 2'>
+              {formatPhoneNumber(user.cliente.telefono_2)}
+            </Descriptions.Item>
+          )}
         </Descriptions>
       </Col>
       <Col xs={24} lg={12}>
@@ -42,10 +45,13 @@ const ProfileOverview = () => {
           column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
           labelStyle={{ fontWeight: 500 }}
         >
-          <Descriptions.Item label='Razón social'>
-            El Clavo S. de R.L. de C.V.
+          <Descriptions.Item label='Nombre Comercial'>
+            {user.cliente.nombre_comercial}
           </Descriptions.Item>
-          <Descriptions.Item label='RFC'>CFE000814QH8</Descriptions.Item>
+          <Descriptions.Item label='Razón social'>
+            {user.cliente.razon_social}
+          </Descriptions.Item>
+          <Descriptions.Item label='RFC'>{user.cliente.rfc}</Descriptions.Item>
         </Descriptions>
       </Col>
     </>
