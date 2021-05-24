@@ -77,24 +77,28 @@ const index = () => {
             onChange={(value) => {
               handleChange(value);
             }}
-            filterOption={(input, option) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
+            defaultValue='Compra'
           >
-            <Option value='1'>Devolución</Option>
-            <Option value='2'>XD</Option>
+            <Option value='Compra'>Compra</Option>
+            <Option value='Venta'>Venta</Option>
+            <Option value='Devolución a cliente'>Devolución a cliente</Option>
+            <Option value='Regreso de mercancía'>Regreso de mercancía</Option>
+            <Option value='Entrada por transferencia'>
+              Entrada por transferencia
+            </Option>
+            <Option value='Salida por transferencia'>
+              Salida por transferencia
+            </Option>
+            <Option value='Componente de ensamble'>
+              Componente de ensamble
+            </Option>
+            <Option value='Producto ensamblado'>Producto ensamblado</Option>
           </Select>
         </Form.Item>
         <Title level={4}>Justificación</Title>
         <Text type='secondary'>
           Debe llenar mínimo 1 de los campos a continuación.
         </Text>
-
         <Title level={5}>Folio de RMA</Title>
         <InputForm
           titulo='rma'
@@ -104,21 +108,21 @@ const index = () => {
         />
         <Title level={5}>Número de Factura</Title>
         <InputForm
-          titulo='no_factura'
+          titulo='factura'
           mensaje='Asignar un número de factura.'
           placeholder='Número de factura'
           required={false}
         />
         <Title level={5}>Número de Devolución</Title>
         <InputForm
-          titulo='no_devolucion'
+          titulo='devolucion a clientes'
           mensaje='Asignar un número de devolución.'
           placeholder='Número de devolución'
           required={false}
         />
-        <Title level={5}>Número de Ensamble</Title>
+        <Title level={5}>Folio de Ensamble</Title>
         <InputForm
-          titulo='no_ensamble'
+          titulo='folio_ensamble'
           mensaje='Asignar un número de ensamble.'
           placeholder='Número de ensamble'
           required={false}
