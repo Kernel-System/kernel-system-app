@@ -32,6 +32,9 @@ import Cuentas from './pages/pagos/Cuentas';
 import Pagos from './pages/pagos/Pagos';
 import PagoNuevo from './pages/pagos/PagoNuevo';
 
+import Productos from './pages/productos/Productos';
+import AgregarProductos from './pages/productos/AgregarProductos';
+
 const asyncForgotPassword = asyncComponent(() =>
   import('pages/auth/ForgotPassword')
 );
@@ -113,6 +116,18 @@ const Rutas = () => {
       <Route path='/cuentas/' exact component={Cuentas} />
       <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
       <Route path='/cuentas/pagos/:id' exact component={Pagos} />
+
+      {/* productos */}
+      <Route path='/productos/' exact component={Productos} />
+      <Route path='/productos/nuevo' exact>
+        {<AgregarProductos tipo={'agregar'} />}
+      </Route>
+      <Route path='/productos/editar/:codigo' exact>
+        {<AgregarProductos tipo={'editar'} />}
+      </Route>
+      <Route path='/productos/mostrar/:codigo' exact>
+        {<AgregarProductos tipo={'mostrar'} />}
+      </Route>
 
       {/* Not Found */}
       <Route component={NotFound} />
