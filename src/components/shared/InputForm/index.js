@@ -6,9 +6,11 @@ const Index = ({
   placeholder,
   type,
   required = true,
-  onBlurred,
+  onBlurred = () => {},
   valueDef = '',
   enable = false,
+  max = 100,
+  value,
 }) => {
   return (
     <div>
@@ -42,7 +44,12 @@ const Index = ({
           placeholder={placeholder}
           style={{ width: '100%' }}
           defaultValue={valueDef}
+          value={value}
+          onBlur={(e) => {
+            onBlurred(e.target.value);
+          }}
           disabled={enable}
+          maxLength={max}
         />
       </Form.Item>
     </div>

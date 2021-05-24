@@ -1,6 +1,7 @@
 import AddProduct from 'components/ensamble/AddProduct';
 import { useState } from 'react';
-import { Typography, Input, Space, Button, Form, Select } from 'antd';
+import { Typography, Input, Space, Button, Form, Select, message } from 'antd';
+import { useHistory } from 'react-router';
 import HeadingBack from 'components/UI/HeadingBack';
 import { http } from 'api';
 const { Title } = Typography;
@@ -8,6 +9,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 const Index = () => {
+  const history = useHistory();
   const [list, setList] = useState({
     descripcion: '',
     observaciones: '',
@@ -81,7 +83,9 @@ const Index = () => {
         });
         console.log(productos);
         http.post('/items/componentes_ensamble', productos).then((result2) => {
-          console.log(result2);
+          message
+            .success('El ensamble ha sido registrados exitosamente', 3)
+            .then(() => history.goBack());
         });
       });
     console.log('Success:', list);

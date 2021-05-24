@@ -120,10 +120,11 @@ const Index = ({ match }) => {
         console.log(result);
         let series = [];
         list.componentes_ensamble.map((componente) => {
-          componente.series_componentes_ensamble.map((serie) => {
+          return componente.series_componentes_ensamble.map((serie) => {
             series.push({
               ...serie,
             });
+            return { ...serie };
           });
         });
         if (list.estado === 'Ordenado')
@@ -173,10 +174,11 @@ const Index = ({ match }) => {
   const actualizarSeries = () => {
     let series = [];
     list.componentes_ensamble.map((componente) => {
-      componente.series_componentes_ensamble.map((serie) => {
+      return componente.series_componentes_ensamble.map((serie) => {
         series.push({
           ...serie,
         });
+        return { ...serie };
       });
     });
     console.log(series);
