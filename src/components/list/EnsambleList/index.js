@@ -1,38 +1,66 @@
 import './styles.css';
-import { List, Typography, Button, Badge, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-const { Title, Text } = Typography;
+import { useState } from 'react';
+import { List, Button, Badge, Select } from 'antd';
+import { useQuery } from 'react-query';
+import { http } from 'api';
 const { Option } = Select;
 
-const Index = ({ list }) => {
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+const Index = () => {
+  const fetchProducts = async () => {
+    const { data } = await http.get(
+      `/items/ordenes_ensamble?fields=folio,fecha_orden,estado,descripcion`
+    );
+    return data.data;
+  };
+
+  const onSearchChange = (value) => {
+    setSearchValue(value);
+    filtrarEnsamblesPorEstado(data, value);
+  };
+
+  const filtrarEnsamblesPorEstado = async (ensambles, value) => {
+    console.log(value);
+    if (value === 'Todo') {
+      setListToShow(ensambles);
+    } else if (ensambles)
+      setListToShow(ensambles.filter((item) => item.estado.includes(value)));
+  };
+
+  const [searchValue, setSearchValue] = useState('');
+
+  const { data } = useQuery('ensambles', async () => {
+    const result = await fetchProducts();
+    setListToShow(result);
+    filtrarEnsamblesPorEstado(result, searchValue);
+    return result;
+  });
+  const [listToShow, setListToShow] = useState([]);
+
   return (
     <>
-      <Title>Órdenes de Ensamble</Title>
-      <Text>Ordenar por Estado:</Text>
-      <br />
       <Select
-        defaultValue='Creado'
+        defaultValue='Todo'
         style={{ width: 120 }}
-        onChange={handleChange}
+        onChange={onSearchChange}
       >
-        <Option value='Creado'>Creado</Option>
+        <Option value='Todo'>Todo</Option>
+        <Option value='Ordenado'>Ordenado</Option>
         <Option value='En ensamble'>En ensamble</Option>
-        <Option value='Finalizado'>Finalizado</Option>
+        <Option value='Ensamblado'>Ensamblado</Option>
+        <Option value='Ingresado en almacén'>Ingresado en almacén</Option>
       </Select>
       <List
         itemLayout='vertical'
         size='default'
         pagination={{
           onChange: (page) => {
-            console.log(page);
+            //changePag(page);
           },
-          pageSize: 10,
+          pageSize: 5,
         }}
-        dataSource={list}
+        dataSource={listToShow}
         renderItem={(item) => (
           <Badge.Ribbon text={item.estado}>
             <Link to={`/ensambles/${item.folio}`}>
@@ -40,7 +68,7 @@ const Index = ({ list }) => {
                 <List.Item.Meta
                   //avatar={<Avatar src={item.avatar} />}
                   title={`Folio ${item.folio}`}
-                  description={item.fechaorden}
+                  description={item.fecha_orden}
                 />
                 {item.descripcion}
               </List.Item>

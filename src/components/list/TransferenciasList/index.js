@@ -11,7 +11,7 @@ const Index = ({ list }) => {
   }
   return (
     <>
-      <Title>Transferencias</Title>
+      <Title level={3}>Transferencias</Title>
       <Text>Filtrar por:</Text>
       <br />
       <Select
@@ -35,21 +35,21 @@ const Index = ({ list }) => {
         dataSource={list}
         renderItem={(item) => (
           <Badge.Ribbon text={item.estado}>
-            <Link to={`/ensambles/${item.id}`}>
+            <Link to={`/transferencia/${item.id}`}>
               <List.Item key={item.id}>
                 <List.Item.Meta
                   //avatar={<Avatar src={item.avatar} />}
                   title={`Transferencia No. ${item.id}`}
                   description={item.fechasolicitud}
                 />
-                {`De ${item.almacen_origen} a ${item.almacen_destino}`}
+                {`Del almacen ${item.almacen_origen}, al almacen ${item.almacen_destino}`}
               </List.Item>
             </Link>
           </Badge.Ribbon>
         )}
       />
       <br />
-      <Link to='/ensambles/nuevo'>
+      <Link to='/transferencia/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nueva Transferencia
         </Button>

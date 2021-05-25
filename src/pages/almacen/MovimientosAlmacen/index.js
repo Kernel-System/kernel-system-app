@@ -8,6 +8,12 @@ const index = () => {
       comentario: 'Producto defectuoso.',
       fecha: '05/05/2021',
     },
+    {
+      clave: '0000013',
+      concepto: 'Venta',
+      comentario: '',
+      fecha: '05/05/2021',
+    },
   ];
   return <MovimientosAlmacenList list={lista} />;
 };

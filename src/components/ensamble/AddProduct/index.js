@@ -1,9 +1,18 @@
-import { Select, Input, Button, Typography, Space, Row, Col, Form } from 'antd';
+import {
+  Select,
+  Input,
+  Button,
+  Space,
+  Row,
+  Col,
+  Form,
+  InputNumber,
+} from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import TextLabel from 'components/UI/TextLabel';
 const { Option } = Select;
-const { Title } = Typography;
 
 const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
   const breakpoint = useBreakpoint();
@@ -34,64 +43,87 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
     setFilas(rows);
   };
 
-  const changeProduct = (id, value, descripcion) => {
+  const onChangeNumber = (id, value) => {
     const rows = JSON.parse(JSON.stringify(filas));
     rows[id] = {
-      id: id,
-      codigo: value,
-      cantidad: 0,
-      descripcion: descripcion,
+      ...rows[id],
+      cantidad: value,
     };
     onChanged(rows, tag);
     setFilas(rows);
   };
 
+  const changeProduct = (id, value, descripcion) => {
+    const rows = JSON.parse(JSON.stringify(filas));
+    rows[id] = {
+      id: id,
+      codigo: value,
+      cantidad: 1,
+      descripcion: descripcion,
+    };
+    onChanged(rows);
+    setFilas(rows);
+  };
+
   return (
     <div style={{ marginBottom: '20px' }}>
-      <Title level={4}>
-        {isNeeded === false ? `${titulo} (Opcional)` : `${titulo}`}
-      </Title>
+      <TextLabel
+        title={isNeeded === false ? `${titulo} (Opcional)` : `${titulo}`}
+      />
       {filas.map((fila) => (
-        <Row key={fila.id} gutter={[16, 24]} style={{ marginBottom: '10px' }}>
-          <Col className='gutter-row' xs={24} lg={12}>
-            <Form.Item
-              name={`${titulo}${fila.id}`}
-              rules={[
-                isNeeded === false
-                  ? { required: false }
-                  : {
-                      required: true,
-                      message: `Asigna un(a) ${titulo.toLowerCase()}`,
-                    },
-              ]}
-            >
-              <Select
-                showSearch
-                key={fila.id}
-                size='large'
-                style={{ width: '100%' }}
-                placeholder='Buscar producto'
-                optionFilterProp='children'
-                onChange={(value, index) =>
-                  changeProduct(fila.id, value, index.children)
-                }
-                //onFocus={onFocus}
-                //onBlur={onBlur}
-                //onSearch={onSearch}
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-              >
-                <Option value='Codigo1'>Objeto 1</Option>
-                <Option value='Codigo2'>Objeto 2</Option>
-              </Select>
-            </Form.Item>
+        <Row key={fila.id} gutter={[4]} style={{ marginBottom: '20px' }}>
+          <Col span={breakpoint.lg ? 12 : 24}>
+            <Row key={fila.id} gutter={[4]}>
+              <Col xs={16} lg={16}>
+                <Form.Item
+                  name={`${titulo}${fila.id}`}
+                  rules={[
+                    isNeeded === false
+                      ? { required: false }
+                      : {
+                          required: true,
+                          message: `Asigna un(a) ${titulo.toLowerCase()}`,
+                        },
+                  ]}
+                >
+                  <Select
+                    showSearch
+                    key={fila.id}
+                    style={{ width: '100%' }}
+                    placeholder='Buscar producto'
+                    optionFilterProp='children'
+                    onChange={(value, index) =>
+                      changeProduct(fila.id, value, index.children)
+                    }
+                    //onFocus={onFocus}
+                    //onBlur={onBlur}
+                    //onSearch={onSearch}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    <Option value='Codigo1'>Objeto 1</Option>
+                    <Option value='Codigo2'>Objeto 2</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={8} lg={8}>
+                <InputNumber
+                  min={1}
+                  max={10}
+                  defaultValue={1}
+                  onChange={(value) => onChangeNumber(fila.id, value)}
+                  disabled={filas[fila.id].codigo !== '' ? false : true}
+                  style={{ width: '100%' }}
+                />
+              </Col>
+            </Row>
           </Col>
-          <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
+          <Col span={breakpoint.lg ? 12 : 24}>
             <Input
               placeholder='Número de Serie'
-              size='large'
               style={{ width: '100%' }}
               disabled={true}
             />

@@ -22,6 +22,7 @@ const Index = (props) => {
     <>
       <Item
         name='rfc_proveedor'
+        label='RFC de proveedor'
         rules={[
           {
             required: true,
@@ -31,11 +32,12 @@ const Index = (props) => {
       >
         <Input disabled placeholder='RFC de proveedor' />
       </Item>
-      <Item name='guia'>
+      <Item name='guia' label='Número de guía'>
         <Input placeholder='Número de guía' />
       </Item>
       <Item
         name='fecha_compra'
+        label='Fecha de compra'
         rules={[
           {
             required: true,
@@ -51,7 +53,7 @@ const Index = (props) => {
           style={{ width: '100%' }}
         />
       </Item>
-      <Item name='fecha_entrega'>
+      <Item name='fecha_entrega' label='Fecha de entrega'>
         <DatePicker
           locale={locale}
           format={dateFormat}
@@ -59,9 +61,9 @@ const Index = (props) => {
           style={{ width: '100%' }}
         />
       </Item>
-
       <Item
         name='moneda'
+        label='Moneda'
         rules={[
           {
             required: true,
@@ -71,11 +73,12 @@ const Index = (props) => {
       >
         <Input disabled placeholder='Moneda' />
       </Item>
-      <Item name='tipo_cambio'>
+      <Item name='tipo_cambio' label='Tipo de cambio'>
         <Input placeholder='Tipo de cambio' />
       </Item>
       <Item
         name='subtotal'
+        label='Subtotal'
         rules={[
           {
             required: true,
@@ -87,6 +90,7 @@ const Index = (props) => {
       </Item>
       <Item
         name='total'
+        label='Monto total'
         rules={[
           {
             required: true,
@@ -98,6 +102,7 @@ const Index = (props) => {
       </Item>
       <Item
         name='forma_pago'
+        label='Forma de pago'
         rules={[
           {
             required: true,
@@ -120,6 +125,7 @@ const Index = (props) => {
       </Item>
       <Item
         name='metodo_pago'
+        label='Metodo de pago'
         rules={[
           {
             required: true,
@@ -153,7 +159,7 @@ const Index = (props) => {
   useEffect(() => {
     for (const dato in props.datosCompra) {
       let value = props.datosCompra[dato];
-      if (dato === 'fecha_compra')
+      if (dato.startsWith('fecha'))
         value = value === '' ? null : moment(value, dateFormat);
       changeFormValue({
         [dato]: value,
@@ -162,9 +168,14 @@ const Index = (props) => {
   }, [props.datosCompra, changeFormValue]);
 
   return (
-    <Form form={form} name='compra-form'>
-      {itemsToGrid(camposGeneral.props.children, 'auto', 2, 8, 16)}
-      <Title level={4}>Productos</Title>
+    <Form
+      form={form}
+      name='compra-form'
+      layout='vertical'
+      requiredMark='optional'
+    >
+      {itemsToGrid(camposGeneral.props.children, 'auto', 2, 16)}
+      <Title level={5}>Productos</Title>
       <Form.Item>
         <Button type='primary' htmlType='submit'>
           {props.submitText}

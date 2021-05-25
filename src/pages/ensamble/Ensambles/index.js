@@ -1,14 +1,16 @@
 import EnsambleList from 'components/list/EnsambleList';
+import { Typography } from 'antd';
+const { Title, Text } = Typography;
 
-const index = () => {
-  const listaEnsambles = [
-    { folio: '00000001', fechaorden: '01/01/2020', estado: 'Creado' },
-  ];
+const Index = () => {
   return (
     <div>
-      <EnsambleList list={listaEnsambles} />
+      <Title level={3}>Órdenes de Ensamble</Title>
+      <Text>Ordenar por Estado:</Text>
+      <br />
+      <EnsambleList />
     </div>
   );
 };
 
-export default index;
+export default Index;

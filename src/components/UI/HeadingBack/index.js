@@ -7,6 +7,7 @@ const HeadingBack = ({ title, subtitle, extra }) => {
   return (
     <PageHeader
       onBack={() => history.goBack()}
+      style={{ padding: '0 0 12px 0' }}
       title={
         <Heading
           title={title}

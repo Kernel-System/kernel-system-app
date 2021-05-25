@@ -1,4 +1,4 @@
-import ProveedorList from 'components/list/ProveedorList';
+import ComprasList from 'components/list/ComprasList';
 import ProductsTable from 'components/shared/ProductsTable';
 import GuestRoute from 'components/utils/GuestRoute';
 import PrivateRoute from 'components/utils/PrivateRoute';
@@ -8,6 +8,7 @@ import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
+import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
 import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
@@ -24,6 +25,13 @@ import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import { Route, Switch } from 'react-router';
+import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
+import Tranferencias from './pages/almacen/Transferencias';
+import Cuentas from './pages/pagos/Cuentas';
+import PagoNuevo from './pages/pagos/PagoNuevo';
+import Pagos from './pages/pagos/Pagos';
+import AgregarProductos from './pages/productos/AgregarProductos';
+import Productos from './pages/productos/Productos';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -109,11 +117,16 @@ const Rutas = () => {
       <PrivateRoute path='/venta' exact component={PuntoDeVenta} />
 
       {/* Proveedores */}
-      <Route path='/registrar-compra' exact component={RegistrarCompra} />
       <Route path='/proveedores' exact>
-        <ProveedorList list={listaProveedores} />
+        <Proveedores />
       </Route>
       <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
+
+      {/* Compras */}
+      <Route path='/compras' exact>
+        <ComprasList />
+      </Route>
+      <Route path='/compras/registrar' exact component={RegistrarCompra} />
 
       {/* Ensambles */}
       <Route path='/ensambles' exact component={Ensambles} />
@@ -126,6 +139,28 @@ const Rutas = () => {
       {/* Movimientos de almacen */}
       <Route path='/almacen' exact component={MovimientosAlmacen} />
       <Route path='/almacen/nuevo' exact component={NuevoMovimiento} />
+
+      {/* Transferencias */}
+      <Route path='/transferencia/' exact component={Tranferencias} />
+      <Route path='/transferencia/nuevo' exact component={NuevaTrasferencia} />
+      <Route path='/transferencia/:id' exact component={NuevaTrasferencia} />
+
+      {/* Pagos */}
+      <Route path='/cuentas/' exact component={Cuentas} />
+      <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
+      <Route path='/cuentas/pagos/:id' exact component={Pagos} />
+
+      {/* Productos */}
+      <Route path='/productos/' exact component={Productos} />
+      <Route path='/productos/nuevo' exact>
+        {<AgregarProductos tipo={'agregar'} />}
+      </Route>
+      <Route path='/productos/editar/:codigo' exact>
+        {<AgregarProductos tipo={'editar'} />}
+      </Route>
+      <Route path='/productos/mostrar/:codigo' exact>
+        {<AgregarProductos tipo={'mostrar'} />}
+      </Route>
 
       {/* Test */}
       <Route path='/test' exact component={ProductsTable} />
