@@ -1,28 +1,26 @@
-import InputForm from 'components/shared/InputForm';
-import InputForm2 from 'components/shared/InputForm2';
-import NumericInputForm from 'components/shared/NumericInputForm';
-import TextLabel from 'components/UI/TextLabel';
-import { useState, useEffect } from 'react';
-import {
-  Input,
-  Space,
-  Button,
-  Form,
-  Select,
-  message,
-  Row,
-  Col,
-  Switch,
-  Upload,
-  Modal,
-  Typography,
-  Tag,
-} from 'antd';
-import { useHistory, useRouteMatch } from 'react-router';
 import { PlusOutlined } from '@ant-design/icons';
-import HeadingBack from 'components/UI/HeadingBack';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Tag,
+  Upload,
+} from 'antd';
 import { http } from 'api';
-import { tiposDeMoneda, categoriasProductos } from 'utils/facturas/catalogo';
+import InputForm from 'components/shared/InputForm';
+import NumericInputForm from 'components/shared/NumericInputForm';
+import HeadingBack from 'components/UI/HeadingBack';
+import TextLabel from 'components/UI/TextLabel';
+import { useEffect, useState } from 'react';
+import { useHistory, useRouteMatch } from 'react-router';
+import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
 const { TextArea } = Input;
 const { Option } = Select;
 
