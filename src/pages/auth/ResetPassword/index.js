@@ -1,18 +1,22 @@
 import { Button, Col, Form, Input, message, Row } from 'antd';
-import { changePassword } from 'api/profile';
+import { resetPassword } from 'api/auth';
 import Heading from 'components/UI/Heading';
-import { useStoreState } from 'easy-peasy';
+import { useQuery } from 'hooks/useQuery';
 import { useHistory } from 'react-router';
 import { passwordRules } from 'utils/validations/auth';
 
-const ChangePassword = () => {
+const ResetPassword = () => {
+  const query = useQuery();
   const history = useHistory();
-  const token = useStoreState((state) => state.user.token.access_token);
-  const onFinish = ({ newPassword }) => {
-    changePassword(token, newPassword)
+
+  const onSubmit = ({ newPassword }) => {
+    resetPassword(query.get('token'), newPassword)
       .then(() => {
-        message.success('Ha cambiado su contraseña exitosamente');
-        history.push('/perfil');
+        message.success(
+          'Se ha restablecido tu contraseña correctamente',
+          2,
+          () => history.push('/iniciar-sesion')
+        );
       })
       .catch(() => {
         message.error('Lo sentimos, ha ocurrido un error');
@@ -21,23 +25,19 @@ const ChangePassword = () => {
 
   return (
     <>
-      <Heading
-        title='Cambiar contraseña'
-        subtitle='Por favor introduzca su actual y nueva contraseña'
-      />
+      <Heading title='Restablecer contraseña' />
       <Row>
         <Col xs={24} lg={12}>
-          <Form
-            name='changePasswordForm'
-            layout='vertical'
-            requiredMark={false}
-            onFinish={onFinish}
-          >
-            <Form.Item name='newPassword' label='Nueva contraseña'>
-              <Input.Password rules={passwordRules} />
+          <Form name='resetPasswordForm' layout='vertical' onFinish={onSubmit}>
+            <Form.Item
+              name='newPassword'
+              label='Nueva contraseña'
+              rules={passwordRules}
+            >
+              <Input.Password />
             </Form.Item>
             <Form.Item
-              name='confirmPassword'
+              name='confirmNewPassword'
               label='Confirmar nueva contraseña'
               dependencies={['newPassword']}
               rules={[
@@ -58,7 +58,7 @@ const ChangePassword = () => {
             </Form.Item>
             <Form.Item>
               <Button type='primary' htmlType='submit'>
-                Cambiar contraseña
+                Establecer nueva contraseña
               </Button>
             </Form.Item>
           </Form>
@@ -68,4 +68,4 @@ const ChangePassword = () => {
   );
 };
 
-export default ChangePassword;
+export default ResetPassword;

@@ -4,7 +4,7 @@ import Heading from 'components/UI/Heading';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 
 // TEMPORAL
 const data = [
@@ -40,25 +40,25 @@ const Order = ({ tipo = 'delivery' }) => {
       />
       <Row gutter={[24, 24]}>
         <Col xs={24} md={12}>
-          <TextLabel title='Nombre' description='Edson David Puente Guerrero' />
-          <TextLabel title='Número de teléfono' description='(612) 135-6709' />
+          <TextLabel title='Nombre' subtitle='Edson David Puente Guerrero' />
+          <TextLabel title='Número de teléfono' subtitle='(612) 135-6709' />
           {tipo === 'delivery' && (
             <>
-              <TextLabel title='No. de guía' description='RR123456789CN' />
+              <TextLabel title='No. de guía' subtitle='RR123456789CN' />
               <TextLabel
                 title='Dirección de envío'
-                description='Calle No.int. No.ext. Colonia, Estado, Municipio, Localidad, C.P'
+                subtitle='Calle No.int. No.ext. Colonia, Estado, Municipio, Localidad, C.P'
               />
             </>
           )}
-          <TextLabel title='Fecha del pedido' description='18/03/2021' />
+          <TextLabel title='Fecha del pedido' subtitle='18/03/2021' />
           {tipo === 'delivery' && (
             <TextLabel
               title='Fecha estimada de entrega'
-              description='30/03/2021'
+              subtitle='30/03/2021'
             />
           )}
-          <TextLabel title='Total' description={formatPrice(12635.23)} />
+          <TextLabel title='Total' subtitle={formatPrice(12635.23)} />
           <TextLabel title='Productos adquiridos' />
           <BoughtProductsList data={data} />
         </Col>

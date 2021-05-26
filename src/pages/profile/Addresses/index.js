@@ -1,28 +1,40 @@
-import { Button, Col, Divider, Row, Typography } from 'antd';
-import Heading from 'components/UI/Heading';
-import AssignAddressCard from 'components/shared/AssignAddressCard';
+import { Button, Col, message, Row } from 'antd';
+import { getUserData } from 'api/profile';
+import { deleteUserDireccion, getUserDirecciones } from 'api/shared/addresses';
 import AddressesList from 'components/profile/Addresses/AddressesList';
+import Heading from 'components/UI/Heading';
+import { useStoreState } from 'easy-peasy';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
-const { Title } = Typography;
 
 const Addresses = () => {
+  const queryClient = useQueryClient();
+  const token = useStoreState((state) => state.user.token.access_token);
+  const user = useQuery('user', () => getUserData(token));
+  const addresses = useQuery(
+    'direcciones',
+    () => getUserDirecciones(user.data.cliente.rfc, token),
+    { enabled: !!user?.data?.cliente }
+  );
+  const mutation = useMutation((id) => deleteUserDireccion(id, token), {
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries('direcciones')
+        .then(() =>
+          message.success('Se ha eliminado la dirección correctamente')
+        );
+    },
+    onError: () => {
+      message.error('Lo sentimos, ha ocurrido un error');
+    },
+  });
+
   return (
     <>
       <Heading title='Mis direcciones' />
-      <Title level={5}>Direcciones por defecto</Title>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <AssignAddressCard tipo='envío' />
-        </Col>
-        <Col xs={24} md={12}>
-          <AssignAddressCard tipo='facturación' />
-        </Col>
-      </Row>
-      <Divider />
-      <Title level={5}>Direcciones adicionales</Title>
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <AddressesList />
+          <AddressesList addresses={addresses} deleteUserDireccion={mutation} />
         </Col>
         <Col xs={24}>
           <Link to='/direcciones/nueva'>

@@ -23,7 +23,7 @@ import BoughtProductsList from 'components/shared/BoughtProductsList';
 import Heading from 'components/UI/Heading';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect, useState } from 'react';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 const { Title, Paragraph } = Typography;
 
 // TEMPORAL
@@ -62,7 +62,7 @@ const Checkout = () => {
         <Steps.Step title='Pago' icon={<DollarOutlined />} />
         <Steps.Step title='¡Gracias por tu compra!' icon={<LikeOutlined />} />
       </Steps>
-      <br />
+      <Divider />
       <Tabs
         activeKey={step.toString()}
         defaultActiveKey={step.toString()}
@@ -137,13 +137,13 @@ const Checkout = () => {
           <Heading title='Gracias, has realizado tu pedido' />
           <Row>
             <Col xs={24} md={12}>
-              <TextLabel title='Número de pedido' description='1237578' />
+              <TextLabel title='Número de pedido' subtitle='1237578' />
               <TextLabel
                 title='Factura electrónica (CFDI)'
-                description='Tendrás 24 horas después de realizar tu pedido para solicitar tu
+                subtitle='Tendrás 24 horas después de realizar tu pedido para solicitar tu
                 factura electrónica (CFDI) a través de “Mis pedidos”.'
               />
-              <TextLabel title='Total' description={formatPrice(420)} />
+              <TextLabel title='Total' subtitle={formatPrice(420)} />
               <TextLabel title='Productos adquiridos' />
               <BoughtProductsList data={data} />
             </Col>

@@ -11,7 +11,7 @@ import {
   Typography,
 } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 const { Title, Paragraph } = Typography;
 
 const OrderCard = ({ data }) => {

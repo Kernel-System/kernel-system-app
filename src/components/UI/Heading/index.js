@@ -9,7 +9,7 @@ const Heading = ({ title, subtitle, extra, style }) => (
       </Title>
       {extra && <Text type='secondary'>{extra}</Text>}
     </Space>
-    {subtitle && <Paragraph>{subtitle}</Paragraph>}
+    {subtitle && <Paragraph style={style}>{subtitle}</Paragraph>}
   </>
 );
 

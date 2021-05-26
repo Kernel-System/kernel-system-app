@@ -1,17 +1,20 @@
+import ComprasList from 'components/list/ComprasList';
+import ProductsTable from 'components/shared/ProductsTable';
+import GuestRoute from 'components/utils/GuestRoute';
+import PrivateRoute from 'components/utils/PrivateRoute';
 import asyncComponent from 'hoc/asyncComponent';
 import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
-import Login from 'pages/auth/Login';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
+import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
 import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
 import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
 import FacturarTicket from 'pages/FacturarTicket';
 import Home from 'pages/Home';
-import NotFound from 'pages/NotFound';
 import Order from 'pages/orders/Order';
 import Orders from 'pages/orders/Orders';
 import Product from 'pages/Product';
@@ -20,24 +23,47 @@ import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
-import Proveedores from 'pages/compras/Proveedores';
-import ComprasList from 'components/list/ComprasList';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-import Venta from 'pages/ventas/Venta';
 import { Route, Switch } from 'react-router';
-
-import Tranferencias from './pages/almacen/Transferencias';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
+import Tranferencias from './pages/almacen/Transferencias';
 import Cuentas from './pages/pagos/Cuentas';
-import Pagos from './pages/pagos/Pagos';
 import PagoNuevo from './pages/pagos/PagoNuevo';
-
-import Productos from './pages/productos/Productos';
+import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
+import Productos from './pages/productos/Productos';
 
-const asyncForgotPassword = asyncComponent(() =>
-  import('pages/auth/ForgotPassword')
+const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
+
+const asyncLogout = asyncComponent(() => import('pages/auth/Logout'));
+
+const asyncRecoverAccount = asyncComponent(() =>
+  import('pages/auth/RecoverAccount')
 );
+
+const asyncResetPassword = asyncComponent(() =>
+  import('pages/auth/ResetPassword')
+);
+
+const asyncNotFound = asyncComponent(() => import('pages/NotFound'));
+
+const listaProveedores = [
+  {
+    rfc: 'ARR-860120',
+    nombre: 'LA @ S.A. DE C.V',
+    razon_social: 'soy una razon 1',
+  },
+  {
+    rfc: 'APO-830120',
+    nombre: 'LA @ DEL % SA DE CV',
+    razon_social: 'soy una razon 2',
+  },
+  {
+    rfc: 'ACO-800210',
+    nombre: '@ COMER.COM',
+    razon_social: 'soy una razon 3',
+  },
+];
 
 const Rutas = () => {
   return (
@@ -46,20 +72,27 @@ const Rutas = () => {
       <Route path='/' exact component={Home} />
 
       {/* Auth */}
-      <Route path='/iniciar-sesion' exact component={Login} />
-      <Route
-        path='/recuperar-contrasena'
+      <GuestRoute path='/iniciar-sesion' exact component={asyncLogin} />
+      <GuestRoute
+        path='/recuperar-cuenta'
         exact
-        component={asyncForgotPassword}
+        component={asyncRecoverAccount}
       />
+      <GuestRoute
+        path='/restablecer-contrasena'
+        exact
+        component={asyncResetPassword}
+      />
+      <PrivateRoute path='/cerrar-sesion' exact component={asyncLogout} />
 
       {/* Addresses */}
-      <Route path='/direcciones' exact component={Addresses} />
-      <Route path='/direcciones/nueva' exact component={NewAddress} />
+      <PrivateRoute path='/direcciones' exact component={Addresses} />
+      <PrivateRoute path='/direcciones/:id' exact component={NewAddress} />
+      <PrivateRoute path='/direcciones/nueva' exact component={NewAddress} />
 
       {/* Profile */}
-      <Route path='/perfil' exact component={Profile} />
-      <Route
+      <PrivateRoute path='/perfil' exact component={Profile} />
+      <PrivateRoute
         path='/perfil/cambiar-contrasena'
         exact
         component={ChangePassword}
@@ -68,21 +101,20 @@ const Rutas = () => {
       {/* Search Product */}
       <Route path='/b/:query' exact component={Search} />
       <Route path='/c/:query' exact component={Search} />
-      <Route path='/p/:id' exact component={Product} />
+      <Route path='/producto/:id' exact component={Product} />
 
       {/* Cart */}
-      <Route path='/lista-de-compra' exact component={Cart} />
+      <PrivateRoute path='/lista-de-compra' exact component={Cart} />
 
       {/* Checkout */}
-      <Route path='/checkout' exact component={Checkout} />
+      <PrivateRoute path='/checkout' exact component={Checkout} />
 
       {/* Orders */}
-      <Route path='/pedidos' exact component={Orders} />
-      <Route path='/pedidos/:id' exact component={Order} />
+      <PrivateRoute path='/pedidos' exact component={Orders} />
+      <PrivateRoute path='/pedidos/:id' exact component={Order} />
 
       {/* Punto de venta */}
-      <Route path='/venta' exact component={PuntoDeVenta} />
-      <Route path='/venta/nueva' exact component={Venta} />
+      <PrivateRoute path='/venta' exact component={PuntoDeVenta} />
 
       {/* Proveedores */}
       <Route path='/proveedores' exact>
@@ -108,6 +140,7 @@ const Rutas = () => {
       <Route path='/almacen' exact component={MovimientosAlmacen} />
       <Route path='/almacen/nuevo' exact component={NuevoMovimiento} />
 
+      {/* Transferencias */}
       <Route path='/transferencia/' exact component={Tranferencias} />
       <Route path='/transferencia/nuevo' exact>
         {<NuevaTrasferencia tipo={'agregar'} />}
@@ -119,12 +152,12 @@ const Rutas = () => {
         {<NuevaTrasferencia tipo={'editar'} />}
       </Route>
 
-      {/* pagos */}
+      {/* Pagos */}
       <Route path='/cuentas/' exact component={Cuentas} />
       <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
       <Route path='/cuentas/pagos/:id' exact component={Pagos} />
 
-      {/* productos */}
+      {/* Productos */}
       <Route path='/productos/' exact component={Productos} />
       <Route path='/productos/nuevo' exact>
         {<AgregarProductos tipo={'agregar'} />}
@@ -136,8 +169,11 @@ const Rutas = () => {
         {<AgregarProductos tipo={'mostrar'} />}
       </Route>
 
+      {/* Test */}
+      <Route path='/test' exact component={ProductsTable} />
+
       {/* Not Found */}
-      <Route component={NotFound} />
+      <Route component={asyncNotFound} />
     </Switch>
   );
 };
