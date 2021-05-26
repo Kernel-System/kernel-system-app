@@ -1,5 +1,4 @@
 import InputForm from 'components/shared/InputForm';
-import InputForm2 from 'components/shared/InputForm2';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import TextLabel from 'components/UI/TextLabel';
 import { useState, useEffect } from 'react';
