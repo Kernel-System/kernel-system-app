@@ -1,8 +1,8 @@
-import React, { useEffect, useCallback } from 'react';
 import 'antd/dist/antd.css';
+import './styles.css';
+import React, { useEffect, useCallback } from 'react';
 import { Form, Input, Button, InputNumber, Switch } from 'antd';
 import { Typography } from 'antd';
-
 import { itemsToGrid } from 'utils/gridUtils';
 
 const { Item } = Form;
@@ -62,7 +62,7 @@ const Index = (props) => {
         label='Correo'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -77,7 +77,7 @@ const Index = (props) => {
         label='Teléfono'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -85,6 +85,9 @@ const Index = (props) => {
         <InputNumber
           min={1000000000}
           max={9999999999}
+          onKeyDown={(evt) =>
+            (evt.key === '.' || evt.key === '-') && evt.preventDefault()
+          }
           placeholder='Teléfono'
           style={{ width: '100%' }}
         />
@@ -93,6 +96,9 @@ const Index = (props) => {
         <InputNumber
           min={1000000000}
           max={9999999999}
+          onKeyDown={(evt) =>
+            (evt.key === '.' || evt.key === '-') && evt.preventDefault()
+          }
           placeholder='Whatsapp'
           style={{ width: '100%' }}
         />
@@ -102,7 +108,7 @@ const Index = (props) => {
         label='Tipo'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -114,7 +120,7 @@ const Index = (props) => {
         label='Categoría'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -183,7 +189,7 @@ const Index = (props) => {
         label='Calle'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -204,7 +210,7 @@ const Index = (props) => {
         label='No. exterior'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -221,7 +227,7 @@ const Index = (props) => {
         label='Colonia'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -233,7 +239,7 @@ const Index = (props) => {
         label='C.P'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -250,7 +256,7 @@ const Index = (props) => {
         label='Localidad'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -262,7 +268,7 @@ const Index = (props) => {
         label='Municipio'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -274,7 +280,7 @@ const Index = (props) => {
         label='Estado'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -286,7 +292,7 @@ const Index = (props) => {
         label='País'
         rules={[
           {
-            required: true,
+            required: false,
             message: 'Requerido',
           },
         ]}
@@ -304,17 +310,17 @@ const Index = (props) => {
   );
 
   const onFinish = async (values) => {
-    await props.onSubmit(values);
-    if (props.cleanOnSubmit) form.resetFields();
+    const success = await props.onSubmit(values);
+    if (success && props.cleanOnSubmit) form.resetFields();
   };
 
   useEffect(() => {
-    for (const dato in props.datosProveedor) {
+    for (const dato in props.itemData) {
       changeFormValue({
-        [dato]: props.datosProveedor[dato],
+        [dato]: props.itemData[dato],
       });
     }
-  }, [props.datosProveedor, changeFormValue]);
+  }, [props.itemData, changeFormValue]);
 
   return (
     <>
