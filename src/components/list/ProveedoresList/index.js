@@ -1,18 +1,11 @@
 import './styles.css';
-import axios from 'axios';
 import { useState } from 'react';
 import { Popconfirm, List, Button, Input } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
+import { getItems } from 'api/shared/proveedores';
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
-  const fetchItems = async () => {
-    const { data } = await axios.get(
-      'https://kernel-system-api.herokuapp.com/items/proveedores'
-    );
-    return data.data;
-  };
-
   const onSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
@@ -29,10 +22,11 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
   const [searchValue, setSearchValue] = useState('');
 
   const { data } = useQuery('proveedores', async () => {
-    const result = await fetchItems();
-    setListToShow(result);
-    filtrarProveedoresPorRFC(result, searchValue);
-    return result;
+    const { data } = await getItems();
+    const proveedores = data.data;
+    setListToShow(proveedores);
+    filtrarProveedoresPorRFC(proveedores, searchValue);
+    return proveedores;
   });
   const [listToShow, setListToShow] = useState([]);
 
