@@ -1,5 +1,5 @@
-import { PercentageOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { Badge, Button, Card, Image, Space, Typography } from 'antd';
+import { PercentageOutlined } from '@ant-design/icons';
+import { Badge, Card, Image, Space, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { formatPrice } from 'utils/functions';
 
@@ -10,11 +10,6 @@ const ProductCard = ({ product, descuento = 0.5 }) => {
 
   const goToProduct = (productId) => {
     history.push(`/producto/${productId}`);
-  };
-
-  const addToCart = (e, productId) => {
-    e.stopPropagation();
-    console.log('Producto:', productId);
   };
 
   return (
@@ -42,26 +37,18 @@ const ProductCard = ({ product, descuento = 0.5 }) => {
         }
         onClick={() => goToProduct(product.id)}
       >
-        <Paragraph type='secondary' style={{ marginBottom: 0 }}>
-          {product.category.toUpperCase()}
-        </Paragraph>
-        <Paragraph strong ellipsis={{ rows: 2 }} style={{ minHeight: 44 }}>
+        <Text type='secondary'>{product.category.toUpperCase()}</Text>
+        <Paragraph ellipsis={{ rows: 2 }} style={{ minHeight: 44 }}>
           {product.title}
         </Paragraph>
-        <Space align='center'>
-          <Title level={3}>{formatPrice(product.price * descuento)}</Title>
-          <Paragraph type={'secondary'} delete>
+        <Space>
+          <Title level={3} style={{ display: 'inline-block', marginBottom: 0 }}>
+            {formatPrice(product.price * descuento)}
+          </Title>
+          <Text type={'secondary'} delete>
             {formatPrice(product.price)}
-          </Paragraph>
+          </Text>
         </Space>
-        <Button
-          block
-          type='primary'
-          icon={<ShoppingCartOutlined />}
-          onClick={(e) => addToCart(e, product.id)}
-        >
-          Añadir a la lista
-        </Button>
       </Card>
     </Badge.Ribbon>
   );

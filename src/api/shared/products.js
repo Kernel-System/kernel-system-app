@@ -12,6 +12,22 @@ export const fetchProduct = async (id) => {
   return data;
 };
 
+export const fetchCartProducts = (cartItems) => {
+  let newCartItems = [];
+  const cartItemsIds = cartItems.map((cartItem) => cartItem.id);
+  Promise.all(
+    cartItemsIds.map(async (cartItemId, i) => {
+      const { data } = await axios.get(
+        `https://fakestoreapi.com/products/${cartItemId}`
+      );
+      return { ...data, quantity: cartItems[i].quantity };
+    })
+  ).then((values) => {
+    newCartItems.push(...values);
+  });
+  return newCartItems;
+};
+
 export const fetchProductsByName = async (sTitle) => {
   const { data } = await axios.get(`https://fakestoreapi.com/products`);
   return data.filter((product) =>
