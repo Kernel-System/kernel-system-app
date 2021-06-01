@@ -1,4 +1,8 @@
+import InputForm from 'components/shared/InputForm';
+import NumericInputForm from 'components/shared/NumericInputForm';
+import TextLabel from 'components/UI/TextLabel';
 import { PlusOutlined } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Col,
@@ -14,11 +18,7 @@ import {
   Upload,
 } from 'antd';
 import { http } from 'api';
-import InputForm from 'components/shared/InputForm';
-import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
-import TextLabel from 'components/UI/TextLabel';
-import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
 const { TextArea } = Input;

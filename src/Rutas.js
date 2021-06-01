@@ -142,8 +142,15 @@ const Rutas = () => {
 
       {/* Transferencias */}
       <Route path='/transferencia/' exact component={Tranferencias} />
-      <Route path='/transferencia/nuevo' exact component={NuevaTrasferencia} />
-      <Route path='/transferencia/:id' exact component={NuevaTrasferencia} />
+      <Route path='/transferencia/nuevo' exact>
+        {<NuevaTrasferencia tipo={'agregar'} />}
+      </Route>
+      <Route path='/transferencia/mostrar/:id' exact>
+        {<NuevaTrasferencia tipo={'mostrar'} />}
+      </Route>
+      <Route path='/transferencia/editar/:id' exact>
+        {<NuevaTrasferencia tipo={'editar'} />}
+      </Route>
 
       {/* Pagos */}
       <Route path='/cuentas/' exact component={Cuentas} />

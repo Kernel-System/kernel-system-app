@@ -11,7 +11,12 @@ import {
   Button,
   Image,
 } from 'antd';
-import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 
 const originData = [];
 
@@ -60,7 +65,7 @@ const EditableCell = ({
   );
 };
 
-const Index = () => {
+const Index = ({ list }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState(originData);
   const [editingKey, setEditingKey] = useState('');
@@ -113,13 +118,18 @@ const Index = () => {
     }
   };
 
+  const handleDelete = (key) => {
+    const dataSource = [...data];
+    setData(dataSource.filter((item) => item.key !== key));
+  };
+
   const columns = [
     {
       title: 'IMAGEN',
       dataIndex: 'image',
       width: '40px',
       //fixed: "left",
-      render: (_, record) => <Image width={150} src={record.productimage} />,
+      render: (_, record) => <Image width={50} src={record.productimage} />,
       editable: false,
     },
     {
@@ -158,14 +168,22 @@ const Index = () => {
             </Popconfirm>
           </span>
         ) : (
-          <Button
-            icon={<EditOutlined />}
-            type='link'
-            disabled={editingKey !== ''}
-            onClick={() => edit(record)}
-          >
-            Editar
-          </Button>
+          <span>
+            <Button
+              icon={<EditOutlined />}
+              type='link'
+              disabled={editingKey !== ''}
+              onClick={() => edit(record)}
+            >
+              Editar
+            </Button>
+            <Popconfirm
+              title='¿Estas seguro de querer eliminar?'
+              onConfirm={() => handleDelete(record.key)}
+            >
+              <DeleteOutlined />
+            </Popconfirm>
+          </span>
         );
       },
     },
