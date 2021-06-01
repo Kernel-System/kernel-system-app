@@ -1,27 +1,50 @@
-import './style.css';
-import { Layout, Menu } from 'antd';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-
 import {
   AppstoreOutlined,
-  PieChartOutlined,
-  DesktopOutlined,
   ContainerOutlined,
+  DesktopOutlined,
   MailOutlined,
+  PieChartOutlined,
 } from '@ant-design/icons';
+import { Divider, Input, Layout, Menu } from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { useHistory } from 'react-router';
+import './style.css';
+
 const { SubMenu } = Menu;
 const { Sider } = Layout;
 
-const Index = ({ collapsed }) => {
+const Index = ({ collapsed, ToggleCollapsed }) => {
   const breakpoint = useBreakpoint();
+  const history = useHistory();
+
+  const onSearch = (value) => {
+    history.push(`/b/${value}`);
+    ToggleCollapsed();
+  };
+
   return (
     <Sider
       className='site-layout-background'
       collapsed={collapsed}
       collapsedWidth={breakpoint.lg ? 80 : 0}
       width={breakpoint.lg ? 200 : '100%'}
+      style={{ zIndex: 1 }}
     >
       <Menu mode='inline'>
+        {breakpoint.xs && (
+          <>
+            <Menu.Item key='0' style={{ marginTop: '1.5rem' }}>
+              <Input.Search
+                placeholder='Buscar...'
+                onSearch={onSearch}
+                enterButton
+                style={{ display: 'block' }}
+                size='large'
+              />
+            </Menu.Item>
+            <Divider />
+          </>
+        )}
         <Menu.Item key='1' icon={<PieChartOutlined />}>
           Option 1
         </Menu.Item>
