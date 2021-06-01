@@ -15,7 +15,7 @@ const App = () => {
 
   useEffect(() => {
     if (rehydrated) {
-      // checkAuthState();
+      checkAuthState();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rehydrated, location]);

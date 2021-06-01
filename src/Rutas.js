@@ -110,8 +110,8 @@ const Rutas = () => {
       <PrivateRoute path='/checkout' exact component={Checkout} />
 
       {/* Orders */}
-      <PrivateRoute path='/pedidos' exact component={Orders} />
-      <PrivateRoute path='/pedidos/:id' exact component={Order} />
+      <PrivateRoute path='/solicitudes-de-compra' exact component={Orders} />
+      <PrivateRoute path='/solicitudes-de-compra/:id' exact component={Order} />
 
       {/* Punto de venta */}
       <PrivateRoute path='/venta' exact component={PuntoDeVenta} />
