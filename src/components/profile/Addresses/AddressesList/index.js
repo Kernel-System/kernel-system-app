@@ -19,15 +19,18 @@ const AddressesList = ({ addresses, deleteUserDireccion }) => {
             <Button
               onClick={() => history.push(`/direcciones/${address.id}`)}
               icon={<EditFilled />}
+              disabled={address.fiscal}
             ></Button>,
             <Button
               danger
               icon={<DeleteFilled />}
               onClick={() => deleteUserDireccion.mutate(address.id)}
+              disabled={address.fiscal}
             ></Button>,
           ]}
         >
           <List.Item.Meta
+            title={address.fiscal && 'Dirección fiscal'}
             description={
               <Text>
                 {address.calle} No. {address.no_ext}

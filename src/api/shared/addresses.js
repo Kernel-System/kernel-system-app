@@ -10,6 +10,14 @@ export const getUserDirecciones = (rfc, token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
+export const getUserDireccionesCount = (rfc, token) =>
+  http.get(
+    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&meta=filter_count`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
 export const getUserDireccion = (id, token) =>
   http.get(
     `/items/domicilios_cliente/${id}?fields=id,estado,municipio,localidad,calle,no_ext,no_int,colonia,cp,entre_calle_1,entre_calle_2,pais`,
@@ -18,23 +26,9 @@ export const getUserDireccion = (id, token) =>
     }
   );
 
-export const getUserDireccionesCount = (rfc, token) =>
+export const getUserDireccionFiscal = (rfc, token) =>
   http.get(
-    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&meta=total_count`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-
-export const getUserDireccionesEnvio = (rfc, token) =>
-  http.get(
-    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&filter[fiscal][_eq]=false`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-
-export const getUserDireccionesFacturacion = (rfc, token) =>
-  http.get(
-    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&filter[fiscal][_eq]=true`,
+    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&filter[fiscal][_eq]=true&limit=1`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 

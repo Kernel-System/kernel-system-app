@@ -16,6 +16,7 @@ export const userModel = {
   expirationDate: 0,
 
   setExpirationDate: action(
+    // (state, payload) => (state.expirationDate = new Date().getTime() + 5000)
     (state, payload) => (state.expirationDate = new Date().getTime() + payload)
   ),
 
@@ -36,16 +37,22 @@ export const userModel = {
     actions.removeExpirationDate();
   }),
 
+  refreshToken: thunk((actions, _, helpers) => {
+    refreshToken(helpers.getStoreState().user.token.refresh_token)
+      .then(({ data: { data } }) => {
+        actions.setUserToken(data);
+        actions.setExpirationDate(data.expires);
+        actions.startAuthTimeout();
+      })
+      .catch(() => {
+        actions.logout();
+      });
+  }),
+
   startAuthTimeout: thunk((actions, _, helpers) => {
     setTimeout(() => {
-      refreshToken(helpers.getStoreState().user.token.refresh_token)
-        .then(({ data: { data } }) => {
-          actions.setUserToken(data);
-          actions.setExpirationDate(data.expires);
-        })
-        .catch(() => {
-          actions.logout();
-        });
+      actions.refreshToken();
+      // }, 5000);
     }, helpers.getStoreState().user.token.expires);
   }),
 
@@ -53,11 +60,16 @@ export const userModel = {
     if (!helpers.getStoreState().user.isAuth) {
       actions.logout();
     } else {
-      if (helpers.getStoreState().user.expirationDate <= new Date().getTime()) {
-        actions.logout();
-      } else {
-        actions.startAuthTimeout();
+      if (
+        helpers.getStoreState().user.expirationDate > 0 &&
+        helpers.getStoreState().user.expirationDate <= new Date().getTime()
+      ) {
+        actions.refreshToken();
       }
+      console.log(
+        helpers.getStoreState().user.expirationDate,
+        new Date().getTime()
+      );
     }
   }),
 };

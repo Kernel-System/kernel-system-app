@@ -1,10 +1,11 @@
-import { Col, Divider, Row } from 'antd';
+import { Col, Divider, message, Row } from 'antd';
 import { fetchProduct, fetchProducts } from 'api/shared/products';
 import ProductDetails from 'components/Product/ProductDetails';
 import ProductImage from 'components/Product/ProductImage';
 import ProductOverview from 'components/Product/ProductOverview';
 import RelatedProducts from 'components/Product/RelatedProducts';
 import CenteredSpinner from 'components/UI/CenteredSpinner';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
@@ -19,14 +20,18 @@ const especificaciones = [
 
 const Product = () => {
   const { id } = useParams();
+  const isAuth = useStoreState((state) => state.user.isAuth);
+  const addCartItem = useStoreActions((actions) => actions.cart.addCartItem);
   const productsQuery = useQuery(['products', 4], () => fetchProducts(4));
   const productQuery = useQuery(['product', id], () => fetchProduct(id));
 
-  //TEMPORAL
-  const isAuth = true;
-
   const addToCart = ({ quantity }) => {
-    console.log(`ID: ${id}, Quantity:${quantity}`);
+    try {
+      addCartItem({ id, quantity });
+      message.success('Producto añadido a la lista');
+    } catch (error) {
+      message.error(`Lo sentimos, ha ocurrido un error`);
+    }
   };
 
   return (
@@ -35,10 +40,10 @@ const Product = () => {
         <CenteredSpinner />
       ) : (
         <>
-          <Col xs={24} md={6}>
+          <Col xs={24} md={8}>
             <ProductImage product={productQuery.data} />
           </Col>
-          <Col xs={24} md={18} flex='auto'>
+          <Col xs={24} md={16} flex='auto'>
             <ProductOverview
               product={productQuery.data}
               isAuth={isAuth}

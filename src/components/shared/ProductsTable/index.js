@@ -3,40 +3,12 @@ import Column from 'antd/lib/table/Column';
 import { Link } from 'react-router-dom';
 import { formatPrice } from 'utils/functions';
 
-const data = [
-  {
-    key: '1',
-    image:
-      'https://www.dentalmex.mx/wp-content/uploads/2019/04/Temp-Bond-cemento-temporal-de-Kerr.jpg',
-    name: 'DentalMex TEMP BOND BASE DE 50G /CATALIZADOR DE 15G. KERR',
-    discount: 10,
-    price: 750,
-    quantity: 5,
-  },
-  {
-    key: '2',
-    image:
-      'https://www.dentalmex.mx/wp-content/uploads/2019/04/Temp-Bond-cemento-temporal-de-Kerr.jpg',
-    name: 'DentalMex TEMP BOND BASE DE 50G /CATALIZADOR DE 15G. KERR',
-    discount: 0,
-    price: 700,
-    quantity: 2,
-  },
-  {
-    key: '3',
-    image:
-      'https://www.dentalmex.mx/wp-content/uploads/2019/04/Temp-Bond-cemento-temporal-de-Kerr.jpg',
-    name: 'DentalMex TEMP BOND BASE DE 50G /CATALIZADOR DE 15G. KERR',
-    discount: 30,
-    price: 75,
-    quantity: 10,
-  },
-];
-
-const ProductsTable = ({ tipo = 'venta' }) => {
+const ProductsTable = ({ products, tipo = 'venta' }) => {
+  console.log(products);
   return (
     <Table
-      dataSource={data}
+      loading={products?.length}
+      dataSource={products}
       pagination={false}
       style={{ marginBottom: '1.714em' }}
       scroll={{ x: true }}
@@ -52,7 +24,7 @@ const ProductsTable = ({ tipo = 'venta' }) => {
       <Column
         title='Nombre'
         key='name'
-        dataIndex='name'
+        dataIndex='title'
         render={(text, record) => (
           <Link to={`/producto/${record.key}`}>{text}</Link>
         )}
@@ -68,12 +40,6 @@ const ProductsTable = ({ tipo = 'venta' }) => {
             `${discount}%`
           )
         }
-      />
-      <Column
-        title='Precio Unitario'
-        key='price'
-        dataIndex='price'
-        render={(price) => formatPrice(price)}
       />
       <Column
         title='Precio Unitario'

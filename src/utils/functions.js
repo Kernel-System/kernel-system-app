@@ -9,12 +9,17 @@ export const isEmptyObject = (obj) => {
 
 export const formatDate = (date) =>
   new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'short',
+  }).format(new Date(date));
+
+export const formatDateTime = (date) =>
+  new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(date));
 
 export const formatPrice = (price) =>
-  new Intl.NumberFormat('es-MX', {
+  new Intl.NumberFormat('en', {
     style: 'currency',
     currency: 'MXN',
   }).format(price);

@@ -1,12 +1,13 @@
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Button, Form, InputNumber, Space, Typography } from 'antd';
+import { Link } from 'react-router-dom';
 import { formatPrice } from 'utils/functions';
 const { Title, Paragraph, Text } = Typography;
 
 const ProductOverview = ({ product, addToCart, isAuth }) => {
   return (
     <>
-      <Paragraph style={{ marginBottom: 0 }}>
+      <Paragraph type='secondary' style={{ marginBottom: 0 }}>
         {product.category.toUpperCase()}
       </Paragraph>
       <Title level={2} style={{ marginTop: 0 }}>
@@ -52,7 +53,9 @@ const ProductOverview = ({ product, addToCart, isAuth }) => {
           </Form>
         </Space>
       ) : (
-        <Button type='primary'>Date de alta para comenzar a comprar!</Button>
+        <Link to='/iniciar-sesion'>
+          <Button type='primary'>Date de alta para comenzar a comprar!</Button>
+        </Link>
       )}
     </>
   );
