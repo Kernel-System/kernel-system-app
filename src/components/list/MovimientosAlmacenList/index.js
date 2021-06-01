@@ -54,7 +54,7 @@ const Index = ({ list }) => {
         )}
       />
       <br />
-      <Link to='/almacen/nuevo'>
+      <Link to='/movimiento_almacen/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nueva Movimiento
         </Button>
