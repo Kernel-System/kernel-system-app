@@ -2,7 +2,7 @@ import { Button, Col, message, Row } from 'antd';
 import { getUserData } from 'api/profile';
 import { deleteUserDireccion, getUserDirecciones } from 'api/shared/addresses';
 import AddressesList from 'components/profile/Addresses/AddressesList';
-import Heading from 'components/UI/Heading';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
@@ -31,7 +31,20 @@ const Addresses = () => {
 
   return (
     <>
-      <Heading title='Mis direcciones' />
+      <HeadingBack
+        title='Mis direcciones'
+        actions={[
+          <Link to='/perfil' key='1'>
+            <Button>Mi perfil</Button>
+          </Link>,
+          <Link to='/direcciones' key='2'>
+            <Button type='primary'>Mis direcciones</Button>
+          </Link>,
+          <Link to='/perfil/cambiar-contrasena' key='3'>
+            <Button>Cambiar contraseña</Button>
+          </Link>,
+        ]}
+      />
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <AddressesList addresses={addresses} deleteUserDireccion={mutation} />

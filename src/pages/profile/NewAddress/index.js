@@ -48,7 +48,7 @@ const NewAddress = () => {
       .then(({ data: { meta } }) => {
         const newAddress = {
           ...values,
-          fiscal: meta.total_count === 0 ? 'true' : 'false',
+          fiscal: meta.filter_count === 0 ? 1 : 0,
           rfc_cliente: user.data.cliente.rfc,
         };
         insertUserDireccion(newAddress, token)
