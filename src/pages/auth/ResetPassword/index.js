@@ -13,7 +13,7 @@ const ResetPassword = () => {
     resetPassword(query.get('token'), newPassword)
       .then(() => {
         message.success(
-          'Se ha restablecido tu contraseña correctamente',
+          'Se ha restablecido su contraseña correctamente',
           2,
           () => history.push('/iniciar-sesion')
         );
