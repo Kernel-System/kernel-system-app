@@ -7,6 +7,7 @@ const Index = ({
   max,
   min,
   required = true,
+  rules,
   onBlurred = () => {},
   valueDef = '',
   enable = false,
@@ -28,6 +29,7 @@ const Index = ({
                 required: true,
                 message: `${mensaje}`,
               },
+          //rules,
         ]}
       >
         <InputNumber

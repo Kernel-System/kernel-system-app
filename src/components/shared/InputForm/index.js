@@ -10,6 +10,7 @@ const Index = ({
   valueDef = '',
   enable = false,
   max = 100,
+  rules = '',
   value,
 }) => {
   return (
@@ -32,10 +33,16 @@ const Index = ({
                 type: 'email',
                 message: `${mensaje}`,
               }
+            : type === 'number'
+            ? {
+                type: 'string',
+                message: `${mensaje}`,
+              }
             : {
                 type: 'string',
                 message: `${mensaje}`,
               },
+          rules,
         ]}
       >
         <Input
