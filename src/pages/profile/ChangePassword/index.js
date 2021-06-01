@@ -1,8 +1,9 @@
 import { Button, Col, Form, Input, message, Row } from 'antd';
 import { changePassword } from 'api/profile';
-import Heading from 'components/UI/Heading';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import { passwordRules } from 'utils/validations/auth';
 
 const ChangePassword = () => {
@@ -21,9 +22,20 @@ const ChangePassword = () => {
 
   return (
     <>
-      <Heading
+      <HeadingBack
         title='Cambiar contraseña'
         subtitle='Por favor introduzca su actual y nueva contraseña'
+        actions={[
+          <Link to='/perfil' key='1'>
+            <Button>Mi perfil</Button>
+          </Link>,
+          <Link to='/direcciones' key='2'>
+            <Button>Mis direcciones</Button>
+          </Link>,
+          <Link to='/perfil/cambiar-contrasena' key='3'>
+            <Button type='primary'>Cambiar contraseña</Button>
+          </Link>,
+        ]}
       />
       <Row>
         <Col xs={24} lg={12}>
