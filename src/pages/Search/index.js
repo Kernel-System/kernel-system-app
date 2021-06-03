@@ -1,8 +1,5 @@
-import { Col, Pagination, Row, Select, Space, Typography } from 'antd';
-import {
-  fetchProductsByCategory,
-  fetchProductsByName,
-} from 'api/shared/products';
+import { Col, Empty, Pagination, Row, Select, Space, Typography } from 'antd';
+import { getProductsByCategory, getProductsByName } from 'api/shared/products';
 import ProductCard from 'components/shared/ProductCard';
 import CenteredSpinner from 'components/UI/CenteredSpinner';
 import Heading from 'components/UI/Heading';
@@ -17,9 +14,10 @@ const Search = () => {
   const products = useQuery(
     ['searchProducts', query],
     pathname[1] === 'b'
-      ? () => fetchProductsByName(query)
-      : () => fetchProductsByCategory(query)
+      ? () => getProductsByName(query)
+      : () => getProductsByCategory(query)
   );
+  const productsData = products.data?.data?.data;
 
   return (
     <>
@@ -41,17 +39,19 @@ const Search = () => {
 
       {products.isLoading ? (
         <CenteredSpinner />
-      ) : (
+      ) : productsData.length ? (
         <Space direction='vertical' size='large'>
           <Row gutter={[16, 16]}>
-            {products.data.map((product) => (
-              <Col xs={24} sm={12} lg={6} key={product.id}>
+            {productsData.map((product) => (
+              <Col xs={24} sm={12} lg={6} key={product.codigo}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
           <Pagination defaultCurrent={1} total={50} />
         </Space>
+      ) : (
+        <Empty description='No se encontraron resultados' />
       )}
     </>
   );
