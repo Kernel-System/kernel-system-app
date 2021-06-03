@@ -7,9 +7,11 @@ export const cartModel = {
 
   addCartItem: action((state, payload) => {
     const existingItem = state.cartItems.find((item) => item.id === payload.id);
+
     const existingItemId = state.cartItems.findIndex(
       (item) => item.id === payload.id
     );
+
     if (existingItem) {
       state.cartItems[existingItemId].quantity += payload.quantity;
     } else {
@@ -17,9 +19,23 @@ export const cartModel = {
     }
   }),
 
+  addOneToItem: action((state, payload) => {
+    const existingItemId = state.cartItems.findIndex(
+      (item) => item.id === payload
+    );
+    state.cartItems[existingItemId].quantity += 1;
+  }),
+
+  subOneToItem: action((state, payload) => {
+    const existingItemId = state.cartItems.findIndex(
+      (item) => item.id === payload
+    );
+    state.cartItems[existingItemId].quantity -= 1;
+  }),
+
   removeCartItem: action((state, payload) => {
     state.cartItems = state.cartItems.filter(
-      (cartItem) => cartItem.codigo !== payload.id
+      (cartItem) => cartItem.id !== payload
     );
   }),
 

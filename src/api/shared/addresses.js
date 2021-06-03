@@ -6,13 +6,16 @@ export const insertUserDireccion = (newAddress, token) =>
   });
 
 export const getUserDirecciones = (rfc, token) =>
-  http.get(`/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  http.get(
+    `/items/domicilios_cliente?filter[rfc_cliente][rfc][_eq]=${rfc}&sort=-fiscal`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
 export const getUserDireccionesCount = (rfc, token) =>
   http.get(
-    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&meta=filter_count`,
+    `/items/domicilios_cliente?filter[rfc_cliente][rfc][_eq]=${rfc}&meta=filter_count`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -28,7 +31,7 @@ export const getUserDireccion = (id, token) =>
 
 export const getUserDireccionFiscal = (rfc, token) =>
   http.get(
-    `/items/domicilios_cliente?filter[rfc_cliente][_eq]=${rfc}&filter[fiscal][_eq]=true&limit=1`,
+    `/items/domicilios_cliente?filter[rfc_cliente][rfc][_eq]=${rfc}&filter[fiscal][_eq]=true&limit=1`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 

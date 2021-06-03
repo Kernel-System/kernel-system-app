@@ -1,4 +1,4 @@
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteFilled } from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -10,7 +10,7 @@ import {
   Space,
   Typography,
 } from 'antd';
-import { fetchCartProducts } from 'api/shared/products';
+import { getCartProducts } from 'api/shared/products';
 import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';
@@ -24,7 +24,9 @@ const Cart = () => {
   const clearCartItems = useStoreActions(
     (actions) => actions.cart.clearCartItems
   );
-  const { data } = useQuery('cartItems', () => fetchCartProducts(cartItems));
+  const { data, isLoading } = useQuery('cart-items', () =>
+    getCartProducts(cartItems)
+  );
   const [tipoEntrega, setTipoEntrega] = useState(0);
   const [envio, setEnvio] = useState(0);
   const [metodoPago, setMetodoPago] = useState(0);
@@ -46,13 +48,13 @@ const Cart = () => {
             okType='danger'
             cancelText='Cancelar'
           >
-            <Button danger icon={<DeleteOutlined />}>
+            <Button danger icon={<DeleteFilled />}>
               Vaciar Lista
             </Button>
           </Popconfirm>
         </Col>
         <Col xs={24}>
-          <ProductsTable products={data} />
+          <ProductsTable products={data} loading={isLoading} type='carrito' />
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Card size='small' title='Tipo de entrega'>
@@ -117,6 +119,7 @@ const Cart = () => {
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Summary
+            products={data}
             buttonLabel='Solicitar orden de compra'
             buttonAction={() => console.log('Haciendo orden de compra')}
           />

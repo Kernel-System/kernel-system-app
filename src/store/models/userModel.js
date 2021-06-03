@@ -66,10 +66,10 @@ export const userModel = {
       ) {
         actions.refreshToken();
       }
-      console.log(
-        helpers.getStoreState().user.expirationDate,
-        new Date().getTime()
-      );
+      // console.log(
+      //   helpers.getStoreState().user.expirationDate,
+      //   new Date().getTime()
+      // );
     }
   }),
 };
