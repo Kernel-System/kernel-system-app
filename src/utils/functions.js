@@ -7,6 +7,10 @@ export const isEmptyObject = (obj) => {
   return JSON.stringify(obj) === '{}';
 };
 
+export const toPercent = (descuento) => {
+  return 1 - descuento / 100;
+};
+
 export const formatDate = (date) =>
   new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'short',
