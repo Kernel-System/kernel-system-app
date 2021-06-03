@@ -1,19 +1,27 @@
 import CuentasList from 'components/list/CuentasList';
+import { Button } from 'antd';
+import { Link } from 'react-router-dom';
+import { PlusOutlined } from '@ant-design/icons';
+import Modal from 'components/empleados/ModalEmpleado';
+import { useState } from 'react';
+import HeadingBack from 'components/UI/HeadingBack';
 
-const index = () => {
-  const lista = [
-    {
-      id_factura: '0000001',
-      estado: 'Sin Finalizar',
-      folio: '12000120',
-      fecha: '01/01/2021',
-    },
-  ];
+const Index = () => {
   return (
-    <>
-      <CuentasList list={lista} />
-    </>
+    <div>
+      <HeadingBack title='Cuentas' />
+      <CuentasList
+      //editItem={showModal}
+      //onConfirmDelete={onConfirmDelete}
+      />
+      <br />
+      <Link to='/cuentas/pagos/nuevo'>
+        <Button type='primary' size='large' icon={<PlusOutlined />}>
+          Añadir Nuevo Pago
+        </Button>
+      </Link>
+    </div>
   );
 };
 
-export default index;
+export default Index;

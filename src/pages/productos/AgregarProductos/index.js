@@ -1,7 +1,6 @@
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import TextLabel from 'components/UI/TextLabel';
-import { PlusOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import {
   Button,
@@ -9,18 +8,18 @@ import {
   Form,
   Input,
   message,
-  Modal,
+  Image,
   Row,
   Select,
   Space,
   Switch,
   Tag,
-  Upload,
 } from 'antd';
-import { http } from 'api';
+import { http, url } from 'api';
 import HeadingBack from 'components/UI/HeadingBack';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
+import { PlusOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -29,12 +28,6 @@ const { Option } = Select;
 const Index = ({ tipo }) => {
   let match = useRouteMatch();
   const history = useHistory();
-  const [imageState, setImageState] = useState({
-    previewVisible: false,
-    previewImage: '',
-    previewTitle: '',
-    fileList: [],
-  });
   const [list, setList] = useState([]);
   const [agregar, setAgregar] = useState(true);
   const [precioFijo, setPrecioFijo] = useState(0);
@@ -63,7 +56,6 @@ const Index = ({ tipo }) => {
           AgregarLista(result.data.data);
           AgregarPrecioFijo(result.data.data.precio_fijo);
         });
-      console.log();
     } else {
       AgregarLista({});
       AgregarPrecioFijo(0);
@@ -80,105 +72,33 @@ const Index = ({ tipo }) => {
   };
 
   const AgregarValor = (lista) => {
+    console.log({
+      ...valor,
+      codigo_producto: lista.codigo,
+      tipo_de_venta: lista.tipo_de_venta,
+    });
     if (lista.categorias.length !== 0)
-      setValor({
-        codigo_producto: lista.codigo,
-        tipo_de_venta: lista.tipo_de_venta,
-        id: lista.precios_variables[0].id,
-        valor_1: lista.precios_variables[0].valor_1,
-        precio_1: lista.precios_variables[0].precio_1,
-        valor_2: lista.precios_variables[0].valor_2,
-        precio_2: lista.precios_variables[0].precio_2,
-        valor_3: lista.precios_variables[0].valor_3,
-        precio_3: lista.precios_variables[0].precio_3,
-        valor_4: lista.precios_variables[0].valor_4,
-        precio_4: lista.precios_variables[0].precio_4,
-      });
+      if (lista.precios_variables.length !== 0)
+        setValor({
+          codigo_producto: lista.codigo,
+          tipo_de_venta: lista.tipo_de_venta,
+          id: lista.precios_variables[0].id,
+          valor_1: lista.precios_variables[0].valor_1,
+          precio_1: lista.precios_variables[0].precio_1,
+          valor_2: lista.precios_variables[0].valor_2,
+          precio_2: lista.precios_variables[0].precio_2,
+          valor_3: lista.precios_variables[0].valor_3,
+          precio_3: lista.precios_variables[0].precio_3,
+          valor_4: lista.precios_variables[0].valor_4,
+          precio_4: lista.precios_variables[0].precio_4,
+        });
+      else
+        setValor({
+          ...valor,
+          codigo_producto: lista.codigo,
+          tipo_de_venta: lista.tipo_de_venta,
+        });
   };
-
-  const getBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        console.log(reader.result);
-        resolve(reader.result);
-      };
-
-      reader.onerror = (error) => {
-        console.log(error);
-        reject(error);
-      };
-    });
-  };
-
-  const handleCancel = () =>
-    setImageState({ ...imageState, previewVisible: false });
-
-  const handlePreview = async (file) => {
-    console.log(file);
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-
-    setImageState({
-      ...imageState,
-      previewImage: file.url || file.preview,
-      previewVisible: true,
-      previewTitle:
-        file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
-    });
-  };
-
-  const handleChange = ({ fileList }) => {
-    console.log(fileList);
-    setImageState({ ...imageState, fileList: fileList });
-  };
-
-  const uploadImage = async ({}) => {
-    const fileInput = document.querySelector('input[type="image"]');
-    const formData = new FormData();
-    formData.append('title', 'My First File');
-    formData.append('file', FormData.files[0]);
-  };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Subir Imagen</div>
-    </div>
-  );
-
-  const subirImagenes = (
-    <div>
-      <TextLabel title='Imágenes' />
-      <Upload
-        disabled={tipo === 'mostrar'}
-        //action='http://localhost:8055/files'
-        listType='picture-card'
-        fileList={imageState.fileList}
-        onPreview={(file) => {
-          handlePreview(file);
-        }}
-        onChange={(fileList) => handleChange(fileList)}
-        maxCount={4}
-      >
-        {imageState.fileList.length >= 4 ? null : uploadButton}
-      </Upload>
-      <Modal
-        visible={imageState.previewVisible}
-        title={imageState.previewTitle}
-        footer={null}
-        onCancel={() => handleCancel()}
-      >
-        <img
-          alt='example'
-          style={{ width: '100%' }}
-          src={imageState.previewImage}
-        />
-      </Modal>
-    </div>
-  );
 
   const changePrecioValue = (value) => {
     setPrecioFijo(parseFloat(value));
@@ -204,8 +124,6 @@ const Index = ({ tipo }) => {
   }, [precioFijo, agregar]);
 
   const changeValor = (value, tag) => {
-    console.log(value);
-    console.log(tag);
     setValor({ ...valor, [tag]: value });
     setAgregar(!agregar);
   };
@@ -224,7 +142,10 @@ const Index = ({ tipo }) => {
   };
 
   const onFinishFailed = (errorInfo: any) => {
-    message.error('Ha sucedido un error ' + errorInfo, 5);
+    message.error(
+      'Ha sucedido un error ' + errorInfo.errorFields[0].errors[0],
+      5
+    );
   };
 
   const onFinish = (datos: any) => {
@@ -235,6 +156,7 @@ const Index = ({ tipo }) => {
         titulo: datos.titulo,
         sku: datos.sku,
         tiempo_surtido: datos.tiempo_surtido,
+        iva: datos.iva,
         peso: datos.peso,
         costo: datos.costo,
         moneda: datos.moneda,
@@ -298,11 +220,11 @@ const Index = ({ tipo }) => {
   };
 
   const onFinishChange = (datos: any) => {
-    console.log(valor);
     http
       .patch(`/items/productos/${datos.codigo}`, {
         codigo: datos.codigo,
         titulo: datos.titulo,
+        iva: datos.iva,
         sku: datos.sku,
         tiempo_surtido: datos.tiempo_surtido,
         peso: datos.peso,
@@ -356,17 +278,18 @@ const Index = ({ tipo }) => {
 
   return list.map((dato) => (
     <Form
-      key={dato.codigo}
+      key={1}
       name='basic'
       initialValues={{
         remember: true,
         codigo: dato.codigo,
         titulo: dato.titulo,
         sku: dato.sku,
+        iva: tipo !== 'agregar' ? dato.iva : 16,
         tiempo_surtido: dato.tiempo_surtido,
         peso: dato.peso,
         costo: dato.costo,
-        moneda: tipo !== 'agregar' ? dato.tipo_de_compra : 'MXM',
+        moneda: tipo !== 'agregar' ? dato.moneda : 'MXM',
         tipo_de_venta: dato.tipo_de_venta,
         tipo_de_compra: dato.tipo_de_compra,
         costeo: dato.costeo,
@@ -423,13 +346,23 @@ const Index = ({ tipo }) => {
       <TextLabel title='SKU' />
       <InputForm
         enable={tipo === 'mostrar'}
-        valueDef={dato.sku}
         titulo='sku'
+        valueDef={dato.sku}
         mensaje='Asignar SKU.'
-        placeholder='SKU.'
+        placeholder='SKU'
         max={19}
         //required={false}
         //disponibilidad
+      />
+      <TextLabel title='IVA' />
+      <NumericInputForm
+        enable={tipo === 'mostrar'}
+        valueDef={dato.iva}
+        formato='porcentaje'
+        titulo='iva'
+        placeholder='iva'
+        min={0}
+        max={100}
       />
       <Row key='Row' gutter={[16, 24]} style={{ marginBottom: '10px' }}>
         <Col className='gutter-row' span={12}>
@@ -471,36 +404,36 @@ const Index = ({ tipo }) => {
             max={45}
           />
           <TextLabel title='Moneda' />
-          {tipo === 'mostrar' ? (
-            <TextLabel description={tiposDeMoneda[dato.moneda]} />
-          ) : (
-            <Form.Item
-              name='moneda'
-              rules={[
-                {
-                  required: true,
-                  message: 'Ingrese un tipo de moneda',
-                },
-              ]}
+          <Form.Item
+            name='moneda'
+            rules={[
+              {
+                required: true,
+                message: 'Ingrese un tipo de moneda',
+              },
+            ]}
+          >
+            <Select
+              showSearch
+              style={{ width: '100%' }}
+              disabled={tipo === 'mostrar'}
+              placeholder='Tipo de moneda'
+              optionFilterProp='children'
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              //defaultValue={'MXM'}
+              defaultValue={tipo === 'agregar' ? dato.moneda : 'MXM'}
             >
-              <Select
-                style={{ width: '100%' }}
-                disabled={tipo === 'mostrar'}
-                placeholder='Tipo de moneda'
-                optionFilterProp='children'
-                defaultValue={'MXM'}
-                value={tipo === 'agregar' ? dato.moneda : 'MXM'}
-              >
-                {Object.keys(tiposDeMoneda).map((item) => {
-                  return (
-                    <Option value={item} key={item}>
-                      {tiposDeMoneda[item]}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          )}
+              {Object.keys(tiposDeMoneda).map((item) => {
+                return (
+                  <Option value={item} key={item}>
+                    {`${item} : ${tiposDeMoneda[item]}`}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
           {/*<TextLabel title='IEPS (Opcional)' />*/}
           <TextLabel title='Unidad de Medida' />
           <InputForm
@@ -880,7 +813,48 @@ const Index = ({ tipo }) => {
           </Row>
         </div>
       ) : null}
-      {tipo !== 'agregar' ? subirImagenes : null}
+      {tipo !== 'agregar' ? (
+        <div>
+          <TextLabel
+            title='Imágenes'
+            subtitle='Seleccionar el boton de "Agregar Imagen", ir a la opción de "Imagenes" y seleccionar "Crear Nuevo", arrastrar o subir los archivos correspondientes, al finalizar confirmar en el boton de la esquina superior derecha'
+          />
+          <Image.PreviewGroup style={{ width: '100%' }}>
+            {dato.imagenes.map((imagen) => {
+              return (
+                <Image
+                  width={100}
+                  src={`${url}/assets/${imagen.directus_files_id}`}
+                  //preview={false}
+                />
+              );
+            })}
+          </Image.PreviewGroup>
+          {tipo !== 'mostrar' ? (
+            <div>
+              <br />
+              <br />
+              <Button
+                type='primary'
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  window
+                    .open(
+                      `${url}/admin/collections/productos/${dato.codigo}`,
+                      '_blank'
+                    )
+                    .focus();
+                }}
+              >
+                Agregar Imagen
+              </Button>
+            </div>
+          ) : null}
+          <br />
+          <br />
+        </div>
+      ) : null}
+
       <Space
         direction='horizontal'
         align='baseline'

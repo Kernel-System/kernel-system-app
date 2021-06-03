@@ -1,11 +1,10 @@
 import AlmacenList from 'components/list/AlmacenList';
-import { Typography, Button } from 'antd';
+import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
 import Modal from 'components/almacen/ModalAlmacen';
 import { useState } from 'react';
-
-const { Title, Text } = Typography;
+import HeadingBack from 'components/UI/HeadingBack';
 
 const Index = () => {
   const [visible, setVisible] = useState(false);
@@ -22,7 +21,26 @@ const Index = () => {
 
   return (
     <div>
-      <Title level={3}>Almacenes</Title>
+      <HeadingBack
+        title='Almacenes'
+        actions={[
+          <Link to='/admid' key='1'>
+            <Button>Administrador</Button>
+          </Link>,
+          <Link to='/admid/empleado' key='2'>
+            <Button>Empleados</Button>
+          </Link>,
+          <Link to='/admid/cliente' key='3'>
+            <Button>Clientes</Button>
+          </Link>,
+          <Link to='/admid/sucursal' selected key='4'>
+            <Button>Sucursales</Button>
+          </Link>,
+          <Link to='/admid/almacen' key='5'>
+            <Button type='primary'>Almacenes</Button>
+          </Link>,
+        ]}
+      />
       <AlmacenList
         onClickItem={changeAlmacen}
         //editItem={showModal}
