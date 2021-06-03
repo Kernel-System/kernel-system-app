@@ -1,63 +1,119 @@
-import { Image, InputNumber, Table } from 'antd';
+import { MinusSquareOutlined } from '@ant-design/icons';
+import { Button, Image, InputNumber, Table } from 'antd';
 import Column from 'antd/lib/table/Column';
+import { useStoreActions } from 'easy-peasy';
+import { focusManager, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
-import { formatPrice } from 'utils/functions';
+import { formatPrice, toPercent } from 'utils/functions';
 
-const ProductsTable = ({ products, tipo = 'venta' }) => {
-  console.log(products);
+const ProductsTable = ({ products, loading, type = 'carrito' }) => {
+  const addOneToItem = useStoreActions((actions) => actions.cart.addOneToItem);
+  const subOneToItem = useStoreActions((actions) => actions.cart.subOneToItem);
+  const removeCartItem = useStoreActions(
+    (actions) => actions.cart.removeCartItem
+  );
+  const queryClient = useQueryClient();
+
   return (
     <Table
-      loading={products?.length}
+      loading={loading}
       dataSource={products}
       pagination={false}
       style={{ marginBottom: '1.714em' }}
+      rowKey='codigo'
       scroll={{ x: true }}
     >
       <Column
+        title=''
+        key='action'
+        render={(_, record) => (
+          <Button
+            icon={<MinusSquareOutlined />}
+            type='link'
+            danger
+            onClick={() => {
+              removeCartItem(record.codigo);
+              focusManager.setFocused(true);
+              queryClient
+                .invalidateQueries('cart-items')
+                .then(() => focusManager.setFocused(false));
+            }}
+          />
+        )}
+      />
+      <Column
         title='Imagen'
-        key='image'
-        dataIndex='image'
-        render={(image) => (
-          <Image width={50} height={50} src={image} preview={false} />
+        dataIndex='imagenes'
+        render={(imagenes) => (
+          <Image
+            width={50}
+            height={50}
+            src={
+              imagenes.length
+                ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagenes[0].directus_files_id}`
+                : undefined
+            }
+            fallback='https://st4.depositphotos.com/17828278/24401/v/600/depositphotos_244011872-stock-illustration-no-image-vector-symbol-missing.jpg'
+            preview={false}
+          />
         )}
       />
       <Column
         title='Nombre'
-        key='name'
-        dataIndex='title'
-        render={(text, record) => (
-          <Link to={`/producto/${record.key}`}>{text}</Link>
+        dataIndex='titulo'
+        render={(titulo, record) => (
+          <Link to={`/producto/${record.codigo}`}>{titulo}</Link>
         )}
       />
       <Column
-        title='Descuento'
-        key='discount'
-        dataIndex='discount'
-        render={(discount) =>
-          tipo === 'venta' ? (
-            <InputNumber min={0} max={100} value={discount} />
+        title='Descuento(%)'
+        dataIndex='descuento'
+        render={(descuento) =>
+          type === 'venta' ? (
+            <InputNumber min={0} max={100} value={descuento} />
           ) : (
-            `${discount}%`
+            `${descuento.toFixed(2)}%`
           )
         }
       />
       <Column
         title='Precio Unitario'
-        key='price'
-        dataIndex='price'
-        render={(price) => formatPrice(price)}
+        dataIndex='costo'
+        render={(costo, record) =>
+          formatPrice(costo * toPercent(record.descuento))
+        }
       />
       <Column
         title='Cantidad'
-        key='quantity'
-        dataIndex='quantity'
-        render={(quantity) => <InputNumber min={1} max={99} value={quantity} />}
+        dataIndex='cantidad'
+        render={(cantidad, record) => (
+          <InputNumber
+            min={1}
+            max={99}
+            value={cantidad}
+            onStep={(_, { type }) => {
+              if (type === 'up') {
+                addOneToItem(record.codigo);
+              } else {
+                subOneToItem(record.codigo);
+              }
+              focusManager.setFocused(true);
+              queryClient
+                .invalidateQueries('cart-items')
+                .then(() => focusManager.setFocused(false));
+            }}
+          />
+        )}
       />
       <Column
         title='Subtotal'
-        key='subtotal'
+        dataIndex='subtotal'
         render={(_, record) => (
-          <strong>{formatPrice(record.price * record.quantity)}</strong>
+          <strong>
+            {formatPrice(
+              record.costo * toPercent(record.descuento) * record.cantidad
+            )}
+          </strong>
         )}
       />
     </Table>
