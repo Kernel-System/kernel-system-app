@@ -7,6 +7,7 @@ export const getUserData = async (token) => {
     '/users/me?fields=id,first_name,last_name,email,role.name,cliente.*,empleado.*',
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  console.log(user);
   return {
     id: user.id,
     nombre: user.first_name,

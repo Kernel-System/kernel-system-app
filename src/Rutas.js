@@ -22,6 +22,7 @@ import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
+import ProfileAdmid from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import { Route, Switch } from 'react-router';
@@ -59,24 +60,6 @@ const asyncResetPassword = asyncComponent(() =>
 );
 
 const asyncNotFound = asyncComponent(() => import('pages/NotFound'));
-
-const listaProveedores = [
-  {
-    rfc: 'ARR-860120',
-    nombre: 'LA @ S.A. DE C.V',
-    razon_social: 'soy una razon 1',
-  },
-  {
-    rfc: 'APO-830120',
-    nombre: 'LA @ DEL % SA DE CV',
-    razon_social: 'soy una razon 2',
-  },
-  {
-    rfc: 'ACO-800210',
-    nombre: '@ COMER.COM',
-    razon_social: 'soy una razon 3',
-  },
-];
 
 const Rutas = () => {
   return (
@@ -172,7 +155,12 @@ const Rutas = () => {
       {/* Pagos */}
       <Route path='/cuentas/' exact component={Cuentas} />
       <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
-      <Route path='/cuentas/pagos/:id' exact component={Pagos} />
+      <Route path='/cuentas/pagos_int/:id_fac/' exact>
+        {<Pagos tipo={'facturas_internas'} />}
+      </Route>
+      <Route path='/cuentas/pagos_ext/:id_fac/' exact>
+        {<Pagos tipo={'facturas_externas'} />}
+      </Route>
 
       {/* Productos */}
       <Route path='/productos/' exact component={Productos} />
@@ -187,7 +175,7 @@ const Rutas = () => {
       </Route>
 
       {/* Administrador */}
-      <Route path='/admid/' exact component={Principal} />
+      <Route path='/admid/' exact component={ProfileAdmid} />
 
       <Route path='/admid/sucursal' exact component={Sucursal} />
       <Route path='/admid/sucursal/nuevo' exact component={NuevaSucursal} />
