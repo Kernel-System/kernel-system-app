@@ -3,19 +3,21 @@ import { getProductsByCategory, getProductsByName } from 'api/shared/products';
 import ProductCard from 'components/shared/ProductCard';
 import CenteredSpinner from 'components/UI/CenteredSpinner';
 import Heading from 'components/UI/Heading';
-import { useQuery } from 'react-query';
+import { useState } from 'react';
+import { focusManager, useQuery, useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router';
 const { Text } = Typography;
 
 const Search = () => {
   const { query } = useParams();
   const { pathname } = useLocation();
-
+  const [sortBy, setSortBy] = useState('default');
+  const queryClient = useQueryClient();
   const products = useQuery(
-    ['searchProducts', query],
+    ['search-products', query, sortBy, pathname[1]],
     pathname[1] === 'b'
-      ? () => getProductsByName(query)
-      : () => getProductsByCategory(query)
+      ? () => getProductsByName(query, sortBy)
+      : () => getProductsByCategory(query, sortBy)
   );
   const productsData = products.data?.data?.data;
 
