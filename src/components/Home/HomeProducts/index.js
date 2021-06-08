@@ -11,13 +11,12 @@ const HomeProducts = () => {
   return (
     <>
       <Heading title='Productos destacados' />
-
       {isLoading ? (
         <CenteredSpinner />
       ) : (
         <Row gutter={[16, 16]}>
           {data?.data?.data.map((product) => (
-            <Col xs={24} sm={12} lg={6} key={product.codigo}>
+            <Col xs={24} sm={12} lg={8} xl={6} key={product.codigo}>
               <ProductCard product={product} />
             </Col>
           ))}
