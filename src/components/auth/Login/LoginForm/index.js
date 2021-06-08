@@ -14,6 +14,7 @@ const LoginForm = () => {
   const setUserNivel = useStoreActions((actions) => actions.user.setUserNivel);
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const role = useStoreActions((actions) => actions.user.role);
 
   const onSubmit = ({ email, password }) => {
     setLoading(true);
@@ -25,30 +26,26 @@ const LoginForm = () => {
             setUserRole(data.role.name);
           })
           .catch(({ response: { status } }) => {
-            if (status !== 401) {
-              message.error(`Lo sentimos, ha ocurrido un error`);
-            }
+            message.error(`Lo sentimos, ha ocurrido un error`);
             setLoading(false);
             setHasError(true);
           });
-        getUserNivel(data.access_token)
-          .then(({ data: { data } }) => {
-            console.log(data);
-            setUserNivel(data.cliente[0].nivel);
-          })
-          .catch(({ response: { status } }) => {
-            if (status !== 401) {
+        if (role === 'cliente') {
+          getUserNivel(data.access_token)
+            .then(({ data: { data } }) => {
+              console.log(data);
+              setUserNivel(data.cliente[0].nivel);
+            })
+            .catch(({ response: { status } }) => {
               message.error(`Lo sentimos, ha ocurrido un error`);
-            }
-            setLoading(false);
-            setHasError(true);
-          });
+              setLoading(false);
+              setHasError(true);
+            });
+        }
         history.push('/');
       })
       .catch(({ response: { status } }) => {
-        if (status !== 401) {
-          message.error(`Lo sentimos, ha ocurrido un error`);
-        }
+        message.error(`Lo sentimos, ha ocurrido un error`);
         setLoading(false);
         setHasError(true);
       });
