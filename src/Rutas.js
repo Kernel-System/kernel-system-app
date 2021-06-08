@@ -1,3 +1,4 @@
+import { Route, Switch } from 'react-router';
 import asyncComponent from 'hoc/asyncComponent';
 import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
@@ -21,10 +22,10 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import Proveedores from 'pages/compras/Proveedores';
-import ComprasList from 'components/list/ComprasList';
+import Compras from 'pages/compras/Compras';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import Venta from 'pages/ventas/Venta';
-import { Route, Switch } from 'react-router';
+import FacturasExternas from 'pages/facturas/FacturasExternas';
 
 import Tranferencias from './pages/almacen/Transferencias';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
@@ -89,7 +90,7 @@ const Rutas = () => {
 
       {/* Compras */}
       <Route path='/compras' exact>
-        <ComprasList />
+        <Compras />
       </Route>
       <Route path='/compras/registrar' exact component={RegistrarCompra} />
 
@@ -99,6 +100,9 @@ const Rutas = () => {
       <Route path='/ensambles/:id' exact component={ModificarEnsambles} />
 
       {/* Facturar ticket */}
+      <Route path='/facturas-externas' exact>
+        <FacturasExternas />
+      </Route>
       <Route path='/facturar_ticket' exact component={FacturarTicket} />
 
       {/* Movimientos de almacen */}
