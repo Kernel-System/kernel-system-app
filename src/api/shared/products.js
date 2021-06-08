@@ -31,5 +31,7 @@ export const getProductsByName = async (name, sortBy) =>
 
 export const getProductsByCategory = async (category, sortBy) =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}`
+    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+      sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
+    }`
   );
