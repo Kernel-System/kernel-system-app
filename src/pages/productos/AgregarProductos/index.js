@@ -1,25 +1,25 @@
-import InputForm from 'components/shared/InputForm';
-import NumericInputForm from 'components/shared/NumericInputForm';
-import TextLabel from 'components/UI/TextLabel';
-import { useState, useEffect } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   Button,
   Col,
   Form,
+  Image,
   Input,
   message,
-  Image,
   Row,
   Select,
   Space,
   Switch,
   Tag,
 } from 'antd';
-import { http, url } from 'api';
+import { http } from 'api';
+import InputForm from 'components/shared/InputForm';
+import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
+import TextLabel from 'components/UI/TextLabel';
+import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
-import { PlusOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -141,14 +141,14 @@ const Index = ({ tipo }) => {
     }
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     message.error(
       'Ha sucedido un error ' + errorInfo.errorFields[0].errors[0],
       5
     );
   };
 
-  const onFinish = (datos: any) => {
+  const onFinish = (datos) => {
     console.log(datos);
     http
       .post('/items/productos/', {
@@ -219,7 +219,7 @@ const Index = ({ tipo }) => {
       .then(() => history.goBack());
   };
 
-  const onFinishChange = (datos: any) => {
+  const onFinishChange = (datos) => {
     http
       .patch(`/items/productos/${datos.codigo}`, {
         codigo: datos.codigo,
@@ -824,7 +824,7 @@ const Index = ({ tipo }) => {
               return (
                 <Image
                   width={100}
-                  src={`${url}/assets/${imagen.directus_files_id}`}
+                  src={`${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagen.directus_files_id}`}
                   //preview={false}
                 />
               );
@@ -840,7 +840,7 @@ const Index = ({ tipo }) => {
                 onClick={() => {
                   window
                     .open(
-                      `${url}/admin/collections/productos/${dato.codigo}`,
+                      `${process.env.REACT_APP_DIRECTUS_API_URL}/admin/collections/productos/${dato.codigo}`,
                       '_blank'
                     )
                     .focus();
