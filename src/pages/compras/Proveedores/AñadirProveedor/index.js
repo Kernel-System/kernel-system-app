@@ -3,7 +3,7 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/HeadingBack';
 import { message, Typography } from 'antd';
-import { insertItems } from 'api/shared/proveedores';
+import { insertItems as insertProveedor } from 'api/shared/proveedores';
 
 const { Title } = Typography;
 
@@ -21,7 +21,7 @@ const Index = () => {
 
     const insertItem = async (values) => {
         let  success = false;
-        await insertItems(values)
+        await insertProveedor(values)
             .then((result) => {
                 if (result.status === 200) {
                     onSuccess();
@@ -49,7 +49,7 @@ const Index = () => {
     return (
         <>
             <Header title='Nuevo proveedor' />
-            <LectorFacturas onSuccess={onFacturaLeida} />
+            <LectorFacturas isDragger onSuccess={onFacturaLeida} />
             <br />
             <Title level={4}>Datos del proveedor</Title>
             <ProveedorForm

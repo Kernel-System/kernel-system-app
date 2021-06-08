@@ -28,7 +28,7 @@ const Index = (props) => {
           },
         ]}
       >
-        <Input maxLength={13} placeholder='RFC' />
+        <Input disabled={props.disableRFC} maxLength={13} placeholder='RFC' />
       </Item>
       <Form.Item name='contacto' label='Contacto'>
         <Input maxLength={150} placeholder='Contacto' />
@@ -142,7 +142,17 @@ const Index = (props) => {
   const camposCuenta = (
     <>
       <Form.Item name='cuenta_contable' label='Cuenta contable'>
-        <Input placeholder='Cuenta contable' />
+        <InputNumber
+          min={0}
+          max={999999999}
+          placeholder='Cuenta contable'
+          precision={2}
+          style={{ width: '100%' }}
+          // formatter={(value) =>
+          //     `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+          // }
+          // parser={(value) => value.replace(/\$?|(,*)/g, '')}
+        />
       </Form.Item>
       <Form.Item name='banco' label='Banco'>
         <Input maxLength={100} placeholder='Banco' />

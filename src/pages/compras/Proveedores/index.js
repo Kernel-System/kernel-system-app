@@ -34,8 +34,8 @@ const Index = (props) => {
   };
 
   const importarProveedores = (datos) => {
-    const hide = message.loading('Importando proveedores..', 0);
-    insertMutation.mutate(datos, { onSuccess: hide });
+    const hide = message.loading('Importando proveedores...', 0);
+    insertMutation.mutate(datos, { onSuccess: hide, onError: hide });
   };
 
   const queryClient = useQueryClient();
@@ -84,7 +84,7 @@ const Index = (props) => {
         text='Importar desde archivo .csv'
       ></CsvReader>
       <Modal
-        title={listElement.rfc}
+        title={listElement.razon_social}
         visible={isModalVisible}
         footer={null}
         onCancel={handleCancel}
@@ -94,6 +94,7 @@ const Index = (props) => {
           onSubmit={onSaveChanges}
           submitText='Guardar cambios'
           itemData={listElement}
+          disableRFC
         />
       </Modal>
     </>
