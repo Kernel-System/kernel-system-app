@@ -1,60 +1,52 @@
-import {
-  Layout,
-  Typography,
-  Image,
-  Space,
-  Row,
-  Button,
-  Col,
-  Avatar,
-} from 'antd';
 import { blue } from '@ant-design/colors';
-import { ShopOutlined, PhoneOutlined, MailOutlined } from '@ant-design/icons';
+import {
+  EnvironmentOutlined,
+  MailOutlined,
+  WhatsAppOutlined,
+} from '@ant-design/icons';
+import { Avatar, Col, Image, Layout, Row, Space, Typography } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { Link as RouterLink } from 'react-router-dom';
 const { Footer } = Layout;
-const { Text } = Typography;
+const { Text, Link } = Typography;
 
 const Index = () => {
   const breakpoint = useBreakpoint();
 
   return (
-    <Footer>
-      <Row align='middle' justify='space-between' gutter={[24, 24]}>
-        <Col xs={24} lg={7}>
-          <Row gutter={[0, 8]}>
+    <Footer style={{ backgroundColor: '#001529' }}>
+      <Row align='middle' justify='space-around' gutter={[0, 24]}>
+        <Col xs={24} md={9}>
+          <Row
+            gutter={[0, 16]}
+            style={{ textAlign: !breakpoint.md && 'center' }}
+          >
             <Col xs={24} sm={12}>
-              <Button type='text' size='small' block={breakpoint.xs}>
+              <RouterLink to='/' style={{ display: 'block' }}>
                 Inicio
-              </Button>
+              </RouterLink>
             </Col>
             <Col xs={24} sm={12}>
-              <Button type='text' size='small' block={breakpoint.xs}>
+              <RouterLink to='/facturacion' style={{ display: 'block' }}>
                 Facturación
-              </Button>
+              </RouterLink>
             </Col>
             <Col xs={24} sm={12}>
-              <Button type='text' size='small' block={breakpoint.xs}>
-                Categorias
-              </Button>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Button type='text' size='small' block={breakpoint.xs}>
+              <RouterLink to='/aviso-legal' style={{ display: 'block' }}>
                 Aviso Legal
-              </Button>
+              </RouterLink>
             </Col>
             <Col xs={24} sm={12}>
-              <Button type='text' size='small' block={breakpoint.xs}>
-                Perfil
-              </Button>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Button type='text' size='small' block={breakpoint.xs}>
-                Términos y condiciones
-              </Button>
+              <RouterLink
+                to='/terminos-y-condiciones'
+                style={{ display: 'block' }}
+              >
+                Términos y Condiciones
+              </RouterLink>
             </Col>
           </Row>
         </Col>
-        <Col xs={24} lg={10}>
+        <Col xs={24} md={6}>
           <Space
             direction='vertical'
             style={{ textAlign: 'center', width: '100%' }}
@@ -65,34 +57,46 @@ const Index = () => {
               preview={false}
               src='https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
             />
-            <Text>Kernel System © 2021</Text>
+            <Text style={{ color: '#CCC' }}>Kernel System © 2021</Text>
           </Space>
         </Col>
-        <Col xs={24} lg={7}>
+        <Col xs={24} md={9}>
           <Space direction='vertical' size='middle'>
             <Space>
               <Avatar
-                icon={<ShopOutlined />}
+                icon={<EnvironmentOutlined />}
                 style={{ backgroundColor: blue.primary }}
               />
-              <Text>
+              <Link
+                href='https://goo.gl/maps/vfNVkuTYjS25Kc2b6'
+                rel='noreferrer'
+                target='_blank'
+              >
                 Calle Márquez de León y Lic. Verdad Col. Centro, C.P. 23000 La
                 Paz, Baja California Sur
-              </Text>
+              </Link>
             </Space>
             <Space>
               <Avatar
-                icon={<PhoneOutlined />}
+                icon={<WhatsAppOutlined />}
                 style={{ backgroundColor: blue.primary }}
               />
-              <Text>(612) 348-92-16</Text>
+              <Link
+                href='https://wa.me/6123489216'
+                rel='noreferrer'
+                target='_blank'
+              >
+                (612) 348-9216
+              </Link>
             </Space>
             <Space>
               <Avatar
                 icon={<MailOutlined />}
                 style={{ backgroundColor: blue.primary }}
               />
-              <Text>kernelsystem@gmail.com</Text>
+              <Link href='mailto:kernelsystem@gmail.com'>
+                kernelsystem@gmail.com
+              </Link>
             </Space>
           </Space>
         </Col>

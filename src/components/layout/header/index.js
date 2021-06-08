@@ -1,5 +1,6 @@
 import {
   CloseOutlined,
+  LoginOutlined,
   MenuOutlined,
   ShoppingCartOutlined,
   UserOutlined,
@@ -20,31 +21,36 @@ import { useStoreState } from 'easy-peasy';
 import { Link, useHistory } from 'react-router-dom';
 const { Header } = Layout;
 
-const menu = (
-  <Menu>
-    <Menu.Item key='1'>
-      <Link to='/perfil'>Mi perfil</Link>{' '}
-    </Menu.Item>
-    <Menu.Item key='2'>
-      <Link to='/solicitudes-de-compra'>Solicitudes de compra</Link>
-    </Menu.Item>
-    <Menu.Item key='3'>
-      <Link to='/cerrar-sesion'>Cerrar sesión</Link>
-    </Menu.Item>
-  </Menu>
-);
-
 const Index = ({ collapsed, ToggleCollapsed }) => {
   const breakpoint = useBreakpoint();
   const history = useHistory();
   const isAuth = useStoreState((state) => state.user.isAuth);
+  const role = useStoreState((state) => state.user.role);
 
   const onSearch = (value) => {
     history.push(`/b/${value}`);
   };
 
+  const menu = (
+    <Menu>
+      <Menu.Item key='1'>
+        <Link to={`${role !== 'cliente' ? '/empleado' : ''}/perfil`}>
+          Mi perfil
+        </Link>
+      </Menu.Item>
+      {role === 'cliente' && (
+        <Menu.Item key='2'>
+          <Link to='/solicitudes-de-compra'>Solicitudes de compra</Link>
+        </Menu.Item>
+      )}
+      <Menu.Item key='3'>
+        <Link to='/cerrar-sesion'>Cerrar sesión</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
-    <Header className='header'>
+    <Header>
       <Row justify='space-between' align='middle' wrap={false}>
         <Col>
           <Space size='middle'>
@@ -64,19 +70,21 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             </Link>
           </Space>
         </Col>
-        {breakpoint.xs || (
-          <Col span={12}>
-            <Input.Search
-              placeholder='Buscar...'
-              onSearch={onSearch}
-              enterButton
-              style={{ display: 'block' }}
-            />
-          </Col>
-        )}
+        {role === 'cliente' || role === undefined
+          ? breakpoint.xs || (
+              <Col span={12}>
+                <Input.Search
+                  placeholder='Buscar...'
+                  onSearch={onSearch}
+                  enterButton
+                  style={{ display: 'block' }}
+                />
+              </Col>
+            )
+          : null}
         <Col>
           <Space size='middle'>
-            {isAuth && (
+            {isAuth && role === 'cliente' && (
               <Link to='/lista-de-compra'>
                 <Button
                   type='link'
@@ -84,11 +92,30 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
                 />
               </Link>
             )}
-            <Link to='/perfil'>
-              <Dropdown overlay={isAuth ? menu : <></>}>
+            <Link
+              to={
+                isAuth
+                  ? `${
+                      role !== 'cliente' && role !== undefined
+                        ? '/empleado'
+                        : ''
+                    }/perfil`
+                  : '/iniciar-sesion'
+              }
+            >
+              <Dropdown
+                overlay={isAuth ? menu : <></>}
+                overlayStyle={{ zIndex: 99999 }}
+              >
                 <Button
                   type='link'
-                  icon={<UserOutlined style={{ fontSize: '24px' }} />}
+                  icon={
+                    isAuth ? (
+                      <UserOutlined style={{ fontSize: '24px' }} />
+                    ) : (
+                      <LoginOutlined style={{ fontSize: '24px' }} />
+                    )
+                  }
                 />
               </Dropdown>
             </Link>
