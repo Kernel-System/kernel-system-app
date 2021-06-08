@@ -2,17 +2,17 @@ import { MinusSquareOutlined } from '@ant-design/icons';
 import { Button, Image, InputNumber, Table } from 'antd';
 import Column from 'antd/lib/table/Column';
 import { useStoreActions } from 'easy-peasy';
-import { focusManager, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
 import { formatPrice, toPercent } from 'utils/functions';
 
-const ProductsTable = ({ products, loading, type = 'carrito' }) => {
+const ProductsTable = ({
+  products,
+  loading,
+  type = 'carrito',
+  removeCartItem,
+}) => {
   const addOneToItem = useStoreActions((actions) => actions.cart.addOneToItem);
   const subOneToItem = useStoreActions((actions) => actions.cart.subOneToItem);
-  const removeCartItem = useStoreActions(
-    (actions) => actions.cart.removeCartItem
-  );
-  const queryClient = useQueryClient();
 
   return (
     <Table
@@ -22,6 +22,7 @@ const ProductsTable = ({ products, loading, type = 'carrito' }) => {
       style={{ marginBottom: '1.714em' }}
       rowKey='codigo'
       scroll={{ x: true }}
+      bordered
     >
       <Column
         title=''
@@ -32,11 +33,7 @@ const ProductsTable = ({ products, loading, type = 'carrito' }) => {
             type='link'
             danger
             onClick={() => {
-              removeCartItem(record.codigo);
-              focusManager.setFocused(true);
-              queryClient
-                .invalidateQueries('cart-items')
-                .then(() => focusManager.setFocused(false));
+              removeCartItem.mutate(record.codigo);
             }}
           />
         )}
@@ -97,10 +94,6 @@ const ProductsTable = ({ products, loading, type = 'carrito' }) => {
               } else {
                 subOneToItem(record.codigo);
               }
-              focusManager.setFocused(true);
-              queryClient
-                .invalidateQueries('cart-items')
-                .then(() => focusManager.setFocused(false));
             }}
           />
         )}

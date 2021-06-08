@@ -2,7 +2,7 @@ import { http } from 'api';
 
 export const getHomeProducts = async () =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true`
+    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true`
   );
 
 export const getProduct = async (id) =>
@@ -17,22 +17,21 @@ export const getRelatedProducts = async () =>
 
 export const getCartProducts = async (cartItems) => {
   const cartItemsIds = cartItems.map((cartItem) => cartItem.id);
-  const { data } = await http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id&filter[codigo][_in]=${cartItemsIds.toString()}`
+  return http.get(
+    `/items/productos?fields=codigo,titulo,costo,descuento,iva,imagenes.directus_files_id&filter[codigo][_in]=${cartItemsIds.toString()}`
   );
-  return data.data.map((cartItem, i) => ({
-    ...cartItem,
-    iva: 16,
-    cantidad: cartItems[i].quantity,
-  }));
 };
 
-export const getProductsByName = async (name) =>
+export const getProductsByName = async (name, sortBy) =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"titulo":{"_contains":"${name}"},"inventario":{"id":{"_nnull":true}}}]}`
+    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"titulo":{"_contains":"${name}"},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+      sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
+    }`
   );
 
-export const getProductsByCategory = async (category) =>
+export const getProductsByCategory = async (category, sortBy) =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}`
+    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+      sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
+    }`
   );

@@ -7,7 +7,11 @@ const Heading = ({ title, subtitle, extra, style }) => (
       <Title level={3} style={style}>
         {title}
       </Title>
-      {extra && <Text type='secondary'>{extra}</Text>}
+      {extra && (
+        <Text type='secondary' style={{ verticalAlign: 'sub' }}>
+          {extra}
+        </Text>
+      )}
     </Space>
     {subtitle && <Paragraph style={style}>{subtitle}</Paragraph>}
   </>

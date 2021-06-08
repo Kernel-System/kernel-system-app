@@ -16,21 +16,63 @@ import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import { useState } from 'react';
-import { useQuery } from 'react-query';
+import {
+  focusManager,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
 const { Paragraph } = Typography;
 
 const Cart = () => {
   const cartItems = useStoreState((state) => state.cart.cartItems);
+  const removeCartItem = useStoreActions(
+    (actions) => actions.cart.removeCartItem
+  );
   const clearCartItems = useStoreActions(
     (actions) => actions.cart.clearCartItems
   );
-  const { data, isLoading } = useQuery('cart-items', () =>
+  const { data, isLoading, isFetching } = useQuery('cart-items', () =>
     getCartProducts(cartItems)
   );
+  const handleRemoveCartItem = useMutation((codigo) => removeCartItem(codigo), {
+    onSuccess: () => {
+      focusManager.setFocused(true);
+      queryClient.invalidateQueries('cart-items').then(() => {
+        focusManager.setFocused(false);
+        message.success('Se ha eliminado el producto correctamente');
+      });
+    },
+    onError: () => {
+      message.error('Lo sentimos, ha ocurrido un error');
+    },
+  });
+  const handleClearCartItems = useMutation(() => clearCartItems(), {
+    onSuccess: () => {
+      focusManager.setFocused(true);
+      queryClient.invalidateQueries('cart-items').then(() => {
+        focusManager.setFocused(false);
+        message.success('Se ha vaciado la lista de compra correctamente');
+      });
+    },
+    onError: () => {
+      message.error('Lo sentimos, ha ocurrido un error');
+    },
+  });
+  const queryClient = useQueryClient();
+
   const [tipoEntrega, setTipoEntrega] = useState(0);
   const [envio, setEnvio] = useState(0);
   const [metodoPago, setMetodoPago] = useState(0);
   const [formaPago, setFormaPago] = useState(0);
+
+  let cartItemsData = undefined;
+  cartItemsData = data?.data?.data.map((cartItemData) => {
+    const cartItemId = cartItems.findIndex(
+      (cartItem) => cartItemData.codigo === cartItem.id
+    );
+    return { ...cartItemData, cantidad: cartItems[cartItemId]?.quantity };
+  });
 
   return (
     <>
@@ -40,10 +82,7 @@ const Cart = () => {
           <Popconfirm
             title='¿Está seguro que quiere vaciar su lista de compra?'
             placement='topLeft'
-            onConfirm={() => {
-              clearCartItems();
-              message.success('Se ha vaciado la lista de compra correctamente');
-            }}
+            onConfirm={() => handleClearCartItems.mutate()}
             okText='Vaciar lista'
             okType='danger'
             cancelText='Cancelar'
@@ -54,7 +93,12 @@ const Cart = () => {
           </Popconfirm>
         </Col>
         <Col xs={24}>
-          <ProductsTable products={data} loading={isLoading} type='carrito' />
+          <ProductsTable
+            products={cartItemsData}
+            loading={isLoading || isFetching}
+            type='carrito'
+            removeCartItem={handleRemoveCartItem}
+          />
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Card size='small' title='Tipo de entrega'>
@@ -119,7 +163,7 @@ const Cart = () => {
         </Col>
         <Col xs={24} md={12} lg={6}>
           <Summary
-            products={data}
+            products={cartItemsData}
             buttonLabel='Solicitar orden de compra'
             buttonAction={() => console.log('Haciendo orden de compra')}
           />
