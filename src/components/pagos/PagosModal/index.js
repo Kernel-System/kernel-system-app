@@ -1,10 +1,8 @@
-import { Modal, Button, Row, Col, Table, Space } from 'antd';
-import { url } from 'api';
-
-import TextLabel from 'components/UI/TextLabel';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { FormasDePago, tiposDeMoneda } from 'utils/facturas/catalogo';
 import { PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Modal, Row, Space, Table } from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import TextLabel from 'components/UI/TextLabel';
+import { FormasDePago, tiposDeMoneda } from 'utils/facturas/catalogo';
 
 const Index = ({ visible, pago, setVis }) => {
   const breakpoint = useBreakpoint();
@@ -205,7 +203,7 @@ const Index = ({ visible, pago, setVis }) => {
               onClick={() => {
                 window
                   .open(
-                    `${url}/assets/${documento.directus_files_id.id}`,
+                    `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${documento.directus_files_id.id}`,
                     '_blank'
                   )
                   .focus();
@@ -223,7 +221,7 @@ const Index = ({ visible, pago, setVis }) => {
           onClick={() => {
             window
               .open(
-                `${url}/admin/collections/pagos/${pago.pagos_id.id}`,
+                `${process.env.REACT_APP_DIRECTUS_API_URL}/admin/collections/pagos/${pago.pagos_id.id}`,
                 '_blank'
               )
               .focus();
