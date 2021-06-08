@@ -6,9 +6,12 @@ const Index = ({
   placeholder,
   type,
   required = true,
-  onBlurred,
+  onBlurred = () => {},
   valueDef = '',
   enable = false,
+  max = 100,
+  rules = '',
+  value,
 }) => {
   return (
     <div>
@@ -30,10 +33,16 @@ const Index = ({
                 type: 'email',
                 message: `${mensaje}`,
               }
+            : type === 'number'
+            ? {
+                type: 'string',
+                message: `${mensaje}`,
+              }
             : {
                 type: 'string',
                 message: `${mensaje}`,
               },
+          rules,
         ]}
       >
         <Input
@@ -42,7 +51,12 @@ const Index = ({
           placeholder={placeholder}
           style={{ width: '100%' }}
           defaultValue={valueDef}
+          value={value}
+          onBlur={(e) => {
+            onBlurred(e.target.value);
+          }}
           disabled={enable}
+          maxLength={max}
         />
       </Form.Item>
     </div>

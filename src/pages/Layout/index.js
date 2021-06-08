@@ -1,30 +1,23 @@
-import React, { useState } from 'react';
 import { Layout } from 'antd';
-import Header from 'components/layout/Header';
 import Content from 'components/layout/Content';
 import Footer from 'components/layout/Footer';
+import Header from 'components/layout/Header';
 import Sider from 'components/layout/Sider';
+import React, { useState } from 'react';
 
 const Index = ({ children }) => {
-  const [collapsed, useCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(true);
 
   const ToggleCollapsed = () => {
-    useCollapsed(!collapsed);
+    setCollapsed(!collapsed);
   };
 
   return (
     <Layout>
-      <Header
-        collapsed={collapsed}
-        ToggleCollapsed={() => {
-          ToggleCollapsed();
-        }}
-      />
+      <Header collapsed={collapsed} ToggleCollapsed={ToggleCollapsed} />
       <Layout>
-        <Layout>
-          <Sider collapsed={collapsed} />
-          <Content>{children}</Content>
-        </Layout>
+        <Sider collapsed={collapsed} ToggleCollapsed={ToggleCollapsed} />
+        <Content>{children}</Content>
       </Layout>
       <Footer />
     </Layout>

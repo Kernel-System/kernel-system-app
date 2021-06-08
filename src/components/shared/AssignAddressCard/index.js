@@ -1,52 +1,25 @@
-import { Button, Card, Modal, Select, Typography } from 'antd';
-import { useState } from 'react';
+import { Card, Typography } from 'antd';
 const { Text } = Typography;
 
-const AssignAddressCard = ({ tipo }) => {
-  const [visible, setVisible] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-
-  const showModal = () => {
-    setVisible(true);
-  };
-
-  const handleOk = () => {
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setVisible(false);
-      setConfirmLoading(false);
-    }, 2000);
-  };
-
-  const handleCancel = () => {
-    setVisible(false);
-  };
-
+const AssignAddressCard = ({ tipo, address }) => {
   return (
-    <>
-      <Card
-        size='small'
-        title={`Dirección de ${tipo} por defecto`}
-        extra={
-          <Button type='link' onClick={showModal}>
-            Asignar
-          </Button>
-        }
-      >
-        <Text>No ha asignado una dirección de {tipo} por defecto</Text>
-      </Card>
-      <Modal
-        title={`Asignar dirección de ${tipo} por defecto`}
-        visible={visible}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
-        <Select defaultValue='lucy' style={{ width: '100%' }}>
-          <Select.Option value='lucy'>Lucy</Select.Option>
-        </Select>
-      </Modal>
-    </>
+    <Card size='small' title={`Dirección ${tipo} por defecto`}>
+      <Text>
+        {address ? (
+          <>
+            {address.calle} No. {address.no_ext}
+            {address.no_int && `-${address.no_int}`}
+            {address.entre_calle_1 && `, entre ${address.entre_calle_1}`}
+            {address.entre_calle_2 && ` y ${address.entre_calle_2}`} Col.{' '}
+            {address.colonia} {address.cp}
+            {address.localidad && ` - ${address.localidad}`},{' '}
+            {address.municipio}, {address.estado}, {address.pais}
+          </>
+        ) : (
+          'No ha asignado una dirección fiscal por defecto'
+        )}
+      </Text>
+    </Card>
   );
 };
 

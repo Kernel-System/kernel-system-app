@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 import './style.css';
-import { Table, Input, InputNumber, Popconfirm, Form, Button } from 'antd';
+import { Table, Input, InputNumber, Popconfirm, Form, Button, Col } from 'antd';
 
 import {
   EditOutlined,
@@ -10,24 +10,6 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 const originData = [];
-
-/*for (let i = 0; i < 5; i++) {
-  originData.push({
-    key: i.toString(),
-    id: '', //25
-    folio: '', //25
-    serie: '', //40
-    moneda_dr: '', //char 3
-    tipo_cambio_dr: '', //decimal 10
-    metodo_de_pago: '', //char 3
-    num_parcialidad: 0, //36
-    imp_saldo_ant: 0,
-    imp_saldo_insoluto: 0,
-    name: `Documento ${i + 1}`,
-    age: 32,
-    address: `London Park no. ${i + 1}`,
-  });
-}*/
 
 const EditableCell = ({
   editing,
@@ -64,25 +46,26 @@ const EditableCell = ({
   );
 };
 
-const Index = () => {
+const Index = ({ lista, cambiarLista }) => {
   const [form] = Form.useForm();
   const [count, setCount] = useState(0);
-  const [data, setData] = useState(originData);
+  const [data, setData] = useState(lista);
   const [editingKey, setEditingKey] = useState('');
 
   const isEditing = (record) => record.key === editingKey;
 
   const edit = (record) => {
     form.setFieldsValue({
-      id: '', //25
+      id_documento: '', //25
       folio: '', //25
       serie: '', //40
       moneda_dr: '', //char 3
       tipo_cambio_dr: '', //decimal 10
-      metodo_de_pago: '', //char 3
-      num_parcialidad: 0, //36
+      metodo_de_pago_dr: '', //char 3
+      numparcialidad: 0, //36
       imp_saldo_ant: 0,
       imp_saldo_insoluto: 0,
+      imp_pagado: 0,
       ...record,
     });
     setEditingKey(record.key);
@@ -102,10 +85,12 @@ const Index = () => {
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
         setData(newData);
+        cambiarLista(newData);
         setEditingKey('');
       } else {
         newData.push(row);
         setData(newData);
+        cambiarLista(newData);
         setEditingKey('');
       }
     } catch (errInfo) {
@@ -127,6 +112,7 @@ const Index = () => {
   const handleDelete = (key) => {
     const dataSource = [...data];
     setData(dataSource.filter((item) => item.key !== key));
+    cambiarLista(dataSource.filter((item) => item.key !== key));
   };
 
   const handleAdd = () => {
@@ -134,28 +120,31 @@ const Index = () => {
     const newData = [...data];
     newData.push({
       key: count,
-      id: '', //25
+      id_documento: '', //25
       folio: '', //25
       serie: '', //40
       moneda_dr: '', //char 3
       tipo_cambio_dr: '', //decimal 10
-      metodo_de_pago: '', //char 3
-      num_parcialidad: 0, //36
+      metodo_de_pago_dr: '', //char 3
+      numparcialidad: 0, //36
       imp_saldo_ant: 0,
       imp_saldo_insoluto: 0,
+      imp_pagado: 0,
     });
     console.log(newData);
     setCount(count + 1);
     setData(newData);
+    cambiarLista(newData);
   };
 
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
+      title: 'ID DOC*',
+      dataIndex: 'id_documento',
       width: '100px',
       ellipsis: true,
       editable: true,
+      max: 36,
     },
     {
       title: 'Folio',
@@ -163,6 +152,7 @@ const Index = () => {
       width: '100px',
       ellipsis: true,
       editable: true,
+      max: 25,
     },
     {
       title: 'Serie',
@@ -170,13 +160,15 @@ const Index = () => {
       width: '100px',
       ellipsis: true,
       editable: true,
+      max: 40,
     },
     {
-      title: 'Moneda DR',
+      title: 'Moneda DR*',
       dataIndex: 'moneda_dr',
       width: '100px',
       ellipsis: true,
       editable: true,
+      max: 3,
     },
     {
       title: 'Tipo de cambio DR',
@@ -186,15 +178,17 @@ const Index = () => {
       editable: true,
     },
     {
-      title: 'Metodo de Pago',
-      dataIndex: 'metodo_de_pago',
+      title: 'Metodo de Pago*',
+      dataIndex: 'metodo_de_pago_dr',
       width: '100px',
       ellipsis: true,
       editable: true,
+      max: 3,
     },
     {
-      title: 'Número de Parcialidad',
-      dataIndex: 'num_parcialidad',
+      title: 'Número de Parcialidad*',
+      dataIndex: 'numparcialidad',
+      max: 2,
       type: 'number',
       width: '80px',
       editable: true,
@@ -209,6 +203,13 @@ const Index = () => {
     {
       title: 'Imp. Saldo Ins',
       dataIndex: 'imp_saldo_insoluto',
+      type: 'number',
+      width: '80px',
+      editable: true,
+    },
+    {
+      title: 'Imp. Pagado',
+      dataIndex: 'imp_pagado',
       type: 'number',
       width: '80px',
       editable: true,
@@ -265,6 +266,7 @@ const Index = () => {
       onCell: (record) => ({
         record,
         inputType: typeColumn(col.type),
+        maxLength: col.max,
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -273,7 +275,7 @@ const Index = () => {
   });
 
   return (
-    <Form form={form} component={false}>
+    <Form form={form} component={false} style={{ marginBottom: '10px' }}>
       <Table
         components={{
           body: {

@@ -1,201 +1,254 @@
 import ShowProduct from 'components/ensamble/ShowProduct';
 import { useState, useEffect } from 'react';
-import { Typography, Input, Space, Button, Form } from 'antd';
+import { useHistory } from 'react-router';
+import {
+  Typography,
+  Input,
+  Space,
+  Button,
+  Form,
+  Row,
+  Col,
+  Popconfirm,
+  message,
+} from 'antd';
+import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
+import { http } from 'api';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
-const Index = () => {
+//encargado ensamble, encargado de almacen
+
+const Index = ({ match }) => {
+  const history = useHistory();
   const [list, setList] = useState({
-    folio: '00000001',
-    descripcion: 'Soy una descripcion',
-    observaciones: 'Observación',
-    estado: 'Creado',
-    empleado_orden: 'RFC000001',
-    productos: {
-      tarjeta_madre: [
-        {
-          id: 1,
-          codigo: '01',
-          cantidad: 1,
-          descripcion: 'tarjeta madre',
-          series: [{ id: 1, serie: 1212121212 }],
-        },
-      ],
-      procesador: [
-        {
-          id: 2,
-          codigo: '02',
-          cantidad: 1,
-          descripcion: 'procesador',
-          series: [],
-        },
-      ],
-      ram: [
-        {
-          id: 3,
-          codigo: '03',
-          cantidad: 2,
-          descripcion: 'ram',
-          series: [],
-        },
-      ],
-      disco_duro: [
-        {
-          id: 4,
-          codigo: '04',
-          cantidad: 2,
-          descripcion: 'disco duro',
-          series: [],
-        },
-        {
-          id: 5,
-          codigo: '05',
-          cantidad: 1,
-          descripcion: 'disco duro 2',
-          series: [],
-        },
-      ],
-      tarjeta_video: [
-        {
-          id: 6,
-          codigo: '06',
-          cantidad: 1,
-          descripcion: 'tarjeta video',
-          series: [],
-        },
-      ],
-      gabinete: [
-        {
-          id: 1,
-          codigo: '02',
-          cantidad: 1,
-          descripcion: 'disco duro',
-          series: [],
-        },
-      ],
-      fuente_poder: [
-        {
-          id: 7,
-          codigo: '07',
-          cantidad: 1,
-          descripcion: 'fuente poder',
-          series: [],
-        },
-      ],
-      disco_optico: [],
-      perifericos: [],
-      sistema_operativo: [
-        {
-          id: 7,
-          codigo: '07',
-          cantidad: 1,
-          descripcion: 'sistema operativo',
-          series: [],
-        },
-      ],
-    },
+    folio: 1,
+    fecha_orden: '',
+    fecha_inicio_ensamble: null,
+    fecha_fin_ensamble: null,
+    estado: 'ejemplo',
+    descripcion: '',
+    codigo_ensamble: '',
+    //observaciones: '',
+    rfc_empleado_orden: '',
+    rfc_empleado_ensamble: '',
+    componentes_ensamble: [],
   });
+  const [editable, setEditable] = useState(true);
+  const [editar, setEditar] = useState(false);
 
   useEffect(() => {
-    // Your code here
+    http
+      .get(
+        `/items/ordenes_ensamble/${match.params.id}?fields=*,componentes_ensamble.id,componentes_ensamble.codigo,componentes_ensamble.cantidad,componentes_ensamble.descripcion,componentes_ensamble.etiqueta,componentes_ensamble.orden_ensamble,componentes_ensamble.series_componentes_ensamble,componentes_ensamble.series_componentes_ensamble.id,componentes_ensamble.series_componentes_ensamble.serie,componentes_ensamble.series_componentes_ensamble.componente_ensamble`
+      )
+      .then((result) => {
+        console.log(result.data.data);
+        ChangeList(result.data.data);
+        if (result.data.data.estado === 'Ingresado en almacén')
+          ChangeEditable(false);
+      });
   }, []);
 
-  const changeSeries = (serie, title, indice, number) => {
+  const ChangeList = (lista) => {
+    setList(lista);
+  };
+
+  const ChangeEditable = () => {
+    setEditable(false);
+  };
+
+  const changeSeries = (serie, indice, number) => {
     const lista = JSON.parse(JSON.stringify(list));
-    lista.productos[title][indice].series[number] = serie;
-    //console.log(lista.productos[title][indice]);
+    lista.componentes_ensamble[indice].series_componentes_ensamble[
+      number
+    ] = serie;
+    console.log(lista.componentes_ensamble[indice]);
     setList(JSON.parse(JSON.stringify(lista)));
   };
 
+  const onEstadoTitleButton = (estado) => {
+    switch (estado) {
+      case 'Ordenado':
+        return 'Iniciar Ensamble';
+      case 'En ensamble':
+        return 'Notificar Realización del Ensamblado';
+      case 'Ensamblado':
+        return 'Ingresado en almacén';
+      default:
+        return 'Ensamble Finalizado';
+    }
+  };
+
   const onFinish = () => {
-    console.log('Success:', list);
+    let estado = {};
+    switch (list.estado) {
+      case 'Ordenado':
+        estado = {
+          estado: 'En ensamble',
+          fecha_inicio_ensamble: obtenerFecha(),
+          observaciones: list.observaciones,
+        };
+        break;
+      case 'En ensamble':
+        estado = {
+          estado: 'Ensamblado',
+          observaciones: list.observaciones,
+        };
+        break;
+      case 'Ensamblado':
+        estado = {
+          estado: 'Ingresado en almacén',
+          fecha_fin_ensamble: obtenerFecha(),
+          observaciones: list.observaciones,
+        };
+        break;
+      default:
+        estado = {
+          estado: list.estado,
+          observaciones: list.observaciones,
+        };
+        break;
+    }
+    console.log(estado);
+    http
+      .patch(`/items/ordenes_ensamble/${match.params.id}`, estado)
+      .then((result) => {
+        console.log(result);
+        let series = [];
+        list.componentes_ensamble.map((componente) => {
+          return componente.series_componentes_ensamble.map((serie) => {
+            series.push({
+              ...serie,
+            });
+            return { ...serie };
+          });
+        });
+        if (list.estado === 'Ordenado')
+          http
+            .post('/items/series_componentes_ensamble', series)
+            .then((result2) => {
+              console.log(result2);
+              console.log('ensamble iniciado');
+              /*const ob3 = {
+                serie:"",
+                producto_movimiento:""
+              };*/
+              mensajeSuccess();
+            });
+        else mensajeSuccess();
+      });
+  };
+
+  const obtenerFecha = () => {
+    const date = new Date();
+    return (
+      date.getUTCFullYear() +
+      '-' +
+      ('00' + (date.getUTCMonth() + 1)).slice(-2) +
+      '-' +
+      ('00' + date.getUTCDate()).slice(-2) +
+      ' ' +
+      ('00' + date.getUTCHours()).slice(-2) +
+      ':' +
+      ('00' + date.getUTCMinutes()).slice(-2) +
+      ':' +
+      ('00' + date.getUTCSeconds()).slice(-2)
+    );
+  };
+
+  const onFinishChange = () => {
+    http
+      .patch(`/items/ordenes_ensamble/${match.params.id}`, {
+        observaciones: list.observaciones,
+      })
+      .then((resul) => {
+        console.log(resul);
+        actualizarSeries();
+      });
+  };
+
+  const actualizarSeries = () => {
+    let series = [];
+    list.componentes_ensamble.map((componente) => {
+      return componente.series_componentes_ensamble.map((serie) => {
+        series.push({
+          ...serie,
+        });
+        return { ...serie };
+      });
+    });
+    console.log(series);
+    http.post('/custom/ensamble/', { series: series }).then((result2) => {
+      console.log(result2);
+      mensajeSuccess();
+    });
+  };
+
+  const mensajeSuccess = () => {
+    message
+      .success('Los cambios han sido registrados exitosamente', 3)
+      .then(() => history.goBack());
   };
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
+    message.error('Ha sucedido un error ' + errorInfo, 5);
   };
 
-  return (
+  return list.componentes_ensamble.length !== 0 ? (
     <Form
       name='basic'
       initialValues={{ remember: true }}
-      onFinish={onFinish}
+      onFinish={!editar ? onFinish : onFinishChange}
       onFinishFailed={onFinishFailed}
     >
-      <HeadingBack title={`Mostrar Ensamble ${list.folio}`} />
+      <HeadingBack
+        title={`Ensamble ${match.params.id}`}
+        extra={list.fecha_orden}
+      />
       <TextLabel title='Estado' description={list.estado} />
       <TextLabel
+        title='Codigo del Producto'
+        description={list.codigo_ensamble}
+      />
+      <TextLabel
         title='Empleado de Ensamble'
-        description={list.empleado_orden}
+        description={list.rfc_empleado_ensamble}
       />
-      <ShowProduct
-        titulo='Tarjeta Madre'
-        tag='tarjeta_madre'
-        filas={list.productos.tarjeta_madre}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Procesador'
-        tag='procesador'
-        filas={list.productos.procesador}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Memoria RAM'
-        tag='ram'
-        filas={list.productos.ram}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Disco Duro'
-        tag='disco_duro'
-        filas={list.productos.disco_duro}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Tarjeta de Video'
-        tag='tarjeta_video'
-        filas={list.productos.tarjeta_video}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Gabinete'
-        tag='gabinete'
-        filas={list.productos.gabinete}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Fuente de Poder'
-        tag='fuente_poder'
-        filas={list.productos.fuente_poder}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Unidad de disco óptico'
-        tag='disco_optico'
-        filas={list.productos.disco_optico}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Periféricos'
-        tag='perifericos'
-        filas={list.productos.perifericos}
-        onChanged={changeSeries}
-      />
-      <ShowProduct
-        titulo='Sistema Operativo'
-        tag='sistema_operativo'
-        filas={list.productos.sistema_operativo}
-        onChanged={changeSeries}
-      />
+      {list.fecha_inicio_ensamble != null ? (
+        <Row key='Row' gutter={[16, 24]} style={{ marginBottom: '10px' }}>
+          <Col className='gutter-row' span={12}>
+            <TextLabel
+              title='Fecha de Inicio de Ensamble'
+              description={list.fecha_inicio_ensamble}
+            />
+          </Col>
+          <Col className='gutter-row' span={12}>
+            <TextLabel
+              title='Fecha de Fin de Ensamble'
+              description={list.fecha_fin_ensamble}
+            />
+          </Col>
+        </Row>
+      ) : null}
+
+      {list.componentes_ensamble.length !== 0 ? (
+        <ShowProduct
+          titulo='Componentes'
+          tag='componente'
+          filas={list.componentes_ensamble}
+          onEdition={list.estado === 'Ordenado' ? false : !editar}
+          onChanged={changeSeries}
+        />
+      ) : null}
       <Space direction='vertical' style={{ width: '100%' }}>
         <TextLabel title='Descripción' description={list.descripcion} />
         <Title level={5}>Observaciones</Title>
         <Form.Item
-          name='observacion'
+          name='observaciones'
           rules={[
             {
               required: false,
@@ -206,8 +259,10 @@ const Index = () => {
             //value={value}
             //placeholder='Controlled autosize'observaciones
             onBlur={(e) => {
-              //             changeElements(e.target.value, 'observaciones');
+              setList({ ...list, observaciones: e.target.value });
             }}
+            disabled={!editar}
+            name='observaciones'
             defaultValue={list.observaciones}
             autoSize={{ minRows: 2, maxRows: 5 }}
             showCount
@@ -216,17 +271,59 @@ const Index = () => {
           />
         </Form.Item>
       </Space>
-      <Form.Item name='boton'>
-        <Button
-          style={{ margin: '0 auto', display: 'block' }}
-          type='primary'
-          htmlType='submit'
-        >
-          Iniciar Ensamble
-        </Button>
-      </Form.Item>
+      <Space
+        direction='horizontal'
+        align='baseline'
+        style={{ width: '100%', justifyContent: 'center' }}
+      >
+        <Form.Item name='boton'>
+          <Button
+            disabled={editar ? true : !editable ? true : false}
+            type='primary'
+            htmlType='submit'
+          >
+            {onEstadoTitleButton(list.estado)}
+          </Button>
+        </Form.Item>
+        {editar ? (
+          <Space direction='horizontal' align='baseline'>
+            <Form.Item name='boton'>
+              <Button type='primary' icon={<CheckOutlined />} htmlType='submit'>
+                Guardar Cambios
+              </Button>
+            </Form.Item>
+            <Popconfirm
+              title='¿Estas seguro de cancelar?'
+              onConfirm={() => {
+                setEditar(!editar);
+              }}
+            >
+              <Button type='primary' icon={<CloseOutlined />} danger>
+                Cancelar
+              </Button>
+            </Popconfirm>
+          </Space>
+        ) : (
+          <Button
+            icon={<EditOutlined />}
+            type='primary'
+            style={{
+              visibility:
+                list.estado === 'Ordenado'
+                  ? 'hidden'
+                  : editable
+                  ? 'visible'
+                  : 'hidden',
+            }}
+            disabled={!editable}
+            onClick={() => setEditar(!editar)}
+          >
+            Editar
+          </Button>
+        )}
+      </Space>
     </Form>
-  );
+  ) : null;
 };
 
 export default Index;

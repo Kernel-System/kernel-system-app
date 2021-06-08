@@ -6,7 +6,6 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ListaFacturas from 'components/list/FacturasExternasList';
 import Descripciones from 'components/descriptions/FacturaExternaDescriptions';
 import { insertItems as insertProveedor } from 'api/shared/proveedores';
-import { insertItems as insertFactura } from 'api/shared/facturas_externas';
 import * as CRUD from 'api/shared/facturas_externas';
 
 const Index = (props) => {

@@ -9,3 +9,7 @@
   font-size: 14px;
   line-height: 1.5715;
 }
+
+.ant-layout-header {
+  padding: 0 32px;
+}

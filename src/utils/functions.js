@@ -3,21 +3,41 @@ export const updateObject = (oldObject, updatedValues) => ({
   ...updatedValues,
 });
 
+export const isEmptyObject = (obj) => {
+  return JSON.stringify(obj) === '{}';
+};
+
+export const toPercent = (descuento) => {
+  return 1 - descuento / 100;
+};
+
+export const formatDate = (date) =>
+  new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'short',
+  }).format(new Date(date));
+
+export const formatDateTime = (date) =>
+  new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(date));
+
 export const formatPrice = (price) =>
-  new Intl.NumberFormat('es-MX', {
+  new Intl.NumberFormat('en', {
     style: 'currency',
     currency: 'MXN',
   }).format(price);
+
+export const formatPhoneNumber = (phoneNumber) =>
+  phoneNumber.toString().replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
 
 export const csvToArray = (str, delimiter = ',') => {
   // slice from start of text to the first \n index
   // use split to create an array from string by delimiter
   const headers = str.slice(0, str.indexOf('\n')).split(delimiter);
-
   // slice from \n index + 1 to the end of the text
   // use split to create an array of each csv value row
   const rows = str.slice(str.indexOf('\n') + 1).split('\n');
-
   rows.pop();
   // Map the rows
   // split values from each row into an array
@@ -32,7 +52,6 @@ export const csvToArray = (str, delimiter = ',') => {
     }, {});
     return el;
   });
-
   // return the array
   return arr;
 };

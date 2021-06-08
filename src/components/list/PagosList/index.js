@@ -1,17 +1,40 @@
 import './styles.css';
-import { List, Badge } from 'antd';
+import { http } from 'api';
 import { useState } from 'react';
-import PagosModal from 'components/pagos/PagosModal';
-import HeaderBack from 'components/UI/HeadingBack';
+import { Popconfirm, List, Button, Input, Select } from 'antd';
+import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
+const { Option } = Select;
 
-const Index = ({ list }) => {
-  const [visible, setVisible] = useState(false);
-  const [clave, setClave] = useState('');
+const Index = ({ onConfirmDelete, onClickItem, id_fac, tipo }) => {
+  const fetchItems = async () => {
+    const { data } = await http.get(
+      `/items/pagos_factura?filter[item][_eq]=${id_fac}&filter[collection][_eq]=${tipo}&fields=*,pagos_id.*,pagos_id.archivos_comprobante.*,pagos_id.doctos_relacionados.*,pagos_id.archivos_comprobante.directus_files_id.*`
+    );
+    return data.data;
+  };
+
+  const { data } = useQuery('clientes', async () => {
+    const result = await fetchItems();
+    setListToShow(result);
+    return result;
+  });
+  const [listToShow, setListToShow] = useState([]);
+
+  /*
+      <Input.Search
+        onChange={onSearchChange}
+        placeholder='Buscar por RFC'
+        value={searchValue}
+      />
+  */
+
   return (
     <>
-      <HeaderBack title='Pagos' />
+      <br />
       <List
-        itemLayout='vertical'
+        itemLayout='horizontal'
         size='default'
         pagination={{
           onChange: (page) => {
@@ -19,32 +42,36 @@ const Index = ({ list }) => {
           },
           pageSize: 10,
         }}
-        dataSource={list}
-        renderItem={(item) => (
-          <Badge.Ribbon text={item.fecha_pago}>
+        dataSource={listToShow}
+        renderItem={(item) => {
+          return (
             <List.Item
-              key={item.id_pago}
-              onClick={() => {
-                setVisible(true);
-                setClave(item.id_pago);
-              }}
+              key={item.id}
+              actions={[
+                <Link to={`/admid/cliente/${item.id}`}>
+                  <Button icon={<EditFilled />}></Button>
+                </Link>,
+              ]}
             >
               <List.Item.Meta
-                //avatar={<Avatar src={item.avatar} />}
-                title={`Id de Pago: ${item.id_pago}`}
-                description={`Pago No: ${item.num_operacion}`}
+                title={
+                  <p
+                    onClick={() => {
+                      onClickItem(item);
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    {`Id: ${item.pagos_id.id}`}
+                  </p>
+                }
+                description={`Fecha: ${item.pagos_id.fecha_pago}`}
               />
-              {`Identificador de Factura: ${item.factura}`}
+              {`No. Operación: ${item.pagos_id.num_operacion}`}
             </List.Item>
-          </Badge.Ribbon>
-        )}
-      />
-      <PagosModal
-        visible={visible}
-        clave={clave}
-        setVis={() => {
-          setVisible(false);
-          setClave('');
+          );
         }}
       />
     </>

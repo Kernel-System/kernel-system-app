@@ -1,7 +1,7 @@
-import React from 'react';
-import { Upload, message, Button } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { csvToArray } from 'utils';
+import { Button, message, Upload } from 'antd';
+import React from 'react';
+import { csvToArray } from 'utils/functions';
 
 const handleUpload = ({ file, onSuccess }) => {
   setTimeout(() => {

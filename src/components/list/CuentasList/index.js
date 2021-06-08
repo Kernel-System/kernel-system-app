@@ -1,31 +1,90 @@
 import './styles.css';
-import { List, Typography, Button, Badge, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { http } from 'api';
+import { useState, useEffect } from 'react';
+import { List, Button, Input, Select } from 'antd';
 import { Link } from 'react-router-dom';
-const { Title, Text } = Typography;
 const { Option } = Select;
 
-const Index = ({ list }) => {
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+const Index = ({ onConfirmDelete, onClickItem }) => {
+  const [tipo, setTipo] = useState('facturas_internas');
+  const [factura, setFactura] = useState([]);
 
-  function onSearch(val) {
-    console.log('search:', val);
-  }
+  useEffect(() => {
+    http.get(`/items/${tipo}?fields=*`).then((resul) => {
+      onSetFactura(resul.data.data);
+    });
+  }, [tipo]);
 
-  // Por verificar
+  const onSetFactura = (lista) => {
+    const newLista = JSON.parse(JSON.stringify(lista));
+    setFactura(newLista);
+    setListToShow(newLista);
+  };
+
+  const onTypeChange = (e) => {
+    const value = e;
+    console.log(e);
+    setTipo(value);
+    //filtrarFacturasPorTipo(data, value);
+  };
+
+  const onSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    filtrarFacturasPorTipo(factura, value);
+  };
+
+  const filtrarFacturasPorTipo = async (facturas_tipo, value) => {
+    console.log(facturas_tipo);
+    console.log(value);
+    if (value.replace(/\s/g, '') === '') {
+      setListToShow(facturas_tipo);
+    } else if (facturas_tipo === 'facturas_externas') {
+      setListToShow(
+        facturas_tipo.filter((item) => item.folio.includes(parseInt(value)))
+      );
+    } else {
+      setListToShow(
+        facturas_tipo.filter((item) =>
+          item.rfc_emisor.includes(value.toUpperCase())
+        )
+      );
+    }
+  };
+
+  const [searchValue, setSearchValue] = useState('');
+  const [listToShow, setListToShow] = useState([]);
+
   return (
     <>
-      <Title level={3}>Cuentas</Title>
-      <Text>Ordenar por:</Text>
-      <br />
-      <Select defaultValue='1' style={{ width: 120 }} onChange={handleChange}>
-        <Option value='1'>Sin finalizar</Option>
-        <Option value='2'>Finalizada</Option>
+      <Select
+        style={{ width: '100%' }}
+        optionFilterProp='children'
+        defaultValue='Facturas Internas'
+        onChange={onTypeChange}
+        filterOption={(input, option) =>
+          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        }
+      >
+        <Option value='facturas_internas' key='facturas_internas'>
+          Facturas Internas
+        </Option>
+        <Option value='facturas_externas' key='facturas_externas'>
+          Facturas Externas
+        </Option>
       </Select>
+      <Input.Search
+        onChange={onSearchChange}
+        placeholder={
+          tipo === 'facturas_internas'
+            ? 'Buscar por RFC Emisor'
+            : 'Buscar por Folio'
+        }
+        value={searchValue}
+      />
+      <br />
       <List
-        itemLayout='vertical'
+        itemLayout='horizontal'
         size='default'
         pagination={{
           onChange: (page) => {
@@ -33,28 +92,39 @@ const Index = ({ list }) => {
           },
           pageSize: 10,
         }}
-        dataSource={list}
-        renderItem={(item) => (
-          <Badge.Ribbon text={item.estado}>
-            <Link to={`/cuentas/pagos/${item.id_factura}`}>
-              <List.Item key={item.id_factura}>
-                <List.Item.Meta
-                  //avatar={<Avatar src={item.avatar} />}
-                  title={`Cuenta No. ${item.id_factura}`}
-                  description={`Folio de Factura no. ${item.folio}`}
-                />
-                {`${item.fecha} $`}
-              </List.Item>
-            </Link>
-          </Badge.Ribbon>
-        )}
+        dataSource={listToShow}
+        renderItem={(item) => {
+          return (
+            <List.Item key={item.rfc} actions={[]}>
+              <List.Item.Meta
+                title={
+                  <Link
+                    to={
+                      tipo === 'facturas_internas'
+                        ? `/cuentas/pagos_int/${item.folio}`
+                        : `/cuentas/pagos_ext/${item.id}`
+                    }
+                  >
+                    <p
+                      onClick={() => {
+                        console.log(item);
+                      }}
+                      style={{
+                        cursor: 'pointer',
+                        margin: 0,
+                      }}
+                    >
+                      {`Folio: ${item.folio}`}
+                    </p>
+                  </Link>
+                }
+                description={`Emisor: ${item.rfc_emisor}`}
+              />
+              {`Receptor: ${item.rfc_receptor}`}
+            </List.Item>
+          );
+        }}
       />
-      <br />
-      <Link to='/cuentas/pagos/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Pago
-        </Button>
-      </Link>
     </>
   );
 };

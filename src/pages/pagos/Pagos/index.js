@@ -1,19 +1,44 @@
 import PagosList from 'components/list/PagosList';
-import { useEffect } from 'react';
+import { Button } from 'antd';
+import { Link } from 'react-router-dom';
+import { PlusOutlined } from '@ant-design/icons';
+import Modal from 'components/pagos/PagosModal';
+import { useState } from 'react';
+import HeadingBack from 'components/UI/HeadingBack';
+import { useRouteMatch } from 'react-router';
 
-const Index = ({ id_factura }) => {
-  const lista = [
-    {
-      id_pago: '00000001',
-      fecha_pago: '01/01/2021',
-      num_operacion: '1',
-      factura: '00001',
-    },
-  ];
+const Index = ({ tipo }) => {
+  let match = useRouteMatch();
+
+  const [visible, setVisible] = useState(false);
+  const [pago, setPago] = useState({});
+
+  const changeModal = () => {
+    setVisible(!visible);
+  };
+
+  const changePago = (value) => {
+    setPago(value);
+    changeModal();
+  };
 
   return (
     <div>
-      <PagosList list={lista} />
+      <HeadingBack title={`Pagos: ${match.params.id_fac}`} />
+      <PagosList
+        onClickItem={changePago}
+        tipo={tipo}
+        id_fac={match.params.id_fac}
+        //editItem={showModal}
+        //onConfirmDelete={onConfirmDelete}
+      />
+      <br />
+      <Link to='/admid/cliente/nuevo'>
+        <Button type='primary' size='large' icon={<PlusOutlined />}>
+          Añadir Nuevo Cliente
+        </Button>
+      </Link>
+      <Modal visible={visible} pago={pago} setVis={changeModal} />
     </div>
   );
 };

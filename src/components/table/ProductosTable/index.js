@@ -1,6 +1,6 @@
 import { Table } from 'antd';
 import Column from 'antd/lib/table/Column';
-import { formatPrice } from 'utils';
+import { formatPrice } from 'utils/functions';
 
 const ProductosTable = ({ productos }) => {
   return (

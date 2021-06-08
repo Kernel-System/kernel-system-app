@@ -1,18 +1,20 @@
 import { Route, Switch } from 'react-router';
+import ProductsTable from 'components/shared/ProductsTable';
+import GuestRoute from 'components/utils/GuestRoute';
+import PrivateRoute from 'components/utils/PrivateRoute';
 import asyncComponent from 'hoc/asyncComponent';
 import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
-import Login from 'pages/auth/Login';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
+import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
 import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
 import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
 import FacturarTicket from 'pages/FacturarTicket';
 import Home from 'pages/Home';
-import NotFound from 'pages/NotFound';
 import Order from 'pages/orders/Order';
 import Orders from 'pages/orders/Orders';
 import Product from 'pages/Product';
@@ -20,22 +22,45 @@ import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
+import ProfileAdmid from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
-import Proveedores from 'pages/compras/Proveedores';
 import Compras from 'pages/compras/Compras';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-import Venta from 'pages/ventas/Venta';
 import FacturasExternas from 'pages/facturas/FacturasExternas';
 
-import Tranferencias from './pages/almacen/Transferencias';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
+import Tranferencias from './pages/almacen/Transferencias';
 import Cuentas from './pages/pagos/Cuentas';
-import Pagos from './pages/pagos/Pagos';
 import PagoNuevo from './pages/pagos/PagoNuevo';
+import Pagos from './pages/pagos/Pagos';
+import AgregarProductos from './pages/productos/AgregarProductos';
+import Productos from './pages/productos/Productos';
 
-const asyncForgotPassword = asyncComponent(() =>
-  import('pages/auth/ForgotPassword')
+import Sucursal from './pages/administrador/sucursales/Sucursales';
+import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
+
+import Almacen from './pages/administrador/almacenes/Almacenes';
+import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
+
+import Empleado from './pages/administrador/empleados/Empleados';
+import NuevoEmpleado from './pages/administrador/empleados/AgregarEmpleado';
+
+import Cliente from './pages/administrador/clientes/Clientes';
+import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
+
+const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
+
+const asyncLogout = asyncComponent(() => import('pages/auth/Logout'));
+
+const asyncRecoverAccount = asyncComponent(() =>
+  import('pages/auth/RecoverAccount')
 );
+
+const asyncResetPassword = asyncComponent(() =>
+  import('pages/auth/ResetPassword')
+);
+
+const asyncNotFound = asyncComponent(() => import('pages/NotFound'));
 
 const Rutas = () => {
   return (
@@ -44,20 +69,27 @@ const Rutas = () => {
       <Route path='/' exact component={Home} />
 
       {/* Auth */}
-      <Route path='/iniciar-sesion' exact component={Login} />
-      <Route
-        path='/recuperar-contrasena'
+      <GuestRoute path='/iniciar-sesion' exact component={asyncLogin} />
+      <GuestRoute
+        path='/recuperar-cuenta'
         exact
-        component={asyncForgotPassword}
+        component={asyncRecoverAccount}
       />
+      <GuestRoute
+        path='/restablecer-contrasena'
+        exact
+        component={asyncResetPassword}
+      />
+      <PrivateRoute path='/cerrar-sesion' exact component={asyncLogout} />
 
       {/* Addresses */}
-      <Route path='/direcciones' exact component={Addresses} />
-      <Route path='/direcciones/nueva' exact component={NewAddress} />
+      <PrivateRoute path='/direcciones' exact component={Addresses} />
+      <PrivateRoute path='/direcciones/:id' exact component={NewAddress} />
+      <PrivateRoute path='/direcciones/nueva' exact component={NewAddress} />
 
       {/* Profile */}
-      <Route path='/perfil' exact component={Profile} />
-      <Route
+      <PrivateRoute path='/perfil' exact component={Profile} />
+      <PrivateRoute
         path='/perfil/cambiar-contrasena'
         exact
         component={ChangePassword}
@@ -66,21 +98,20 @@ const Rutas = () => {
       {/* Search Product */}
       <Route path='/b/:query' exact component={Search} />
       <Route path='/c/:query' exact component={Search} />
-      <Route path='/p/:id' exact component={Product} />
+      <Route path='/producto/:id' exact component={Product} />
 
       {/* Cart */}
-      <Route path='/lista-de-compra' exact component={Cart} />
+      <PrivateRoute path='/lista-de-compra' exact component={Cart} />
 
       {/* Checkout */}
-      <Route path='/checkout' exact component={Checkout} />
+      <PrivateRoute path='/checkout' exact component={Checkout} />
 
       {/* Orders */}
-      <Route path='/pedidos' exact component={Orders} />
-      <Route path='/pedidos/:id' exact component={Order} />
+      <PrivateRoute path='/solicitudes-de-compra' exact component={Orders} />
+      <PrivateRoute path='/solicitudes-de-compra/:id' exact component={Order} />
 
       {/* Punto de venta */}
-      <Route path='/venta' exact component={PuntoDeVenta} />
-      <Route path='/venta/nueva' exact component={Venta} />
+      <PrivateRoute path='/venta' exact component={PuntoDeVenta} />
 
       {/* Proveedores */}
       <Route path='/proveedores' exact>
@@ -106,20 +137,71 @@ const Rutas = () => {
       <Route path='/facturar_ticket' exact component={FacturarTicket} />
 
       {/* Movimientos de almacen */}
-      <Route path='/almacen' exact component={MovimientosAlmacen} />
-      <Route path='/almacen/nuevo' exact component={NuevoMovimiento} />
+      <Route path='/movimiento_almacen' exact component={MovimientosAlmacen} />
+      <Route
+        path='/movimiento_almacen/nuevo'
+        exact
+        component={NuevoMovimiento}
+      />
 
+      {/* Transferencias */}
       <Route path='/transferencia/' exact component={Tranferencias} />
-      <Route path='/transferencia/nuevo' exact component={NuevaTrasferencia} />
-      <Route path='/transferencia/:id' exact component={NuevaTrasferencia} />
+      <Route path='/transferencia/nuevo' exact>
+        {<NuevaTrasferencia tipo={'agregar'} />}
+      </Route>
+      <Route path='/transferencia/mostrar/:id' exact>
+        {<NuevaTrasferencia tipo={'mostrar'} />}
+      </Route>
+      <Route path='/transferencia/editar/:id' exact>
+        {<NuevaTrasferencia tipo={'editar'} />}
+      </Route>
 
-      {/* pagos */}
+      {/* Pagos */}
       <Route path='/cuentas/' exact component={Cuentas} />
       <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
-      <Route path='/cuentas/pagos/:id' exact component={Pagos} />
+      <Route path='/cuentas/pagos_int/:id_fac/' exact>
+        {<Pagos tipo={'facturas_internas'} />}
+      </Route>
+      <Route path='/cuentas/pagos_ext/:id_fac/' exact>
+        {<Pagos tipo={'facturas_externas'} />}
+      </Route>
+
+      {/* Productos */}
+      <Route path='/productos/' exact component={Productos} />
+      <Route path='/productos/nuevo' exact>
+        {<AgregarProductos tipo={'agregar'} />}
+      </Route>
+      <Route path='/productos/editar/:codigo' exact>
+        {<AgregarProductos tipo={'editar'} />}
+      </Route>
+      <Route path='/productos/mostrar/:codigo' exact>
+        {<AgregarProductos tipo={'mostrar'} />}
+      </Route>
+
+      {/* Administrador */}
+      <Route path='/admid/' exact component={ProfileAdmid} />
+
+      <Route path='/admid/sucursal' exact component={Sucursal} />
+      <Route path='/admid/sucursal/nuevo' exact component={NuevaSucursal} />
+      <Route path='/admid/sucursal/:clave' exact component={NuevaSucursal} />
+
+      <Route path='/admid/almacen' exact component={Almacen} />
+      <Route path='/admid/almacen/nuevo' exact component={NuevoAlmacen} />
+      <Route path='/admid/almacen/:clave' exact component={NuevoAlmacen} />
+
+      <Route path='/admid/empleado' exact component={Empleado} />
+      <Route path='/admid/empleado/nuevo' exact component={NuevoEmpleado} />
+      <Route path='/admid/empleado/:rfc' exact component={NuevoEmpleado} />
+
+      <Route path='/admid/cliente' exact component={Cliente} />
+      <Route path='/admid/cliente/nuevo' exact component={NuevoCliente} />
+      <Route path='/admid/cliente/:id' exact component={NuevoCliente} />
+
+      {/* Test */}
+      <Route path='/test' exact component={ProductsTable} />
 
       {/* Not Found */}
-      <Route component={NotFound} />
+      <Route component={asyncNotFound} />
     </Switch>
   );
 };

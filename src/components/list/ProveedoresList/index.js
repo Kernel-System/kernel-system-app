@@ -1,6 +1,6 @@
 import './styles.css';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Input, Select } from 'antd';
+import { Popconfirm, List, Button, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/shared/proveedores';

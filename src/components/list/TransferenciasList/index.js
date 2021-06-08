@@ -1,30 +1,50 @@
 import './styles.css';
-import { List, Typography, Button, Badge, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { http } from 'api';
+import { useState } from 'react';
+import { List, Button, Input, Space } from 'antd';
+import { EditFilled } from '@ant-design/icons';
+import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-const { Title, Text } = Typography;
-const { Option } = Select;
 
-const Index = ({ list }) => {
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+const Index = () => {
+  const fetchTransferencia = async () => {
+    const { data } = await http.get('/items/solicitudes_transferencia');
+    return data.data;
+  };
+
+  const onSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    filtrarTransferenciasPorEstado(data, value);
+  };
+
+  const filtrarTransferenciasPorEstado = async (ensambles, value) => {
+    if (value === 'Todo') {
+      setListToShow(ensambles);
+    } else if (ensambles)
+      setListToShow(ensambles.filter((item) => item.estado.includes(value)));
+  };
+
+  const [searchValue, setSearchValue] = useState('');
+
+  const { data } = useQuery('transferencia', async () => {
+    const result = await fetchTransferencia();
+    setListToShow(result);
+    filtrarTransferenciasPorEstado(result, searchValue);
+    return result;
+  });
+  const [listToShow, setListToShow] = useState([]);
+
   return (
     <>
-      <Title level={3}>Transferencias</Title>
-      <Text>Filtrar por:</Text>
+      <Input.Search
+        onChange={onSearchChange}
+        placeholder='Buscar por estado'
+        value={searchValue}
+      ></Input.Search>
       <br />
-      <Select
-        defaultValue='Creado'
-        style={{ width: 120 }}
-        onChange={handleChange}
-      >
-        <Option value='1'>Pendiente</Option>
-        <Option value='2'>Tranferido</Option>
-        <Option value='3'>Recibido</Option>
-      </Select>
       <List
-        itemLayout='vertical'
+        itemLayout='horizontal'
         size='default'
         pagination={{
           onChange: (page) => {
@@ -32,28 +52,37 @@ const Index = ({ list }) => {
           },
           pageSize: 10,
         }}
-        dataSource={list}
+        dataSource={listToShow}
         renderItem={(item) => (
-          <Badge.Ribbon text={item.estado}>
-            <Link to={`/transferencia/${item.id}`}>
-              <List.Item key={item.id}>
-                <List.Item.Meta
-                  //avatar={<Avatar src={item.avatar} />}
-                  title={`Transferencia No. ${item.id}`}
-                  description={item.fechasolicitud}
-                />
-                {`Del almacen ${item.almacen_origen}, al almacen ${item.almacen_destino}`}
-              </List.Item>
-            </Link>
-          </Badge.Ribbon>
+          <List.Item
+            key={item.id}
+            actions={[
+              <Space>
+                <Link to={`/transferencia/editar/${item.id}`}>
+                  <Button icon={<EditFilled />} />
+                </Link>
+              </Space>,
+            ]}
+          >
+            <List.Item.Meta
+              title={
+                <Link to={`/transferencia/mostrar/${item.id}`}>
+                  <p
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    {`Transferencia ${item.id}`}
+                  </p>
+                </Link>
+              }
+              description={item.fecha_solicitud}
+            />
+            {item.estado}
+          </List.Item>
         )}
       />
-      <br />
-      <Link to='/transferencia/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Nueva Transferencia
-        </Button>
-      </Link>
     </>
   );
 };
