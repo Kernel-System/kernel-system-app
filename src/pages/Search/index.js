@@ -30,10 +30,20 @@ const Search = () => {
         <Col>
           <Space>
             <Text>Ordenar por:</Text>
-            <Select defaultValue='default' loading={products.isLoading}>
+            <Select
+              defaultValue='default'
+              loading={products.isLoading || products.isFetching}
+              onChange={(value) => {
+                console.log(value);
+                setSortBy(value);
+                focusManager.setFocused(true);
+                queryClient.invalidateQueries('search-products');
+                focusManager.setFocused(false);
+              }}
+            >
               <Select.Option value='default'>Predeterminado</Select.Option>
-              <Select.Option value='lowestPrice'>Menor Precio</Select.Option>
-              <Select.Option value='highestPrice'>Mayor Precio</Select.Option>
+              <Select.Option value='menor'>Menor Precio</Select.Option>
+              <Select.Option value='mayor'>Mayor Precio</Select.Option>
             </Select>
           </Space>
         </Col>
@@ -42,10 +52,10 @@ const Search = () => {
       {products.isLoading ? (
         <CenteredSpinner />
       ) : productsData.length ? (
-        <Space direction='vertical' size='large'>
+        <Space direction='vertical' size='large' style={{ width: '100%' }}>
           <Row gutter={[16, 16]}>
             {productsData.map((product) => (
-              <Col xs={24} sm={12} lg={6} key={product.codigo}>
+              <Col xs={24} sm={12} lg={8} xl={6} key={product.codigo}>
                 <ProductCard product={product} />
               </Col>
             ))}
