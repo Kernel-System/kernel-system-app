@@ -2,50 +2,212 @@ import React, { useState } from 'react';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import CompraForm from 'components/forms/CompraForm';
 import Header from 'components/UI/HeadingBack';
-import { Typography } from 'antd';
-
-const { Title } = Typography;
+import { message } from 'antd';
+import { insertItems as insertProveedor } from 'api/shared/proveedores';
+import { insertItems as insertFactura } from 'api/shared/facturas_externas';
+import { insertItems as insertCompra } from 'api/shared/compras';
+import { filtrarPorUUID } from 'api/shared/facturas_externas';
+import moment from 'moment';
 
 const Index = () => {
   const onFacturaLeida = (factura) => {
+    // console.log({ factura });
     const cfdi = factura['$'];
-    console.log({ factura });
     const emisor = factura['cfdi:Emisor'][0].$;
-    setCompra((prev) => ({
-      ...prev,
-      rfc_proveedor: emisor.Rfc,
-      folio: cfdi.Folio,
-      fecha_compra: cfdi.Fecha,
-      moneda: cfdi.Moneda,
-      tipo_cambio: cfdi.TipoCambio,
-      subtotal: cfdi.SubTotal,
-      total: cfdi.Total,
-      forma_pago: cfdi.FormaPago,
-      metodo_pago: cfdi.MetodoPago,
+    const receptor = factura['cfdi:Receptor'][0].$;
+    const timbreFiscal =
+      factura['cfdi:Complemento'][0]['tfd:TimbreFiscalDigital'][0].$;
+
+    setFactura(() => ({
+      datosFactura: {
+        folio: cfdi.Folio,
+        serie: cfdi.Serie,
+        tipo_de_comprobante: cfdi.TipoDeComprobante,
+        fecha: cfdi.Fecha,
+        condiciones_de_pago: cfdi.CondicionesDePago,
+        lugar_expedicion: cfdi.LugarExpedicion,
+        uuid: timbreFiscal.UUID,
+
+        moneda: cfdi.Moneda,
+        tipo_cambio: cfdi.TipoCambio,
+        subtotal: cfdi.SubTotal,
+        total: cfdi.Total,
+        forma_pago: cfdi.FormaPago,
+        metodo_pago: cfdi.MetodoPago,
+
+        rfc_emisor: emisor.Rfc,
+        nombre_emisor: emisor.Nombre,
+        regimen_fiscal: emisor.RegimenFiscal,
+
+        rfc_receptor: receptor.Rfc,
+        nombre_receptor: receptor.Nombre,
+        uso_cfdi: receptor.UsoCFDI,
+      },
+
+      proveedor: {
+        rfc: emisor.Rfc,
+        razon_social: emisor.Nombre,
+        regimen_fiscal: emisor.RegimenFiscal,
+      },
+
+      datosCompra: {
+        fecha_compra: cfdi.Fecha,
+        productos_comprados: leerConceptosFactura(factura),
+      },
     }));
   };
-  const compraInicial = {
-    rfc_proveedor: '',
-    folio: '',
-    fecha_compra: '',
-    moneda: '',
-    tipo_cambio: '',
-    subtotal: '',
-    total: '',
-    forma_pago: '',
-    metodo_pago: '',
+
+  function leerConceptosFactura(factura) {
+    const conceptos = factura['cfdi:Conceptos'][0]['cfdi:Concepto'];
+    const productos = [];
+
+    conceptos.forEach((elemento, index) => {
+      const objeto = elemento.$;
+      const producto = {
+        key: index,
+        cantidad: objeto.Cantidad,
+        clave: objeto.ClaveProdServ,
+        clave_unidad: objeto.ClaveUnidad,
+        descripcion: objeto.Descripcion,
+        importe: objeto.Importe,
+        codigo: objeto.NoIdentificacion,
+        unidad: objeto.Unidad,
+        descuento: objeto.Descuento ? objeto.Descuento : '',
+        valor_unitario: objeto.ValorUnitario,
+      };
+      productos.push(producto);
+    });
+
+    return productos;
+  }
+
+  const [factura, setFactura] = useState({});
+
+  const insertarFactura = async (factura) => {
+    let id = -1;
+    await insertFactura(factura)
+      .then((result) => {
+        if (result.status === 200) {
+          id = result.data.data.id;
+        }
+      })
+      .catch((error) => {
+        if (
+          error.response.data.errors[0].message.includes('has to be unique')
+        ) {
+          id = 0;
+        }
+      });
+    return id;
   };
-  const [compra, setCompra] = useState(compraInicial);
+
+  const insertarCompra = async (compra) => {
+    let noCompra = -1;
+    await insertCompra(compra)
+      .then((result) => {
+        if (result.status === 200) {
+          noCompra = result.data.data.no_compra;
+        }
+      })
+      .catch((error) => {
+        if (
+          error.response.data.errors[0].message.includes('has to be unique')
+        ) {
+          noCompra = 0;
+        }
+      });
+    return noCompra;
+  };
+
+  const insertarProveedor = async (proveedor) => {
+    let rfc = -1;
+    await insertProveedor(proveedor)
+      .then((result) => {
+        if (result.status === 200) {
+          rfc = result.data.data.rfc;
+        }
+      })
+      .catch((error) => {
+        if (
+          error.response.data.errors[0].message.includes('has to be unique')
+        ) {
+          rfc = 0;
+        }
+      });
+    return rfc;
+  };
+
+  const getFactura = async (uuid) => {
+    let idEncontrada = 0;
+    await filtrarPorUUID(uuid).then((result) => {
+      idEncontrada = result.data.data[0].id;
+    });
+    return idEncontrada;
+  };
+
+  const insertItem = async (compra) => {
+    let success = false;
+    const hide0 = message.loading('Registrando proveedor', 0);
+    const rfc_proveedor = await insertarProveedor(factura.proveedor);
+
+    hide0();
+    if (rfc_proveedor.length >= 12)
+      message.success('El proveedor ha sido registrado exitosamente');
+    else if (rfc_proveedor === 0) {
+      message.warn('Este proveedor ya ha sido registrado previamente');
+    } else {
+      message.error('Fallo al intentar registrar el proveedor');
+    }
+
+    const hide1 = message.loading('Registrando datos de factura', 0);
+    const idRegistrada = await insertarFactura(factura.datosFactura);
+    hide1();
+    let idFactura = idRegistrada;
+    if (idRegistrada > 0)
+      message.success('La factura ha sido registrada exitosamente', 2);
+    else if (idRegistrada === 0) {
+      message.warn('Esta factura ya ha sido registrada previamente', 2.5);
+      idFactura = await getFactura(factura.datosFactura.uuid);
+    } else {
+      message.error('Fallo al intentar registrar los datos de factura', 2.5);
+    }
+
+    const hide2 = message.loading('Registrando datos de compra', 0);
+    const noCompra = await insertarCompra({
+      ...compra,
+      fecha_compra: moment(compra.fecha_compra).format('YYYY-MM-DDThh:mm:ss'),
+      fecha_entrega: compra.fecha_entrega
+        ? moment(compra.fecha_entrega).format('YYYY-MM-DD')
+        : null,
+      productos_comprados: factura.datosCompra.productos_comprados,
+      factura: idFactura,
+    });
+    hide2();
+    if (noCompra > 0) {
+      message.success('La compra ha sido registrada exitosamente', 2);
+      success = true;
+    } else if (noCompra === 0) {
+      message.warn('Esta compra ya ha sido registrada previamente', 2.5);
+    } else {
+      message.error('Fallo al intentar registrar los datos de la compra', 2.5);
+    }
+
+    return success;
+  };
 
   return (
     <>
       <Header title='Registrar compra' />
-      <LectorFacturas onSuccess={onFacturaLeida} />
+      <LectorFacturas isDragger onSuccess={onFacturaLeida} />
       <br />
-      <Title level={4}>Datos de compra</Title>
       <CompraForm
-        datosCompra={compra}
+        datosCompra={{
+          ...factura.datosCompra,
+          ...factura.datosFactura,
+        }}
         submitText='REGISTRAR COMPRA'
+        cleanOnSubmit
+        onSubmit={insertItem}
       ></CompraForm>
     </>
   );
