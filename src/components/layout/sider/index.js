@@ -1,6 +1,5 @@
 import {
   AppstoreOutlined,
-  ContainerOutlined,
   DollarOutlined,
   ImportOutlined,
   ShopOutlined,
@@ -38,6 +37,86 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     }
   };
 
+  const VentaMenuItem = (
+    <Menu.Item
+      key='venta'
+      icon={<ShopOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/venta'>Punto de Venta</Link>
+    </Menu.Item>
+  );
+
+  const EnsamblesMenuItem = (
+    <Menu.Item
+      key='ensambles'
+      icon={<ToolOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/ensambles'>Órdenes de ensamble</Link>
+    </Menu.Item>
+  );
+
+  const ProductosMenuItem = (
+    <Menu.Item
+      key='productos'
+      icon={<AppstoreOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/productos'>Productos</Link>
+    </Menu.Item>
+  );
+
+  const CuentasMenuItem = (
+    <Menu.Item
+      key='cuentas'
+      icon={<DollarOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/cuentas'>Cuentas</Link>
+    </Menu.Item>
+  );
+
+  const MovimientosAlmacenMenuItem = (
+    <Menu.Item
+      key='movimiento-almacen'
+      icon={<ImportOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/movimiento-almacen'>Movimientos de Almacén</Link>
+    </Menu.Item>
+  );
+
+  const TransferenciaMenuItem = (
+    <Menu.Item
+      key='transferencia'
+      icon={<SwapOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/transferencia'>Transferencias</Link>
+    </Menu.Item>
+  );
+
+  const ComprasMenuItem = (
+    <Menu.Item
+      key='compras'
+      icon={<ShoppingOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/compras'>Compras</Link>
+    </Menu.Item>
+  );
+
+  const ProveedoresMenuItem = (
+    <Menu.Item
+      key='proveedores'
+      icon={<TeamOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/proveedores'>Proveedores</Link>
+    </Menu.Item>
+  );
+
   const clienteGuestMenuItems = (
     <>
       {breakpoint.xs && (
@@ -69,91 +148,27 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const encargadoDeVentasMenuItems = (
     <>
-      <Menu.Item
-        key='venta'
-        icon={<ShopOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/venta'>Punto de Venta</Link>
-      </Menu.Item>
-      <Menu.Item
-        key='ensambles'
-        icon={<ToolOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/ensambles'>Ensambles</Link>
-      </Menu.Item>
-      <Menu.Item
-        key='productos'
-        icon={<AppstoreOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/productos'>Productos</Link>
-      </Menu.Item>
+      {VentaMenuItem}
+      {EnsamblesMenuItem}
+      {ProductosMenuItem}
     </>
   );
 
-  const cuentasPorCobrarMenuItems = (
-    <>
-      <Menu.Item
-        key='cuentas'
-        icon={<DollarOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/cuentas'>Cuentas</Link>
-      </Menu.Item>
-    </>
-  );
+  const cuentasPorCobrarMenuItems = <>{CuentasMenuItem}</>;
 
   const encargadoDeAlmacenMenuItems = (
     <>
-      <Menu.Item
-        key='ensambles'
-        icon={<ToolOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/ensambles'>Órdenes de ensamble</Link>
-      </Menu.Item>
-      <Menu.Item
-        key='movimiento-almacen'
-        icon={<ImportOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/movimiento-almacen'>Movimientos de Almacén</Link>
-      </Menu.Item>
-      <Menu.Item
-        key='transferencia'
-        icon={<SwapOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/transferencia'>Transferencias</Link>
-      </Menu.Item>
+      {EnsamblesMenuItem}
+      {MovimientosAlmacenMenuItem}
+      {TransferenciaMenuItem}
     </>
   );
 
   const encargadoDeComprasMenuItems = (
     <>
-      <Menu.Item
-        key='compras'
-        icon={<ShoppingOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/compras'>Compras</Link>
-      </Menu.Item>
-      <Menu.Item
-        key='proveedores'
-        icon={<TeamOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/proveedores'>Proveedores</Link>
-      </Menu.Item>
-      <Menu.Item
-        key='productos'
-        icon={<AppstoreOutlined />}
-        onClick={!collapsed && ToggleCollapsed}
-      >
-        <Link to='/productos'>Productos</Link>
-      </Menu.Item>
+      {ComprasMenuItem}
+      {ProveedoresMenuItem}
+      {ProductosMenuItem}
     </>
   );
 
@@ -162,7 +177,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       collapsed={collapsed}
       collapsedWidth={breakpoint.lg ? 80 : 0}
       width={breakpoint.lg ? 250 : '100vw'}
-      style={{ backgroundColor: '#fff' }}
+      style={{ backgroundColor: '#fff', zIndex: 1 }}
     >
       <Menu mode='inline'>
         {role === 'cliente' || role === undefined
@@ -174,13 +189,14 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
         {role === 'encargado de compras' && encargadoDeComprasMenuItems}
         {role === 'administrador' && (
           <>
-            <Menu.SubMenu title='Categorias' icon={<ContainerOutlined />}>
-              {clienteGuestMenuItems}
-            </Menu.SubMenu>
-            {encargadoDeVentasMenuItems}
-            {cuentasPorCobrarMenuItems}
-            {encargadoDeAlmacenMenuItems}
-            {encargadoDeComprasMenuItems}
+            {VentaMenuItem}
+            {EnsamblesMenuItem}
+            {ProductosMenuItem}
+            {CuentasMenuItem}
+            {MovimientosAlmacenMenuItem}
+            {TransferenciaMenuItem}
+            {ComprasMenuItem}
+            {ProveedoresMenuItem}
           </>
         )}
       </Menu>
