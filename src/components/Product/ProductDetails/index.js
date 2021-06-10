@@ -1,11 +1,12 @@
-import { List, Space, Typography } from 'antd';
+import { List, Typography } from 'antd';
 import Heading from 'components/UI/Heading';
+import { capitalize } from 'utils/functions';
 
-const { Text } = Typography;
+const { Paragraph } = Typography;
 
 const ProductDetails = ({ especificaciones }) => {
-  const newEspecificaciones = especificaciones.filter(
-    (especificacion) => especificacion !== null
+  const newEspecificaciones = Object.entries(especificaciones).filter(
+    ([_, value]) => value != null
   );
 
   return (
@@ -14,14 +15,14 @@ const ProductDetails = ({ especificaciones }) => {
       <List
         size='small'
         dataSource={newEspecificaciones}
-        renderItem={(item) => {
-          if (item !== null || item !== undefined) {
+        renderItem={(especificacion) => {
+          if (especificacion !== null || especificacion !== undefined) {
             return (
-              <List.Item key={item}>
-                <Space>
-                  <Text>◼</Text>
-                  {item}
-                </Space>
+              <List.Item key={especificacion[0]}>
+                <Paragraph>
+                  ◼ {capitalize(especificacion[0].replaceAll('_', ' '))}:{' '}
+                  {capitalize(especificacion[1])}
+                </Paragraph>
               </List.Item>
             );
           } else {
