@@ -1,10 +1,7 @@
-import { Modal, Button, Row, Col } from 'antd';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { Modal, Button } from 'antd';
 import TextLabel from '../../UI/TextLabel';
 
 const Index = ({ visible, almacen, setVis }) => {
-  const breakpoint = useBreakpoint();
-
   return (
     <>
       <Modal
