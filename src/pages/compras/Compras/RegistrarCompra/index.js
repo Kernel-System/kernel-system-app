@@ -181,6 +181,7 @@ const Index = () => {
         : null,
       productos_comprados: factura.datosCompra.productos_comprados,
       factura: idFactura,
+      proveedor: factura.proveedor.rfc,
     });
     hide2();
     if (noCompra > 0) {
