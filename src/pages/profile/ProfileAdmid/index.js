@@ -5,39 +5,38 @@ import CenteredSpinner from 'components/UI/CenteredSpinner';
 import HeadingBack from 'components/UI/HeadingBack';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { useStoreState } from 'easy-peasy';
 
 const Profile = () => {
-  const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk2NGIyNjRiLTdmMzktNDZlOC1hZmEwLWVjM2ZjYmQ1MWY3YSIsImlhdCI6MTYyMjU2MDQ4NSwiZXhwIjoxNjIyNTk2NDg1fQ.CtPkzvBKq4Rl36MaBrRsYt5VnzYOfN1fsmDe-F6rBS0'; //useStoreState((state) => state.admid.token.access_token);
-  const admid = useQuery('admid', () => getUserData(token));
-
+  const token = useStoreState((state) => state.user.token.access_token);
+  const admin = useQuery('admin', () => getUserData(token));
   return (
     <>
       <HeadingBack
         title='Administrador'
         actions={[
-          <Link to='/admid' key='1'>
+          <Link to='/admin' key='1'>
             <Button type='primary'>Administrador</Button>
           </Link>,
-          <Link to='/admid/empleado' key='2'>
+          <Link to='/admin/empleado' key='2'>
             <Button>Empleados</Button>
           </Link>,
-          <Link to='/admid/cliente' key='3'>
+          <Link to='/admin/cliente' key='3'>
             <Button>Clientes</Button>
           </Link>,
-          <Link to='/admid/sucursal' key='4'>
+          <Link to='/admin/sucursal' key='4'>
             <Button>Sucursales</Button>
           </Link>,
-          <Link to='/admid/almacen' key='5'>
+          <Link to='/admin/almacen' key='5'>
             <Button>Almacenes</Button>
           </Link>,
         ]}
       />
-      {admid.isLoading ? (
+      {admin.isLoading ? (
         <CenteredSpinner />
       ) : (
         <Row gutter={[24, 24]}>
-          <ProfileAdmidOverview admid={admid.data} />
+          <ProfileAdmidOverview admin={admin.data} />
         </Row>
       )}
     </>

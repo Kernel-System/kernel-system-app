@@ -2,7 +2,7 @@ import { Col, Descriptions, Typography } from 'antd';
 import { formatPhoneNumber } from 'utils/functions';
 const { Title } = Typography;
 
-const ProfileOverview = ({ admid }) => {
+const ProfileOverview = ({ admin }) => {
   return (
     <>
       <Col xs={24} lg={12}>
@@ -18,16 +18,16 @@ const ProfileOverview = ({ admid }) => {
           labelStyle={{ fontWeight: 500 }}
         >
           <Descriptions.Item label='Nombre'>
-            {admid.empleado.nombre}
+            {admin.empleado.nombre}
           </Descriptions.Item>
           <Descriptions.Item label='Correo electrónico'>
-            {admid.correo}
+            {admin.correo}
           </Descriptions.Item>
           <Descriptions.Item label='Número telefónico'>
-            {formatPhoneNumber(admid.empleado.telefono)}
+            {formatPhoneNumber(admin.empleado.telefono)}
           </Descriptions.Item>
           <Descriptions.Item label='RFC'>
-            {formatPhoneNumber(admid.empleado.rfc)}
+            {formatPhoneNumber(admin.empleado.rfc)}
           </Descriptions.Item>
         </Descriptions>
       </Col>
