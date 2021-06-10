@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ListaFacturas from 'components/list/FacturasExternasList';
-import Descripciones from 'components/descriptions/FacturaExternaDescriptions';
+import Descripciones from 'components/descriptions/FacturaDescriptions';
 import { insertItems as insertProveedor } from 'api/shared/proveedores';
 import * as CRUD from 'api/shared/facturas_externas';
 
@@ -32,6 +32,7 @@ const Index = (props) => {
       total: cfdi.Total,
       forma_pago: cfdi.FormaPago,
       metodo_pago: cfdi.MetodoPago,
+      descuento: cfdi.Descuento,
 
       rfc_emisor: emisor.Rfc,
       nombre_emisor: emisor.Nombre,
