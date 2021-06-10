@@ -1,10 +1,11 @@
-import { Typography, Button, Form, Select, message } from 'antd';
+import { Button, Form, Select, message } from 'antd';
 import { useHistory, useRouteMatch } from 'react-router';
 import HeadingBack from 'components/UI/HeadingBack';
 import InputForm from 'components/shared/InputForm';
 import { useEffect, useState } from 'react';
 import { http } from 'api';
 import TextLabel from 'components/UI/TextLabel';
+import { useStoreState } from 'easy-peasy';
 const { Option } = Select;
 
 const Index = () => {
@@ -12,27 +13,34 @@ const Index = () => {
   const [sucursales, setSucursales] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const history = useHistory();
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   let match = useRouteMatch();
 
   useEffect(() => {
-    http.get(`/items/sucursales/`).then((resul) => {
+    http.get(`/items/sucursales/`, putToken).then((resul) => {
       console.log(resul.data.data);
       onSetSucursales(resul.data.data);
     });
-    http.get(`/items/empleados/`).then((resul) => {
+    http.get(`/items/empleados/`, putToken).then((resul) => {
       console.log(resul.data.data);
       onSetEmpleados(resul.data.data);
     });
-    if (match.params.clave != window.undefined) {
-      http.get(`/items/almacenes/${match.params.clave}`).then((resul) => {
-        onSetAlmacen(resul.data.data);
-      });
+    if (match.params.clave !== window.undefined) {
+      http
+        .get(`/items/almacenes/${match.params.clave}`, putToken)
+        .then((resul) => {
+          onSetAlmacen(resul.data.data);
+        });
     } else onSetAlmacen([{}]);
   }, []);
 
   const onSetAlmacen = (lista) => {
     const newLista = JSON.parse(JSON.stringify(lista));
-    console.log(newLista);
     setAlmacen([newLista]);
   };
 
@@ -51,11 +59,15 @@ const Index = () => {
   const onFinish = (datos: any) => {
     console.log(datos);
     http
-      .post('/items/almacenes/', {
-        dimensiones: datos.dimensiones,
-        rfc_encargado: datos.rfc_encargado,
-        clave_sucursal: datos.clave_sucursal,
-      })
+      .post(
+        '/items/almacenes/',
+        {
+          dimensiones: datos.dimensiones,
+          rfc_encargado: datos.rfc_encargado,
+          clave_sucursal: datos.clave_sucursal,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         Mensaje();
@@ -73,11 +85,15 @@ const Index = () => {
     console.log(datos);
     console.log(`/items/almacenes/${match.params.clave}`);
     http
-      .patch(`/items/almacenes/${match.params.clave}`, {
-        dimensiones: datos.dimensiones,
-        rfc_encargado: datos.rfc_encargado,
-        clave_sucursal: datos.clave_sucursal,
-      })
+      .patch(
+        `/items/almacenes/${match.params.clave}`,
+        {
+          dimensiones: datos.dimensiones,
+          rfc_encargado: datos.rfc_encargado,
+          clave_sucursal: datos.clave_sucursal,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         Mensaje();

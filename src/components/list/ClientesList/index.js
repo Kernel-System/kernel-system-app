@@ -5,12 +5,19 @@ import { Popconfirm, List, Button, Input, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-const { Option } = Select;
+import { useStoreState } from 'easy-peasy';
 
 const Index = ({ onConfirmDelete, onClickItem }) => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const fetchItems = async () => {
     const { data } = await http.get(
-      '/items/clientes?fields=*,cuenta.id,cuenta.email'
+      '/items/clientes?fields=*,cuenta.id,cuenta.email',
+      putToken
     );
     return data.data;
   };
@@ -63,7 +70,7 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
             <List.Item
               key={item.id}
               actions={[
-                <Link to={`/admid/cliente/${item.id}`}>
+                <Link to={`/admin/cliente/${item.id}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
                 <Popconfirm

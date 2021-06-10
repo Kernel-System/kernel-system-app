@@ -1,16 +1,24 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Input, Select } from 'antd';
+import { Popconfirm, List, Button, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { useStoreState } from 'easy-peasy';
 const { Option } = Select;
 
 const Index = ({ onConfirmDelete, onClickItem }) => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const fetchItems = async () => {
     const { data } = await http.get(
-      '/items/empleados?fields=*,cuenta.id,cuenta.email'
+      '/items/empleados?fields=*,cuenta.id,cuenta.email',
+      putToken
     );
     return data.data;
   };
@@ -111,7 +119,6 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
           Administrator
         </Option>
       </Select>
-
       <br />
       <List
         itemLayout='horizontal'
@@ -128,7 +135,7 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
             <List.Item
               key={item.rfc}
               actions={[
-                <Link to={`/admid/empleado/${item.rfc}`}>
+                <Link to={`/admin/empleado/${item.rfc}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
                 <Popconfirm

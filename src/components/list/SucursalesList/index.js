@@ -5,10 +5,17 @@ import { Popconfirm, List, Button, Input } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { useStoreState } from 'easy-peasy';
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const fetchItems = async () => {
-    const { data } = await http.get('/items/sucursales');
+    const { data } = await http.get('/items/sucursales', putToken);
     return data.data;
   };
 
@@ -58,7 +65,7 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
             <List.Item
               key={item.clave}
               actions={[
-                <Link to={`/admid/sucursal/${item.clave}`}>
+                <Link to={`/admin/sucursal/${item.clave}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
                 item.almacenes.length === 0 ? (
