@@ -27,7 +27,9 @@ import ProfileAdmid from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
 import Compras from 'pages/compras/Compras';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
+
 import FacturasExternas from 'pages/facturas/FacturasExternas';
+import FacturasInternas from 'pages/facturas/FacturasInternas';
 
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 import Tranferencias from './pages/almacen/Transferencias';
@@ -194,6 +196,23 @@ const Rutas = () => {
         component={AñadirProveedor}
       />
 
+      {/* Facturas Externas */}
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/facturas-externas'
+        exact
+      >
+        <FacturasExternas />
+      </PrivateRoute>
+
+      {/* Facturas Internas */}
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/facturas-internas'
+        exact
+      >
+        <FacturasInternas />
+      </PrivateRoute>
       {/* Compras */}
       <PrivateRoute
         allowedRoles={['encargado de compras']}
