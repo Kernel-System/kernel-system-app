@@ -62,7 +62,7 @@ const Index = () => {
     setMail(correo);
   };
 
-  const onFinish = (dato: any) => {
+  const onFinish = (dato) => {
     console.log(dato);
     http
       .post(
@@ -116,7 +116,7 @@ const Index = () => {
       });
   };
 
-  const onFinishChange = (dato: any) => {
+  const onFinishChange = (dato) => {
     console.log(dato);
     console.log(`/users/${empleado[0].cuenta.id}`);
     http
@@ -166,11 +166,11 @@ const Index = () => {
 
   const Mensaje = () => {
     message
-      .success('La empleado ha sido registrada exitosamente', 3)
+      .success('El empleado ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
