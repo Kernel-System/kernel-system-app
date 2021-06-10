@@ -1,12 +1,10 @@
 import SucursalesList from 'components/list/SucursalesList';
-import { Typography, Button } from 'antd';
+import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
 import Modal from 'components/sucursal/ModalSucursal';
 import { useState } from 'react';
 import HeadingBack from 'components/UI/HeadingBack';
-
-const { Title } = Typography;
 
 const Index = () => {
   const [visible, setVisible] = useState(false);
@@ -26,19 +24,19 @@ const Index = () => {
       <HeadingBack
         title='Sucursales'
         actions={[
-          <Link to='/admid' key='1'>
+          <Link to='/empleado/perfil' key='1'>
             <Button>Administrador</Button>
           </Link>,
-          <Link to='/admid/empleado' key='2'>
+          <Link to='/admin/empleado' key='2'>
             <Button>Empleados</Button>
           </Link>,
-          <Link to='/admid/cliente' key='3'>
+          <Link to='/admin/cliente' key='3'>
             <Button>Clientes</Button>
           </Link>,
-          <Link to='/admid/sucursal' selected key='4'>
+          <Link to='/admin/sucursal' selected key='4'>
             <Button type='primary'>Sucursales</Button>
           </Link>,
-          <Link to='/admid/almacen' key='5'>
+          <Link to='/admin/almacen' key='5'>
             <Button>Almacenes</Button>
           </Link>,
         ]}
@@ -49,7 +47,7 @@ const Index = () => {
         //onConfirmDelete={onConfirmDelete}
       />
       <br />
-      <Link to='/admid/sucursal/nuevo'>
+      <Link to='/admin/sucursal/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nueva Sucursal
         </Button>

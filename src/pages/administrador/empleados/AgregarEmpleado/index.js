@@ -6,6 +6,7 @@ import NumericInputForm from 'components/shared/NumericInputForm';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { useEffect, useState } from 'react';
 import { http } from 'api';
+import { useStoreState } from 'easy-peasy';
 import {
   calleRules,
   cpRules,
@@ -19,27 +20,42 @@ const { Option } = Select;
 const Index = () => {
   const [empleado, setEmpleado] = useState([]);
   const [mail, setMail] = useState('');
-
+  const [almacenes, setAlmacenes] = useState([]);
   const history = useHistory();
   let match = useRouteMatch();
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
     if (match.params.rfc != window.undefined) {
       http
         .get(
-          `/items/empleados/${match.params.rfc}?fields=*,cuenta.id,cuenta.email`
+          `/items/empleados/${match.params.rfc}?fields=*,cuenta.id,cuenta.email`,
+          putToken
         )
         .then((resul) => {
           onSetCorreo(resul.data.data.cuenta.email);
           onSetEmpleado(resul.data.data);
         });
     } else onSetEmpleado([{}]);
+    http.get(`/items/almacenes/`, putToken).then((result) => {
+      console.log(result.data.data);
+      onSetAlmacenes(result.data.data);
+    });
   }, []);
 
   const onSetEmpleado = (lista) => {
     const newLista = JSON.parse(JSON.stringify(lista));
-    console.log(newLista);
     setEmpleado([newLista]);
+  };
+
+  const onSetAlmacenes = (lista) => {
+    const newLista = JSON.parse(JSON.stringify(lista));
+    setAlmacenes(newLista);
   };
 
   const onSetCorreo = (correo) => {
@@ -49,34 +65,42 @@ const Index = () => {
   const onFinish = (dato: any) => {
     console.log(dato);
     http
-      .post('/users/', {
-        email: dato.correo,
-        password: dato.password,
-        role: dato.puesto,
-        rfc: dato.rfc,
-      })
+      .post(
+        '/users/',
+        {
+          email: dato.correo,
+          password: dato.password,
+          role: dato.puesto,
+          rfc: dato.rfc,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         http
-          .post('/items/empleados/', {
-            rfc: dato.rfc,
-            nombre: dato.nombre,
-            puesto: dato.puesto,
-            no_seguro_social: dato.no_seguro_social,
-            extension: dato.extension,
-            telefono: dato.telefono,
-            estado: dato.estado,
-            municipio: dato.municipio,
-            localidad: dato.localidad,
-            calle: dato.calle,
-            no_ext: dato.no_ext,
-            no_int: dato.no_int,
-            colonia: dato.colonia,
-            cp: dato.cp,
-            entre_calle_1: dato.entre_calle_1,
-            entre_calle_2: dato.entre_calle_2,
-            cuenta: resul.data.data.id,
-          })
+          .post(
+            '/items/empleados/',
+            {
+              rfc: dato.rfc,
+              nombre: dato.nombre,
+              puesto: dato.puesto,
+              no_seguro_social: dato.no_seguro_social,
+              extension: dato.extension,
+              telefono: dato.telefono,
+              estado: dato.estado,
+              municipio: dato.municipio,
+              localidad: dato.localidad,
+              calle: dato.calle,
+              no_ext: dato.no_ext,
+              no_int: dato.no_int,
+              colonia: dato.colonia,
+              cp: dato.cp,
+              entre_calle_1: dato.entre_calle_1,
+              entre_calle_2: dato.entre_calle_2,
+              cuenta: resul.data.data.id,
+            },
+            putToken
+          )
           .then((resul) => {
             console.log(resul);
             Mensaje();
@@ -96,31 +120,40 @@ const Index = () => {
     console.log(dato);
     console.log(`/users/${empleado[0].cuenta.id}`);
     http
-      .patch(`/users/${empleado[0].cuenta.id}`, {
-        //email: dato.correo,
-        password: dato.password,
-        role: dato.puesto,
-      })
+      .patch(
+        `/users/${empleado[0].cuenta.id}`,
+        {
+          //email: dato.correo,
+          password: dato.password,
+          role: dato.puesto,
+        },
+        putToken
+      )
       .then((resul) => {
         http
-          .patch(`/items/empleados/${match.params.rfc}`, {
-            rfc: dato.rfc,
-            nombre: dato.nombre,
-            puesto: dato.puesto,
-            no_seguro_social: dato.no_seguro_social,
-            extension: dato.extension,
-            telefono: dato.telefono,
-            estado: dato.estado,
-            municipio: dato.municipio,
-            localidad: dato.localidad,
-            calle: dato.calle,
-            no_ext: dato.no_ext,
-            no_int: dato.no_int,
-            colonia: dato.colonia,
-            cp: dato.cp,
-            entre_calle_1: dato.entre_calle_1,
-            entre_calle_2: dato.entre_calle_2,
-          })
+          .patch(
+            `/items/empleados/${match.params.rfc}`,
+            {
+              rfc: dato.rfc,
+              nombre: dato.nombre,
+              puesto: dato.puesto,
+              no_seguro_social: dato.no_seguro_social,
+              extension: dato.extension,
+              telefono: dato.telefono,
+              estado: dato.estado,
+              municipio: dato.municipio,
+              localidad: dato.localidad,
+              calle: dato.calle,
+              no_ext: dato.no_ext,
+              no_int: dato.no_int,
+              colonia: dato.colonia,
+              cp: dato.cp,
+              entre_calle_1: dato.entre_calle_1,
+              entre_calle_2: dato.entre_calle_2,
+              almacen: dato.almacen,
+            },
+            putToken
+          )
           .then((resul) => {
             console.log(resul);
             Mensaje();
@@ -282,6 +315,28 @@ const Index = () => {
             </Option>
           </Select>
         </Form.Item>
+        <Title level={5}>Almacén</Title>
+        <Form.Item name='almacen'>
+          <Select
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Buscar un almacén'
+            optionFilterProp='children'
+            //onChange={onChange}
+            //onFocus={onFocus}
+            //onSearch={onSearch}
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+          >
+            {almacenes.map((almacen) => (
+              <Option
+                value={almacen.clave}
+                key={almacen.clave}
+              >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
+            ))}
+          </Select>
+        </Form.Item>
         <Row key='Row1' gutter={[16, 24]} style={{ marginBottom: '10px' }}>
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Title level={5}>Teléfono</Title>
@@ -410,8 +465,8 @@ const Index = () => {
               titulo='no_seguro_social'
               type='number'
               valueDef={dato.no_seguro_social}
-              min='01'
-              max='99999999999'
+              min='11'
+              max='11'
               placeholder='No. Seguro Social'
               rules={{
                 pattern: '[0-9]{11}',

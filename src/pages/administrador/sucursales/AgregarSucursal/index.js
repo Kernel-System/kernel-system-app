@@ -1,4 +1,4 @@
-import { Typography, Button, Form, Select, message, Row, Col } from 'antd';
+import { Typography, Button, Form, message, Row, Col } from 'antd';
 import { useHistory, useRouteMatch } from 'react-router';
 import HeadingBack from 'components/UI/HeadingBack';
 import InputForm from 'components/shared/InputForm';
@@ -6,6 +6,7 @@ import NumericInputForm from 'components/shared/NumericInputForm';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { useEffect, useState } from 'react';
 import { http } from 'api';
+import { useStoreState } from 'easy-peasy';
 import {
   calleRules,
   cpRules,
@@ -15,18 +16,25 @@ import {
 } from 'utils/validations/address';
 
 const { Title } = Typography;
-const { Option } = Select;
 
 const Index = () => {
   const [sucursal, setSucursal] = useState([]);
   const history = useHistory();
   let match = useRouteMatch();
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
-    if (match.params.clave != window.undefined) {
-      http.get(`/items/sucursales/${match.params.clave}`).then((resul) => {
-        onSetSucursal(resul.data.data);
-      });
+    if (match.params.clave !== window.undefined) {
+      http
+        .get(`/items/sucursales/${match.params.clave}`, putToken)
+        .then((resul) => {
+          onSetSucursal(resul.data.data);
+        });
     } else onSetSucursal([{}]);
   }, []);
 
@@ -39,23 +47,27 @@ const Index = () => {
   const onFinish = (datos: any) => {
     console.log(datos);
     http
-      .post('/items/sucursales/', {
-        clave: datos.clave,
-        nombre: datos.nombre,
-        rfc: datos.rfc,
-        extension: datos.extension,
-        telefono: datos.telefono,
-        estado: datos.estado,
-        municipio: datos.municipio,
-        localidad: datos.localidad,
-        calle: datos.calle,
-        no_ext: datos.no_ext,
-        no_int: datos.no_int,
-        colonia: datos.colonia,
-        cp: datos.cp,
-        entre_calle_1: datos.entre_calle_1,
-        entre_calle_2: datos.entre_calle_2,
-      })
+      .post(
+        '/items/sucursales/',
+        {
+          clave: datos.clave,
+          nombre: datos.nombre,
+          rfc: datos.rfc,
+          extension: datos.extension,
+          telefono: datos.telefono,
+          estado: datos.estado,
+          municipio: datos.municipio,
+          localidad: datos.localidad,
+          calle: datos.calle,
+          no_ext: datos.no_ext,
+          no_int: datos.no_int,
+          colonia: datos.colonia,
+          cp: datos.cp,
+          entre_calle_1: datos.entre_calle_1,
+          entre_calle_2: datos.entre_calle_2,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         Mensaje();
@@ -73,23 +85,27 @@ const Index = () => {
     console.log(datos);
     console.log(`/items/sucursales/${match.params.clave}`);
     http
-      .patch(`/items/sucursales/${match.params.clave}`, {
-        clave: datos.clave,
-        nombre: datos.nombre,
-        rfc: datos.rfc,
-        extension: datos.extension,
-        telefono: datos.telefono,
-        estado: datos.estado,
-        municipio: datos.municipio,
-        localidad: datos.localidad,
-        calle: datos.calle,
-        no_ext: datos.no_ext,
-        no_int: datos.no_int,
-        colonia: datos.colonia,
-        cp: datos.cp,
-        entre_calle_1: datos.entre_calle_1,
-        entre_calle_2: datos.entre_calle_2,
-      })
+      .patch(
+        `/items/sucursales/${match.params.clave}`,
+        {
+          clave: datos.clave,
+          nombre: datos.nombre,
+          rfc: datos.rfc,
+          extension: datos.extension,
+          telefono: datos.telefono,
+          estado: datos.estado,
+          municipio: datos.municipio,
+          localidad: datos.localidad,
+          calle: datos.calle,
+          no_ext: datos.no_ext,
+          no_int: datos.no_int,
+          colonia: datos.colonia,
+          cp: datos.cp,
+          entre_calle_1: datos.entre_calle_1,
+          entre_calle_2: datos.entre_calle_2,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         Mensaje();

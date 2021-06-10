@@ -26,6 +26,7 @@ const { Paragraph } = Typography;
 
 const Cart = () => {
   const cartItems = useStoreState((state) => state.cart.cartItems);
+  const nivel = useStoreState((state) => state.user.nivel);
   const removeCartItem = useStoreActions(
     (actions) => actions.cart.removeCartItem
   );
@@ -98,6 +99,7 @@ const Cart = () => {
             loading={isLoading || isFetching}
             type='carrito'
             removeCartItem={handleRemoveCartItem}
+            nivel={nivel}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>
@@ -166,6 +168,7 @@ const Cart = () => {
             products={cartItemsData}
             buttonLabel='Solicitar orden de compra'
             buttonAction={() => console.log('Haciendo orden de compra')}
+            nivel={nivel}
           />
         </Col>
       </Row>

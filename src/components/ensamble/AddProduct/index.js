@@ -14,14 +14,17 @@ import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import TextLabel from 'components/UI/TextLabel';
 const { Option } = Select;
 
-const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
+const Index = ({ titulo, isNeeded, noAdd, tag, onChanged, products }) => {
   const breakpoint = useBreakpoint();
+
   const [filas, setFilas] = useState([
     {
       id: 0,
       codigo: '',
       cantidad: 0,
       descripcion: '',
+      clave: '',
+      clave_unidad: '',
     },
   ]);
 
@@ -32,6 +35,8 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
       codigo: '',
       cantidad: 0,
       descripcion: '',
+      clave: '',
+      clave_unidad: '',
     });
     setFilas(rows);
   };
@@ -53,13 +58,15 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
     setFilas(rows);
   };
 
-  const changeProduct = (id, value, descripcion) => {
+  const changeProduct = (id, value, descripcion, key) => {
     const rows = JSON.parse(JSON.stringify(filas));
     rows[id] = {
       id: id,
       codigo: value,
       cantidad: 1,
       descripcion: descripcion,
+      clave: products[key].clave,
+      clave_unidad: products[key].unidad_cfdi,
     };
     onChanged(rows);
     setFilas(rows);
@@ -90,10 +97,10 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
                     showSearch
                     key={fila.id}
                     style={{ width: '100%' }}
-                    placeholder='Buscar producto'
+                    placeholder='Buscar producto por código'
                     optionFilterProp='children'
                     onChange={(value, index) =>
-                      changeProduct(fila.id, value, index.children)
+                      changeProduct(fila.id, value, index.children, index.key)
                     }
                     //onFocus={onFocus}
                     //onBlur={onBlur}
@@ -104,15 +111,19 @@ const Index = ({ titulo, isNeeded, noAdd, tag, onChanged }) => {
                         .indexOf(input.toLowerCase()) >= 0
                     }
                   >
-                    <Option value='Codigo1'>Objeto 1</Option>
-                    <Option value='Codigo2'>Objeto 2</Option>
+                    {products.map((product, index) => (
+                      <Option
+                        value={product.codigo}
+                        key={index}
+                      >{`${product.codigo} : ${product.titulo}`}</Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
               <Col xs={8} lg={8}>
                 <InputNumber
                   min={1}
-                  max={10}
+                  max={5}
                   defaultValue={1}
                   onChange={(value) => onChangeNumber(fila.id, value)}
                   disabled={filas[fila.id].codigo !== '' ? false : true}

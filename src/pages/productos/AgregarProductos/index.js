@@ -17,6 +17,7 @@ import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
+import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
@@ -43,12 +44,19 @@ const Index = ({ tipo }) => {
     valor_4: 1,
     precio_4: 1,
   });
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
     if (tipo !== 'agregar') {
       http
         .get(
-          `/items/productos/${match.params.codigo}?fields=*,precios_variables.*,imagenes.*,categorias.*`
+          `/items/productos/${match.params.codigo}?fields=*,precios_variables.*,imagenes.*,categorias.*`,
+          putToken
         )
         .then((result) => {
           console.log(result.data.data);
@@ -151,30 +159,34 @@ const Index = ({ tipo }) => {
   const onFinish = (datos) => {
     console.log(datos);
     http
-      .post('/items/productos/', {
-        codigo: datos.codigo,
-        titulo: datos.titulo,
-        sku: datos.sku,
-        tiempo_surtido: datos.tiempo_surtido,
-        iva: datos.iva,
-        peso: datos.peso,
-        costo: datos.costo,
-        moneda: datos.moneda,
-        tipo_de_venta: datos.tipo_de_venta,
-        tipo_de_compra: datos.tipo_de_compra,
-        costeo: datos.costeo,
-        //ieps: datos.ieps,
-        //tipo_de_ieps: datos.tipo_de_ieps,
-        unidad_de_medida: datos.unidad_de_medida,
-        descripcion: datos.descripcion,
-        precio_fijo: datos.precio_fijo,
-        unidad_cfdi: datos.unidad_cfdi,
-        maximo: datos.maximo,
-        minimo: datos.minimo,
-        descuento: datos.descuento,
-        disponibilidad: datos.disponibilidad,
-        clave: datos.clave,
-      })
+      .post(
+        '/items/productos/',
+        {
+          codigo: datos.codigo,
+          titulo: datos.titulo,
+          sku: datos.sku,
+          tiempo_surtido: datos.tiempo_surtido,
+          iva: datos.iva,
+          peso: datos.peso,
+          costo: datos.costo,
+          moneda: datos.moneda,
+          tipo_de_venta: datos.tipo_de_venta,
+          tipo_de_compra: datos.tipo_de_compra,
+          costeo: datos.costeo,
+          //ieps: datos.ieps,
+          //tipo_de_ieps: datos.tipo_de_ieps,
+          unidad_de_medida: datos.unidad_de_medida,
+          descripcion: datos.descripcion,
+          precio_fijo: datos.precio_fijo,
+          unidad_cfdi: datos.unidad_cfdi,
+          maximo: datos.maximo,
+          minimo: datos.minimo,
+          descuento: datos.descuento,
+          disponibilidad: datos.disponibilidad,
+          clave: datos.clave,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         let categorias = [];
@@ -184,20 +196,26 @@ const Index = ({ tipo }) => {
             categorias_id: categoria,
           });
         });
-        http.post(`/items/productos_categorias`, categorias).then((resul2) => {
-          console.log(resul2);
-          if (datos.tipo_de_venta !== 'Fijo')
-            http
-              .post(`/items/precios_variables`, {
-                ...valor,
-                codigo_producto: datos.codigo,
-              })
-              .then((resul3) => {
-                console.log(resul3);
-                Mensaje();
-              });
-          else Mensaje();
-        });
+        http
+          .post(`/items/productos_categorias`, categorias, putToken)
+          .then((resul2) => {
+            console.log(resul2);
+            if (datos.tipo_de_venta !== 'Fijo')
+              http
+                .post(
+                  `/items/precios_variables`,
+                  {
+                    ...valor,
+                    codigo_producto: datos.codigo,
+                  },
+                  putToken
+                )
+                .then((resul3) => {
+                  console.log(resul3);
+                  Mensaje();
+                });
+            else Mensaje();
+          });
       })
       .catch((error) => {
         if (
@@ -206,11 +224,6 @@ const Index = ({ tipo }) => {
           message.error('Codigo ya existente');
         } else message.error('Un error ha ocurrido');
       });
-
-    /*let estado = {};
-    http
-      .post(`/items/ordenes_ensamble/${match.params.id}`, estado)
-      .then((result) => {});*/
   };
 
   const Mensaje = () => {
@@ -221,47 +234,59 @@ const Index = ({ tipo }) => {
 
   const onFinishChange = (datos) => {
     http
-      .patch(`/items/productos/${datos.codigo}`, {
-        codigo: datos.codigo,
-        titulo: datos.titulo,
-        iva: datos.iva,
-        sku: datos.sku,
-        tiempo_surtido: datos.tiempo_surtido,
-        peso: datos.peso,
-        costo: datos.costo,
-        moneda: datos.moneda,
-        tipo_de_venta: datos.tipo_de_venta,
-        tipo_de_compra: datos.tipo_de_compra,
-        costeo: datos.costeo,
-        //ieps: datos.ieps,
-        //tipo_de_ieps: datos.tipo_de_ieps,
-        unidad_de_medida: datos.unidad_de_medida,
-        descripcion: datos.descripcion,
-        precio_fijo: datos.precio_fijo,
-        unidad_cfdi: datos.unidad_cfdi,
-        maximo: datos.maximo,
-        minimo: datos.minimo,
-        descuento: datos.descuento,
-        disponibilidad: datos.disponibilidad,
-        clave: datos.clave,
-      })
+      .patch(
+        `/items/productos/${datos.codigo}`,
+        {
+          codigo: datos.codigo,
+          titulo: datos.titulo,
+          iva: datos.iva,
+          sku: datos.sku,
+          tiempo_surtido: datos.tiempo_surtido,
+          peso: datos.peso,
+          costo: datos.costo,
+          moneda: datos.moneda,
+          tipo_de_venta: datos.tipo_de_venta,
+          tipo_de_compra: datos.tipo_de_compra,
+          costeo: datos.costeo,
+          //ieps: datos.ieps,
+          //tipo_de_ieps: datos.tipo_de_ieps,
+          unidad_de_medida: datos.unidad_de_medida,
+          descripcion: datos.descripcion,
+          precio_fijo: datos.precio_fijo,
+          unidad_cfdi: datos.unidad_cfdi,
+          maximo: datos.maximo,
+          minimo: datos.minimo,
+          descuento: datos.descuento,
+          disponibilidad: datos.disponibilidad,
+          clave: datos.clave,
+        },
+        putToken
+      )
       .then((resul) => {
         if (valor.id === window.undefined)
           http
-            .post(`/items/precios_variables`, {
-              ...valor,
-              codigo_producto: datos.codigo,
-            })
+            .post(
+              `/items/precios_variables`,
+              {
+                ...valor,
+                codigo_producto: datos.codigo,
+              },
+              putToken
+            )
             .then((resul3) => {
               console.log(resul3);
               Mensaje();
             });
         else
           http
-            .patch(`/items/precios_variables/${valor.id}`, {
-              ...valor,
-              codigo_producto: datos.codigo,
-            })
+            .patch(
+              `/items/precios_variables/${valor.id}`,
+              {
+                ...valor,
+                codigo_producto: datos.codigo,
+              },
+              putToken
+            )
             .then((resul3) => {
               console.log(resul3);
               Mensaje();

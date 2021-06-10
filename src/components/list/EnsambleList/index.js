@@ -1,16 +1,16 @@
 import './styles.css';
-import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { List, Button, Badge, Select } from 'antd';
+import { List, Badge, Select } from 'antd';
 import { useQuery } from 'react-query';
 import { http } from 'api';
 const { Option } = Select;
 
-const Index = () => {
+const Index = ({ putToken }) => {
   const fetchProducts = async () => {
     const { data } = await http.get(
-      `/items/ordenes_ensamble?fields=folio,fecha_orden,estado,descripcion`
+      `/items/ordenes_ensamble?fields=folio,fecha_orden,estado,descripcion`,
+      putToken
     );
     return data.data;
   };
@@ -76,12 +76,6 @@ const Index = () => {
           </Badge.Ribbon>
         )}
       />
-      <br />
-      <Link to='/ensambles/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Nueva Orden de Ensamble
-        </Button>
-      </Link>
     </>
   );
 };

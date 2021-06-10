@@ -7,6 +7,7 @@ import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
+import Compras from 'pages/compras/Compras';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
 import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
@@ -23,14 +24,20 @@ import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
-import ProfileAdmid from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
-import Compras from 'pages/compras/Compras';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 
 import FacturasExternas from 'pages/facturas/FacturasExternas';
 import FacturasInternas from 'pages/facturas/FacturasInternas';
 
+import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
+import Almacen from './pages/administrador/almacenes/Almacenes';
+import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
+import Cliente from './pages/administrador/clientes/Clientes';
+import NuevoEmpleado from './pages/administrador/empleados/AgregarEmpleado';
+import Empleado from './pages/administrador/empleados/Empleados';
+import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
+import Sucursal from './pages/administrador/sucursales/Sucursales';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 import Tranferencias from './pages/almacen/Transferencias';
 import Cuentas from './pages/pagos/Cuentas';
@@ -38,18 +45,6 @@ import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
-
-import Sucursal from './pages/administrador/sucursales/Sucursales';
-import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
-
-import Almacen from './pages/administrador/almacenes/Almacenes';
-import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
-
-import Empleado from './pages/administrador/empleados/Empleados';
-import NuevoEmpleado from './pages/administrador/empleados/AgregarEmpleado';
-
-import Cliente from './pages/administrador/clientes/Clientes';
-import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -369,85 +364,79 @@ const Rutas = () => {
       </PrivateRoute>
 
       {/* Administrador */}
-      <PrivateRoute
-        allowedRoles={['administrador']}
-        path='/admid/'
-        exact
-        component={ProfileAdmid}
-      />
 
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/sucursal'
+        path='/admin/sucursal'
         exact
         component={Sucursal}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/sucursal/nuevo'
+        path='/admin/sucursal/nuevo'
         exact
         component={NuevaSucursal}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/sucursal/:clave'
+        path='/admin/sucursal/:clave'
         exact
         component={NuevaSucursal}
       />
 
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/almacen'
+        path='/admin/almacen'
         exact
         component={Almacen}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/almacen/nuevo'
+        path='/admin/almacen/nuevo'
         exact
         component={NuevoAlmacen}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/almacen/:clave'
+        path='/admin/almacen/:clave'
         exact
         component={NuevoAlmacen}
       />
 
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/empleado'
+        path='/admin/empleado'
         exact
         component={Empleado}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/empleado/nuevo'
+        path='/admin/empleado/nuevo'
         exact
         component={NuevoEmpleado}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/empleado/:rfc'
+        path='/admin/empleado/:rfc'
         exact
         component={NuevoEmpleado}
       />
 
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/cliente'
+        path='/admin/cliente'
         exact
         component={Cliente}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/cliente/nuevo'
+        path='/admin/cliente/nuevo'
         exact
         component={NuevoCliente}
       />
       <PrivateRoute
         allowedRoles={['administrador']}
-        path='/admid/cliente/:id'
+        path='/admin/cliente/:id'
         exact
         component={NuevoCliente}
       />

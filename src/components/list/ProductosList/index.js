@@ -6,9 +6,9 @@ import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
-const Index = () => {
+const Index = ({ putToken }) => {
   const fetchProducts = async () => {
-    const { data } = await http.get('/items/productos');
+    const { data } = await http.get('/items/productos', putToken);
     return data.data;
   };
 

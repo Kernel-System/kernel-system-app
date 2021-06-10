@@ -1,24 +1,57 @@
 import AddProduct from 'components/ensamble/AddProduct';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Typography, Input, Space, Button, Form, Select, message } from 'antd';
 import { useHistory } from 'react-router';
 import HeadingBack from 'components/UI/HeadingBack';
 import { http } from 'api';
+import { useStoreState } from 'easy-peasy';
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
 const Index = () => {
   const history = useHistory();
+  const [products, setProduct] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
+  const [creador, setCreador] = useState('');
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  useEffect(() => {
+    http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
+      onChangeDato(result.data.data.empleado[0], setCreador);
+      console.log(result.data.data.empleado[0]);
+      http
+        .get(
+          `/items/empleados?filter[puesto][_eq]=3afe4f4d-7125-45d5-ba57-402221ef956d`, //&filter[almacen][_eq]=${result.data.data.empleado[0].almacen}
+          putToken
+        )
+        .then((result2) => {
+          console.log(result2.data.data);
+          onChangeDato(result2.data.data, setEmpleados);
+        });
+    });
+    http.get(`/items/productos/`, putToken).then((result) => {
+      onChangeDato(result.data.data, setProduct);
+    });
+  }, []);
+
+  const onChangeDato = (lista, setDato) => {
+    const newData = JSON.parse(JSON.stringify(lista));
+    setDato(newData);
+  };
+
   const [list, setList] = useState({
     descripcion: '',
     observaciones: '',
     rfc_empleado_ensamble: '',
     codigo_ensamble: '',
     estado: 'Ordenado',
-    productos:
-      //{ codigo: '', cantidad: 0, descripcion: '' }
-      [],
+    productos: [],
   });
 
   const changeProducts = (element) => {
@@ -35,58 +68,44 @@ const Index = () => {
   };
 
   const onFinish = () => {
-    /*http
-      .post('/items/movimientos_almacen', {
-        fecha: obtenerFecha(),
-        concepto: 'Componente de ensamble',
-        comentario: list.observaciones,
-        folio_ensamble: result_ens.data.data.folio,
-        rfc_empleado: 'Empleado de Almacen',
-        clave_almacen: 1,
-        mostrar: false,
-      })
-      .then((result_mov) => {});*/
-
     http
-      .post('/items/ordenes_ensamble', {
-        fecha_orden: new Date().toLocaleDateString(),
-        fecha_inicio_ensamble: null,
-        fecha_fin_ensamble: null,
-        estado: 'Ordenado',
-        descripcion: list.descripcion,
-        observaciones: list.observaciones,
-        codigo_ensamble: list.codigo_ensamble,
-        rfc_empleado_ensamble: list.rfc_empleado_ensamble,
-        rfc_empleado_orden: 'Empleado Actual',
-      })
+      .post(
+        '/items/ordenes_ensamble',
+        {
+          fecha_orden: new Date().toLocaleDateString(),
+          fecha_inicio_ensamble: null,
+          fecha_fin_ensamble: null,
+          estado: 'Ordenado',
+          descripcion: list.descripcion,
+          observaciones: list.observaciones,
+          codigo_ensamble: list.codigo_ensamble,
+          rfc_empleado_ensamble: list.rfc_empleado_ensamble,
+          rfc_empleado_orden: creador.rfc,
+          clave_almacen: creador.almacen,
+        },
+        putToken
+      )
       .then((result_ens) => {
-        const lista = JSON.parse(JSON.stringify(list.productos));
         let productos = [];
         //let productosMovimiento = [];
         list.productos.map((producto) => {
           productos.push({
             codigo: producto.codigo,
+            clave: producto.clave,
             cantidad: producto.cantidad,
+            clave_unidad: producto.clave_unidad,
             descripcion: producto.descripcion,
             orden_ensamble: result_ens.data.data.folio,
           });
-          /*productosMovimiento.push({
-            codigo: producto.codigo,
-            clave: '',
-            cantidad: producto.cantidad,
-            descripcion: producto.descripcion,
-            unidad: '',
-            clave_unidad: '',
-            nota: '',
-            id_movimiento: '1',
-          });*/
         });
         console.log(productos);
-        http.post('/items/componentes_ensamble', productos).then((result2) => {
-          message
-            .success('El ensamble ha sido registrados exitosamente', 3)
-            .then(() => history.goBack());
-        });
+        http
+          .post('/items/componentes_ensamble', productos, putToken)
+          .then((result2) => {
+            message
+              .success('El ensamble ha sido registrados exitosamente', 3)
+              .then(() => history.goBack());
+          });
       });
     console.log('Success:', list);
   };
@@ -125,11 +144,15 @@ const Index = () => {
           }}
           //onSearch={onSearch}
           filterOption={(input, option) =>
-            option.children.toLowerCase().iOf(input.toLowerCase()) >= 0
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
         >
-          <Option value='Producto 1'>Compu 1</Option>
-          <Option value='Producto 2'>Compu 2</Option>
+          {products.map((product) => (
+            <Option
+              value={product.codigo}
+              key={product.codigo}
+            >{`${product.codigo} : ${product.titulo}`}</Option>
+          ))}
         </Select>
       </Form.Item>
       <Title level={5}>Empleado de Ensamble</Title>
@@ -145,7 +168,7 @@ const Index = () => {
         <Select
           showSearch
           style={{ width: '100%' }}
-          placeholder='Buscar empleado'
+          placeholder='Buscar empleado por RFC'
           optionFilterProp='children'
           //onChange={onChange}
           //onFocus={onFocus}
@@ -157,14 +180,19 @@ const Index = () => {
             option.children.toLowerCase().iOf(input.toLowerCase()) >= 0
           }
         >
-          <Option value='RFC 1'>Juan</Option>
-          <Option value='RFC 2'>Pedro</Option>
+          {empleados.map((empleado) => (
+            <Option
+              value={empleado.rfc}
+              key={empleado.rfc}
+            >{`${empleado.rfc} : ${empleado.nombre}`}</Option>
+          ))}
         </Select>
       </Form.Item>
       <AddProduct
         titulo='Componentes'
         tag='componentes'
         onChanged={changeProducts}
+        products={products}
       />
       <Title level={5}>Descripción</Title>
       <Space direction='vertical' style={{ width: '100%' }}>

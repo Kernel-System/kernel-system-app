@@ -1,28 +1,71 @@
 import './styles.css';
-import { List, Typography, Button, Badge, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import ModalMovimiento from 'components/almacen/ModalMovimiento';
+import { http } from 'api';
 import { useState } from 'react';
-const { Title, Text } = Typography;
+import { List, Badge, Select, Typography } from 'antd';
+import { useQuery } from 'react-query';
 const { Option } = Select;
+const { Text } = Typography;
 
-const Index = ({ list }) => {
-  const [visible, setVisible] = useState(false);
-  const [clave, setClave] = useState('');
+const Index = ({ onClickItem }) => {
+  const fetchItems = async () => {
+    const { data } = await http.get(
+      '/items/movimientos_almacen?fields=*,productos_movimiento.*,productos_movimiento.series_producto_movimiento.*'
+    );
+    return data.data;
+  };
 
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+  const onSearchChange = (e) => {
+    const value = e;
+    setSearchValue(value);
+    filtrarMovimientoPorConcepto(data, value);
+  };
+
+  const filtrarMovimientoPorConcepto = async (movimientos, value) => {
+    if (value === 'Todo') {
+      setListToShow(movimientos);
+    } else if (movimientos)
+      setListToShow(
+        movimientos.filter((item) => item.concepto.includes(value))
+      );
+  };
+
+  const [searchValue, setSearchValue] = useState('');
+
+  const { data } = useQuery('movimientos_almacen', async () => {
+    const result = await fetchItems();
+    setListToShow(result);
+    filtrarMovimientoPorConcepto(result, searchValue);
+    return result;
+  });
+  const [listToShow, setListToShow] = useState([]);
+
   return (
     <>
-      <Title level={3}>Movimientos de almacén</Title>
       <Text>Filtrar por Concepto:</Text>
       <br />
-      <Select defaultValue='1' style={{ width: 120 }} onChange={handleChange}>
-        <Option value='1'>Concepto 1</Option>
-        <Option value='2'>Concepto 2</Option>
-        <Option value='3'>Concepto 3</Option>
+      <Select
+        style={{ width: '40%' }}
+        placeholder='Seleccionar un Puesto'
+        optionFilterProp='children'
+        defaultValue='Todo'
+        onChange={onSearchChange}
+        filterOption={(input, option) =>
+          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        }
+      >
+        <Option value='Todo'>Todo</Option>
+        <Option value='Compra'>Compra</Option>
+        <Option value='Venta'>Venta</Option>
+        <Option value='Devolución a cliente'>Devolución a cliente</Option>
+        <Option value='Regreso de mercancía'>Regreso de mercancía</Option>
+        <Option value='Entrada por transferencia'>
+          Entrada por transferencia
+        </Option>
+        <Option value='Salida por transferencia'>
+          Salida por transferencia
+        </Option>
+        <Option value='Componentes de ensamble'>Componentes de ensamble</Option>
+        <Option value='Producto ensamblado'>Producto ensamblado</Option>
       </Select>
       <List
         itemLayout='vertical'
@@ -33,39 +76,24 @@ const Index = ({ list }) => {
           },
           pageSize: 10,
         }}
-        dataSource={list}
+        dataSource={listToShow}
         renderItem={(item) => (
           <Badge.Ribbon text={item.concepto}>
             <List.Item
               key={item.clave}
               onClick={() => {
-                setVisible(true);
-                setClave(item.clave);
+                onClickItem(item);
               }}
             >
               <List.Item.Meta
                 //avatar={<Avatar src={item.avatar} />}
-                title={`Movimiento No. ${item.clave}`}
+                title={`Movimiento No. ${item.id}`}
                 description={item.fecha}
               />
-              {`${item.comentario}`}
+              {`Almacen: ${item.clave_almacen}`}
             </List.Item>
           </Badge.Ribbon>
         )}
-      />
-      <br />
-      <Link to='/movimiento_almacen/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Nueva Movimiento
-        </Button>
-      </Link>
-      <ModalMovimiento
-        visible={visible}
-        clave={clave}
-        setVis={() => {
-          setVisible(false);
-          setClave('');
-        }}
       />
     </>
   );

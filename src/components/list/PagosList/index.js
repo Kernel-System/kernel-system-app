@@ -1,16 +1,23 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Input, Select } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { List, Button } from 'antd';
+import { EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-const { Option } = Select;
+import { useStoreState } from 'easy-peasy';
 
-const Index = ({ onConfirmDelete, onClickItem, id_fac, tipo }) => {
+const Index = ({ onClickItem, id_fac, tipo }) => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const fetchItems = async () => {
     const { data } = await http.get(
-      `/items/pagos_factura?filter[item][_eq]=${id_fac}&filter[collection][_eq]=${tipo}&fields=*,pagos_id.*,pagos_id.archivos_comprobante.*,pagos_id.doctos_relacionados.*,pagos_id.archivos_comprobante.directus_files_id.*`
+      `/items/pagos_factura?filter[item][_eq]=${id_fac}&filter[collection][_eq]=${tipo}&fields=*,pagos_id.*,pagos_id.archivos_comprobante.*,pagos_id.doctos_relacionados.*,pagos_id.archivos_comprobante.directus_files_id.*`,
+      putToken
     );
     return data.data;
   };

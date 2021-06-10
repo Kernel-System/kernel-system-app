@@ -3,7 +3,7 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/HeadingBack';
 import { message, Typography } from 'antd';
-import axios from 'axios';
+import { insertItems as insertProveedor } from 'api/shared/proveedores';
 
 const { Title } = Typography;
 
@@ -13,40 +13,47 @@ const Index = () => {
         setProveedor((prev) => ({
             ...prev,
             rfc: emisor.Rfc,
-            nombre: emisor.Nombre,
+            razon_social: emisor.Nombre,
             regimen_fiscal: emisor.RegimenFiscal,
         }));
     };
-    const proveedorInicial = {
-        rfc: '',
-        nombre: '',
-        razon_social: '',
-    };
-    const [proveedor, setProveedor] = useState(proveedorInicial);
+    const [proveedor, setProveedor] = useState({});
 
-    const insertItem = (values) => {
-       axios
-            .post(
-                'https://kernel-system-api.herokuapp.com/items/proveedores',
-                values
-            )
-            .then(() => {
-                onInserted();
+    const insertItem = async (values) => {
+        let  success = false;
+        await insertProveedor(values)
+            .then((result) => {
+                if (result.status === 200) {
+                    onSuccess();
+                    success = true;
+                }
+            })
+            .catch((error) => {
+                onError(error);
+                success = false;
             });
-    };
 
-    const onInserted = () => {
+        return success;
+    };
+    const onSuccess = async () => {
         message.success('El Proveedor ha sido registrado exitosamente');
+    };
+    const onError = async (error) => {
+        if (
+            error.response.data.errors[0].message.includes('has to be unique')
+        ) {
+            message.warn('Esta proveedor ya ha sido registrado previamente');
+        }
     };
 
     return (
         <>
             <Header title='Nuevo proveedor' />
-            <LectorFacturas onSuccess={onFacturaLeida} />
+            <LectorFacturas isDragger onSuccess={onFacturaLeida} />
             <br />
             <Title level={4}>Datos del proveedor</Title>
             <ProveedorForm
-                datosProveedor={proveedor}
+                itemData={proveedor}
                 submitText='AÑADIR PROVEEDOR'
                 cleanOnSubmit
                 onSubmit={insertItem}

@@ -24,19 +24,19 @@ const Index = () => {
       <HeadingBack
         title='Empleados'
         actions={[
-          <Link to='/admid' key='1'>
+          <Link to='/empleado/perfil' key='1'>
             <Button>Administrador</Button>
           </Link>,
-          <Link to='/admid/empleado' key='2'>
+          <Link to='/admin/empleado' key='2'>
             <Button type='primary'>Empleados</Button>
           </Link>,
-          <Link to='/admid/cliente' key='3'>
+          <Link to='/admin/cliente' key='3'>
             <Button>Clientes</Button>
           </Link>,
-          <Link to='/admid/sucursal' selected key='4'>
+          <Link to='/admin/sucursal' selected key='4'>
             <Button>Sucursales</Button>
           </Link>,
-          <Link to='/admid/almacen' key='5'>
+          <Link to='/admin/almacen' key='5'>
             <Button>Almacenes</Button>
           </Link>,
         ]}
@@ -47,7 +47,7 @@ const Index = () => {
         //onConfirmDelete={onConfirmDelete}
       />
       <br />
-      <Link to='/admid/empleado/nuevo'>
+      <Link to='/admin/empleado/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
           Añadir Nuevo Empleado
         </Button>

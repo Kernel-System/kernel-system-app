@@ -13,7 +13,7 @@ const Addresses = () => {
   const user = useQuery('user', () => getUserData(token));
   const addresses = useQuery(
     'direcciones',
-    () => getUserDirecciones(user.data.cliente.rfc, token),
+    () => getUserDirecciones(user.data.cliente.id, token),
     { enabled: !!user?.data?.cliente }
   );
   const mutation = useMutation((id) => deleteUserDireccion(id, token), {

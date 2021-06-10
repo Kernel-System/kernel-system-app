@@ -5,6 +5,7 @@ import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { useEffect, useState } from 'react';
+import { useStoreState } from 'easy-peasy';
 import { http } from 'api';
 const { Title } = Typography;
 const { Option } = Select;
@@ -12,15 +13,21 @@ const { Option } = Select;
 const Index = () => {
   const [cliente, setCliente] = useState([]);
   const [mail, setMail] = useState('');
-
   const history = useHistory();
   let match = useRouteMatch();
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
-    if (match.params.id != window.undefined) {
+    if (match.params.id !== window.undefined) {
       http
         .get(
-          `/items/clientes/${match.params.id}?fields=*,cuenta.id,cuenta.email`
+          `/items/clientes/${match.params.id}?fields=*,cuenta.id,cuenta.email`,
+          putToken
         )
         .then((resul) => {
           console.log(resul.data.data);
@@ -43,29 +50,36 @@ const Index = () => {
   const onFinish = (dato: any) => {
     console.log(dato);
     http
-      .post('/users/', {
-        email: dato.correo,
-        password: dato.password,
-        role: '76677353-b580-4090-83ca-0ca7c3965848',
-        rfc: dato.rfc,
-      })
+      .post(
+        '/users/',
+        {
+          email: dato.correo,
+          password: dato.password,
+          role: '76677353-b580-4090-83ca-0ca7c3965848',
+          rfc: dato.rfc,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         http
-          .post('/items/clientes/', {
-            rfc: dato.rfc,
-            rfc: dato.rfc,
-            razon_social: dato.razon_social,
-            nombre_comercial: dato.nombre_comercial,
-            correo: mail,
-            extension: dato.extension,
-            telefono: dato.telefono,
-            telefono_2: dato.telefono_2,
-            saldo: dato.saldo,
-            notas: dato.notas,
-            nivel: dato.nivel,
-            cuenta: resul.data.data.id,
-          })
+          .post(
+            '/items/clientes/',
+            {
+              rfc: dato.rfc,
+              razon_social: dato.razon_social,
+              nombre_comercial: dato.nombre_comercial,
+              correo: mail,
+              extension: dato.extension,
+              telefono: dato.telefono,
+              telefono_2: dato.telefono_2,
+              saldo: dato.saldo,
+              notas: dato.notas,
+              nivel: dato.nivel,
+              cuenta: resul.data.data.id,
+            },
+            putToken
+          )
           .then((resul) => {
             console.log(resul);
             Mensaje();
@@ -85,24 +99,32 @@ const Index = () => {
     console.log(dato);
     console.log(`/users/${cliente[0].cuenta.id}`);
     http
-      .patch(`/users/${cliente[0].cuenta.id}`, {
-        //email: dato.correo,
-        password: dato.password,
-      })
+      .patch(
+        `/users/${cliente[0].cuenta.id}`,
+        {
+          //email: dato.correo,
+          password: dato.password,
+        },
+        putToken
+      )
       .then((resul) => {
         http
-          .patch(`/items/clientes/${match.params.id}`, {
-            rfc: dato.rfc,
-            razon_social: dato.razon_social,
-            nombre_comercial: dato.nombre_comercial,
-            correo: mail,
-            extension: dato.extension,
-            telefono: dato.telefono,
-            telefono_2: dato.telefono_2,
-            saldo: dato.saldo,
-            notas: dato.notas,
-            nivel: dato.nivel,
-          })
+          .patch(
+            `/items/clientes/${match.params.id}`,
+            {
+              rfc: dato.rfc,
+              razon_social: dato.razon_social,
+              nombre_comercial: dato.nombre_comercial,
+              correo: mail,
+              extension: dato.extension,
+              telefono: dato.telefono,
+              telefono_2: dato.telefono_2,
+              saldo: dato.saldo,
+              notas: dato.notas,
+              nivel: dato.nivel,
+            },
+            putToken
+          )
           .then((resul) => {
             console.log(resul);
             Mensaje();

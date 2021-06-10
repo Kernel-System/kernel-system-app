@@ -34,7 +34,7 @@ const OrderCard = ({ details }) => {
               <Statistic title='Total' value={formatPrice(details.total)} />
               <Statistic
                 title='Enviar a'
-                value={details.rfc_cliente.razon_social}
+                value={details.id_cliente.razon_social}
               />
             </Space>
           </Col>
@@ -86,7 +86,7 @@ const OrderCard = ({ details }) => {
           <Space direction='vertical' style={{ width: '100%' }}>
             <Link to={`/solicitudes-de-compra/${details.id}?tipo=recoger`}>
               <Button block type='primary'>
-                Rastrear pedido
+                Ver detalles
               </Button>
             </Link>
             <Button block>Solicitar factura</Button>
