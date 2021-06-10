@@ -202,7 +202,7 @@ const Rutas = () => {
 
       {/* Facturas Internas */}
       <PrivateRoute
-        allowedRoles={['encargado de compras']}
+        allowedRoles={['encargado de ventas']}
         path='/facturas-internas'
         exact
       >
