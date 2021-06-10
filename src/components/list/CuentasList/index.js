@@ -1,16 +1,23 @@
 import './styles.css';
 import { http } from 'api';
 import { useState, useEffect } from 'react';
-import { List, Button, Input, Select } from 'antd';
+import { List, Input, Select } from 'antd';
 import { Link } from 'react-router-dom';
+import { useStoreState } from 'easy-peasy';
 const { Option } = Select;
 
 const Index = ({ onConfirmDelete, onClickItem }) => {
   const [tipo, setTipo] = useState('facturas_internas');
   const [factura, setFactura] = useState([]);
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
-    http.get(`/items/${tipo}?fields=*`).then((resul) => {
+    http.get(`/items/${tipo}?fields=*`, putToken).then((resul) => {
       onSetFactura(resul.data.data);
     });
   }, [tipo]);
