@@ -24,7 +24,7 @@ const Index = () => {
       <HeadingBack
         title='Empleados'
         actions={[
-          <Link to='/admin' key='1'>
+          <Link to='/empleado/perfil' key='1'>
             <Button>Administrador</Button>
           </Link>,
           <Link to='/admin/empleado' key='2'>

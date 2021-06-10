@@ -23,7 +23,6 @@ import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
-import ProfileAdmin from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import { Route, Switch } from 'react-router';
@@ -344,12 +343,6 @@ const Rutas = () => {
       </PrivateRoute>
 
       {/* Administrador */}
-      <PrivateRoute
-        allowedRoles={['administrador']}
-        path='/admin/'
-        exact
-        component={ProfileAdmin}
-      />
 
       <PrivateRoute
         allowedRoles={['administrador']}
