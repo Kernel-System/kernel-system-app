@@ -24,31 +24,24 @@ const LoginForm = () => {
           .then(({ data: { data } }) => {
             setUserRole(data.role.name);
           })
-          .catch(({ response: { status } }) => {
-            if (status !== 401) {
-              message.error(`Lo sentimos, ha ocurrido un error`);
-            }
+          .catch(() => {
+            message.error(`Lo sentimos, ha ocurrido un error`);
             setLoading(false);
             setHasError(true);
           });
         getUserNivel(data.access_token)
           .then(({ data: { data } }) => {
-            console.log(data);
-            setUserNivel(data.cliente[0].nivel);
+            setUserNivel(data?.cliente[0]?.nivel);
           })
-          .catch(({ response: { status } }) => {
-            if (status !== 401) {
-              message.error(`Lo sentimos, ha ocurrido un error`);
-            }
+          .catch(() => {
+            message.error(`Lo sentimos, ha ocurrido un error`);
             setLoading(false);
             setHasError(true);
           });
         history.push('/');
       })
-      .catch(({ response: { status } }) => {
-        if (status !== 401) {
-          message.error(`Lo sentimos, ha ocurrido un error`);
-        }
+      .catch(() => {
+        message.error(`Lo sentimos, ha ocurrido un error`);
         setLoading(false);
         setHasError(true);
       });

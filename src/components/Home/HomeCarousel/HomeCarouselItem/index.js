@@ -17,7 +17,6 @@ const HomeCarouselItem = ({ url }) => {
       height={300}
       alt={url}
       src='https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-      fallback='https://st4.depositphotos.com/17828278/24401/v/600/depositphotos_244011872-stock-illustration-no-image-vector-symbol-missing.jpg'
     />
   );
 };

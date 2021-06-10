@@ -2,14 +2,10 @@ import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Button, Form, InputNumber, Space, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { formatPrice, toPercent } from 'utils/functions';
+import { calcCantidad, calcPrecioVariable } from 'utils/productos';
 const { Title, Paragraph, Text } = Typography;
 
-const ProductOverview = ({ product, addToCart, isAuth }) => {
-  const cantidad = product.inventario.reduce(
-    (acc, product) => acc + product.cantidad,
-    0
-  );
-
+const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
   return (
     <>
       {product.categorias.map((categoria, i) => (
@@ -32,11 +28,13 @@ const ProductOverview = ({ product, addToCart, isAuth }) => {
       <Paragraph>{product.descripcion}</Paragraph>
       <Space align='end'>
         <Title level={2} style={{ display: 'inline-block', marginBottom: 0 }}>
-          {formatPrice(product.costo * toPercent(product.descuento))}
+          {formatPrice(
+            calcPrecioVariable(product, nivel) * toPercent(product.descuento)
+          )}
         </Title>
         {product.descuento > 0 && (
           <Paragraph type={'secondary'} delete>
-            {formatPrice(product.costo)}
+            {formatPrice(calcPrecioVariable(product, nivel))}
           </Paragraph>
         )}
       </Space>
@@ -48,10 +46,15 @@ const ProductOverview = ({ product, addToCart, isAuth }) => {
         Disponibles:{' '}
         <Text
           type={
-            cantidad <= 5 ? 'danger' : cantidad <= 10 ? 'warning' : 'success'
+            calcCantidad(product) <= 5
+              ? 'danger'
+              : calcCantidad(product) <= 10
+              ? 'warning'
+              : 'success'
           }
+          strong
         >
-          {cantidad}
+          {calcCantidad(product)}
         </Text>
       </Paragraph>
       {isAuth ? (
@@ -63,12 +66,18 @@ const ProductOverview = ({ product, addToCart, isAuth }) => {
             onFinish={addToCart}
           >
             <Form.Item name='quantity'>
-              <InputNumber min={1} max={99} keyboard />
+              <InputNumber min={1} max={calcCantidad(product)} keyboard />
             </Form.Item>
             <Form.Item>
               <Button
                 type='primary'
                 htmlType='submit'
+                disabled={
+                  cartItems.find((item) => item.id === product.codigo)
+                    ?.quantity >= calcCantidad(product)
+                    ? true
+                    : false
+                }
                 icon={<ShoppingCartOutlined />}
               >
                 Añadir a la lista
