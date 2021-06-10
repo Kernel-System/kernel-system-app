@@ -5,10 +5,20 @@ import { List, Button, Input, Space } from 'antd';
 import { EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { useStoreState } from 'easy-peasy';
 
 const Index = () => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const fetchTransferencia = async () => {
-    const { data } = await http.get('/items/solicitudes_transferencia');
+    const { data } = await http.get(
+      '/items/solicitudes_transferencia',
+      putToken
+    );
     return data.data;
   };
 

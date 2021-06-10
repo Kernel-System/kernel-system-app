@@ -27,6 +27,7 @@ import ModalProducto from 'components/transferencia/ModalTransferencia';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
+import { useStoreState } from 'easy-peasy';
 import { http } from 'api';
 const { Search } = Input;
 const { Option } = Select;
@@ -72,12 +73,19 @@ const Index = ({ tipo }) => {
   let match = useRouteMatch();
   const history = useHistory();
   const [tipoMuestra, setTipoMuestra] = useState(tipo);
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
     if (tipoMuestra !== 'agregar') {
       http
         .get(
-          `/items/solicitudes_transferencia/${match.params.id}?fields=*,productos_transferencia.id,productos_transferencia.codigo,productos_transferencia.clave,productos_transferencia.cantidad,productos_transferencia.clave_unidad,productos_transferencia.estado,productos_transferencia.transferencia,productos_transferencia.titulo`
+          `/items/solicitudes_transferencia/${match.params.id}?fields=*,productos_transferencia.id,productos_transferencia.codigo,productos_transferencia.clave,productos_transferencia.cantidad,productos_transferencia.clave_unidad,productos_transferencia.estado,productos_transferencia.transferencia,productos_transferencia.titulo`,
+          putToken
         )
         .then((result) => {
           console.log(result.data.data);
@@ -146,16 +154,16 @@ const Index = ({ tipo }) => {
   };
 
   const fetchProducts = async () => {
-    const { data } = await http.get(`/items/productos`);
+    const { data } = await http.get(`/items/productos`, putToken);
     return data.data;
   };
 
   const onSearchChange = (value) => {
     setSearchValue(value);
-    filtrarEnsamblesPorEstado(data, value);
+    filtrarProductosPorTitulo(data, value);
   };
 
-  const filtrarEnsamblesPorEstado = async (productos, value) => {
+  const filtrarProductosPorTitulo = async (productos, value) => {
     if (productos) {
       setListProductsToShow(
         productos.filter((item) => item.titulo.includes(value))
@@ -168,7 +176,7 @@ const Index = ({ tipo }) => {
   const { data } = useQuery('productos', async () => {
     const result = await fetchProducts();
     setListProductsToShow(result);
-    filtrarEnsamblesPorEstado(result, searchValue);
+    filtrarProductosPorTitulo(result, searchValue);
     return result;
   });
 
@@ -179,13 +187,17 @@ const Index = ({ tipo }) => {
 
     if (listProducts.length !== 0) {
       http
-        .post('/items/solicitudes_transferencia/', {
-          estado: datos.estado,
-          almacen_origen: datos.almacen_origen,
-          almacen_destino: datos.almacen_destino,
-          factura: datos.factura,
-          rfc_empleado: 'Empleado Actual',
-        })
+        .post(
+          '/items/solicitudes_transferencia/',
+          {
+            estado: datos.estado,
+            almacen_origen: datos.almacen_origen,
+            almacen_destino: datos.almacen_destino,
+            factura: datos.factura,
+            rfc_empleado: 'Empleado Actual',
+          },
+          putToken
+        )
         .then((resul) => {
           console.log(resul);
           let productos = [];
@@ -203,7 +215,7 @@ const Index = ({ tipo }) => {
           });
           console.log(productos);
           http
-            .post(`/items/productos_transferencia`, productos)
+            .post(`/items/productos_transferencia`, productos, putToken)
             .then((resul2) => {
               console.log(resul2);
               Mensaje();
@@ -225,12 +237,16 @@ const Index = ({ tipo }) => {
   const onFinishChange = (datos: any) => {
     console.log();
     http
-      .patch(`/items/solicitudes_transferencia/${match.params.id}`, {
-        estado: datos.estado,
-        factura: datos.factura,
-        fecha_estimada: datosTransferencia.fecha_estimada,
-        comentario: datos.comentario,
-      })
+      .patch(
+        `/items/solicitudes_transferencia/${match.params.id}`,
+        {
+          estado: datos.estado,
+          factura: datos.factura,
+          fecha_estimada: datosTransferencia.fecha_estimada,
+          comentario: datos.comentario,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         Mensaje();

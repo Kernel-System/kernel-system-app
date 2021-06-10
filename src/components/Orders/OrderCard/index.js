@@ -13,7 +13,7 @@ import {
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { Link } from 'react-router-dom';
 import { formatDate, formatPrice } from 'utils/functions';
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 const OrderCard = ({ details }) => {
   const breakpoint = useBreakpoint();
