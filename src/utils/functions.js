@@ -7,6 +7,14 @@ export const isEmptyObject = (obj) => {
   return JSON.stringify(obj) === '{}';
 };
 
+export const capitalize = (word) => {
+  return word[0].toUpperCase() + word.slice(1).toLowerCase();
+};
+
+export const toPercent = (descuento) => {
+  return 1 - descuento / 100;
+};
+
 export const formatDate = (date) =>
   new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'short',

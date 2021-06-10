@@ -4,20 +4,30 @@ import Heading from 'components/UI/Heading';
 const { Text } = Typography;
 
 const ProductDetails = ({ especificaciones }) => {
+  const newEspecificaciones = especificaciones.filter(
+    (especificacion) => especificacion !== null
+  );
+
   return (
     <>
       <Heading title='Especificaciones' />
       <List
         size='small'
-        dataSource={especificaciones}
-        renderItem={(item) => (
-          <List.Item key={item}>
-            <Space>
-              <Text>◼</Text>
-              {item}
-            </Space>
-          </List.Item>
-        )}
+        dataSource={newEspecificaciones}
+        renderItem={(item) => {
+          if (item !== null || item !== undefined) {
+            return (
+              <List.Item key={item}>
+                <Space>
+                  <Text>◼</Text>
+                  {item}
+                </Space>
+              </List.Item>
+            );
+          } else {
+            return;
+          }
+        }}
       />
     </>
   );

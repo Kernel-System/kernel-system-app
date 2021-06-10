@@ -23,3 +23,8 @@ export const getUserRole = (token) =>
   http.get('/users/me?fields=role.name', {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const getUserNivel = (token) =>
+  http.get('/users/me?fields=cliente.nivel', {
+    headers: { Authorization: `Bearer ${token}` },
+  });

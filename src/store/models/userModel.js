@@ -16,12 +16,31 @@ export const userModel = {
   expirationDate: 0,
 
   setExpirationDate: action(
-    // (state, payload) => (state.expirationDate = new Date().getTime() + 5000)
     (state, payload) => (state.expirationDate = new Date().getTime() + payload)
   ),
 
   removeExpirationDate: action((state) => {
     state.expirationDate = 0;
+  }),
+
+  role: undefined,
+
+  setUserRole: action((state, payload) => {
+    state.role = payload;
+  }),
+
+  removeUserRole: action((state) => {
+    state.role = undefined;
+  }),
+
+  nivel: undefined,
+
+  setUserNivel: action((state, payload) => {
+    state.nivel = payload;
+  }),
+
+  removeUserNivel: action((state) => {
+    state.nivel = undefined;
   }),
 
   isAuth: computed((state) => !isEmptyObject(state.token)),
@@ -35,6 +54,8 @@ export const userModel = {
   logout: thunk((actions) => {
     actions.removeUserToken();
     actions.removeExpirationDate();
+    actions.removeUserRole();
+    actions.removeUserNivel();
   }),
 
   refreshToken: thunk((actions, _, helpers) => {
@@ -66,10 +87,10 @@ export const userModel = {
       ) {
         actions.refreshToken();
       }
-      console.log(
-        helpers.getStoreState().user.expirationDate,
-        new Date().getTime()
-      );
+      // console.log(
+      //   helpers.getStoreState().user.expirationDate,
+      //   new Date().getTime()
+      // );
     }
   }),
 };

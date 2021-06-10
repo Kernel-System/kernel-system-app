@@ -1,4 +1,4 @@
-import ComprasList from 'components/list/ComprasList';
+import { Route, Switch } from 'react-router';
 import ProductsTable from 'components/shared/ProductsTable';
 import GuestRoute from 'components/utils/GuestRoute';
 import PrivateRoute from 'components/utils/PrivateRoute';
@@ -10,6 +10,7 @@ import Checkout from 'pages/Checkout';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
 import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
+import EmpleadoProfile from 'pages/empleado/EmpleadoProfile';
 import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
 import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
@@ -24,8 +25,10 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import ProfileAdmin from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
+import Compras from 'pages/compras/Compras';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-import { Route, Switch } from 'react-router';
+import FacturasExternas from 'pages/facturas/FacturasExternas';
+
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 import Tranferencias from './pages/almacen/Transferencias';
 import Cuentas from './pages/pagos/Cuentas';
@@ -78,16 +81,42 @@ const Rutas = () => {
         exact
         component={asyncResetPassword}
       />
-      <PrivateRoute path='/cerrar-sesion' exact component={asyncLogout} />
+      <PrivateRoute
+        allowedRoles='*'
+        path='/cerrar-sesion'
+        exact
+        component={asyncLogout}
+      />
 
       {/* Addresses */}
-      <PrivateRoute path='/direcciones' exact component={Addresses} />
-      <PrivateRoute path='/direcciones/:id' exact component={NewAddress} />
-      <PrivateRoute path='/direcciones/nueva' exact component={NewAddress} />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/direcciones'
+        exact
+        component={Addresses}
+      />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/direcciones/:id'
+        exact
+        component={NewAddress}
+      />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/direcciones/nueva'
+        exact
+        component={NewAddress}
+      />
 
       {/* Profile */}
-      <PrivateRoute path='/perfil' exact component={Profile} />
       <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/perfil'
+        exact
+        component={Profile}
+      />
+      <PrivateRoute
+        allowedRoles={['cliente']}
         path='/perfil/cambiar-contrasena'
         exact
         component={ChangePassword}
@@ -99,98 +128,310 @@ const Rutas = () => {
       <Route path='/producto/:id' exact component={Product} />
 
       {/* Cart */}
-      <PrivateRoute path='/lista-de-compra' exact component={Cart} />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/lista-de-compra'
+        exact
+        component={Cart}
+      />
 
       {/* Checkout */}
-      <PrivateRoute path='/checkout' exact component={Checkout} />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/checkout'
+        exact
+        component={Checkout}
+      />
 
       {/* Orders */}
-      <PrivateRoute path='/solicitudes-de-compra' exact component={Orders} />
-      <PrivateRoute path='/solicitudes-de-compra/:id' exact component={Order} />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/solicitudes-de-compra'
+        exact
+        component={Orders}
+      />
+      <PrivateRoute
+        allowedRoles={['cliente']}
+        path='/solicitudes-de-compra/:id'
+        exact
+        component={Order}
+      />
+
+      {/* Empleados */}
+      <PrivateRoute
+        allowedRoles={[
+          'cuentas por cobrar',
+          'encargado de almacen',
+          'encargado de compras',
+          'encargado de ensamble',
+          'encargado de ventas',
+        ]}
+        path='/empleado/perfil'
+        exact
+        component={EmpleadoProfile}
+      />
 
       {/* Punto de venta */}
-      <PrivateRoute path='/venta' exact component={PuntoDeVenta} />
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/venta'
+        exact
+        component={PuntoDeVenta}
+      />
 
       {/* Proveedores */}
-      <Route path='/proveedores' exact>
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/proveedores'
+        exact
+      >
         <Proveedores />
-      </Route>
-      <Route path='/proveedores/nuevo' exact component={AñadirProveedor} />
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/proveedores/nuevo'
+        exact
+        component={AñadirProveedor}
+      />
 
       {/* Compras */}
-      <Route path='/compras' exact>
-        <ComprasList />
-      </Route>
-      <Route path='/compras/registrar' exact component={RegistrarCompra} />
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/compras'
+        exact
+      >
+        <Compras />
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/compras/registrar'
+        exact
+        component={RegistrarCompra}
+      />
 
       {/* Ensambles */}
-      <Route path='/ensambles' exact component={Ensambles} />
-      <Route path='/ensambles/nuevo' exact component={AgregarEnsambles} />
-      <Route path='/ensambles/:id' exact component={ModificarEnsambles} />
+      <PrivateRoute
+        allowedRoles={[
+          'encargado de ensamble',
+          'encargado de ventas',
+          'encargado de almacen',
+        ]}
+        path='/ensambles'
+        exact
+        component={Ensambles}
+      />
+      <PrivateRoute
+        allowedRoles={[
+          'encargado de ensamble',
+          'encargado de ventas',
+          'encargado de almacen',
+        ]}
+        path='/ensambles/nuevo'
+        exact
+        component={AgregarEnsambles}
+      />
+      <PrivateRoute
+        allowedRoles={[
+          'encargado de ensamble',
+          'encargado de ventas',
+          'encargado de almacen',
+        ]}
+        path='/ensambles/:id'
+        exact
+        component={ModificarEnsambles}
+      />
 
       {/* Facturar ticket */}
-      <Route path='/facturar_ticket' exact component={FacturarTicket} />
+      <PrivateRoute
+        allowedRoles='*'
+        path='/facturar-ticket'
+        exact
+        component={FacturarTicket}
+      />
 
       {/* Movimientos de almacen */}
-      <Route path='/movimiento_almacen' exact component={MovimientosAlmacen} />
-      <Route
-        path='/movimiento_almacen/nuevo'
+      <PrivateRoute
+        allowedRoles={['encargado de almacen']}
+        path='/movimiento-almacen'
+        exact
+        component={MovimientosAlmacen}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de almacen']}
+        path='/movimiento-almacen/nuevo'
         exact
         component={NuevoMovimiento}
       />
 
       {/* Transferencias */}
-      <Route path='/transferencia/' exact component={Tranferencias} />
-      <Route path='/transferencia/nuevo' exact>
+      <PrivateRoute
+        allowedRoles={['encargado de almacen']}
+        path='/transferencia'
+        exact
+        component={Tranferencias}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de almacen']}
+        path='/transferencia/nuevo'
+        exact
+      >
         {<NuevaTrasferencia tipo={'agregar'} />}
-      </Route>
-      <Route path='/transferencia/mostrar/:id' exact>
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de almacen']}
+        path='/transferencia/mostrar/:id'
+        exact
+      >
         {<NuevaTrasferencia tipo={'mostrar'} />}
-      </Route>
-      <Route path='/transferencia/editar/:id' exact>
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de almacen']}
+        path='/transferencia/editar/:id'
+        exact
+      >
         {<NuevaTrasferencia tipo={'editar'} />}
-      </Route>
+      </PrivateRoute>
 
       {/* Pagos */}
-      <Route path='/cuentas/' exact component={Cuentas} />
-      <Route path='/cuentas/pagos/nuevo' exact component={PagoNuevo} />
-      <Route path='/cuentas/pagos_int/:id_fac/' exact>
+      <PrivateRoute
+        allowedRoles={['cuentas por cobrar']}
+        path='/cuentas'
+        exact
+        component={Cuentas}
+      />
+      <PrivateRoute
+        allowedRoles={['cuentas por cobrar']}
+        path='/cuentas/pagos/nuevo'
+        exact
+        component={PagoNuevo}
+      />
+      <PrivateRoute
+        allowedRoles={['cuentas por cobrar']}
+        path='/cuentas/pagos_int/:id_fac/'
+        exact
+      >
         {<Pagos tipo={'facturas_internas'} />}
-      </Route>
-      <Route path='/cuentas/pagos_ext/:id_fac/' exact>
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['cuentas por cobrar']}
+        path='/cuentas/pagos_ext/:id_fac/'
+        exact
+      >
         {<Pagos tipo={'facturas_externas'} />}
-      </Route>
+      </PrivateRoute>
 
       {/* Productos */}
-      <Route path='/productos/' exact component={Productos} />
-      <Route path='/productos/nuevo' exact>
+      <PrivateRoute
+        allowedRoles={['encargado de compras', 'encargado de ventas']}
+        path='/productos'
+        exact
+        component={Productos}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de compras', 'encargado de ventas']}
+        path='/productos/nuevo'
+        exact
+      >
         {<AgregarProductos tipo={'agregar'} />}
-      </Route>
-      <Route path='/productos/editar/:codigo' exact>
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de compras', 'encargado de ventas']}
+        path='/productos/editar/:codigo'
+        exact
+      >
         {<AgregarProductos tipo={'editar'} />}
-      </Route>
-      <Route path='/productos/mostrar/:codigo' exact>
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de compras', 'encargado de ventas']}
+        path='/productos/mostrar/:codigo'
+        exact
+      >
         {<AgregarProductos tipo={'mostrar'} />}
-      </Route>
+      </PrivateRoute>
 
       {/* Administrador */}
-      <Route path='/admin/' exact component={ProfileAdmin} />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/'
+        exact
+        component={ProfileAdmid}
+      />
 
-      <Route path='/admin/sucursal' exact component={Sucursal} />
-      <Route path='/admin/sucursal/nuevo' exact component={NuevaSucursal} />
-      <Route path='/admin/sucursal/:clave' exact component={NuevaSucursal} />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/sucursal'
+        exact
+        component={Sucursal}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/sucursal/nuevo'
+        exact
+        component={NuevaSucursal}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/sucursal/:clave'
+        exact
+        component={NuevaSucursal}
+      />
 
-      <Route path='/admin/almacen' exact component={Almacen} />
-      <Route path='/admin/almacen/nuevo' exact component={NuevoAlmacen} />
-      <Route path='/admin/almacen/:clave' exact component={NuevoAlmacen} />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/almacen'
+        exact
+        component={Almacen}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/almacen/nuevo'
+        exact
+        component={NuevoAlmacen}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/almacen/:clave'
+        exact
+        component={NuevoAlmacen}
+      />
 
-      <Route path='/admin/empleado' exact component={Empleado} />
-      <Route path='/admin/empleado/nuevo' exact component={NuevoEmpleado} />
-      <Route path='/admin/empleado/:rfc' exact component={NuevoEmpleado} />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/empleado'
+        exact
+        component={Empleado}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/empleado/nuevo'
+        exact
+        component={NuevoEmpleado}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/empleado/:rfc'
+        exact
+        component={NuevoEmpleado}
+      />
 
-      <Route path='/admin/cliente' exact component={Cliente} />
-      <Route path='/admin/cliente/nuevo' exact component={NuevoCliente} />
-      <Route path='/admin/cliente/:id' exact component={NuevoCliente} />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/cliente'
+        exact
+        component={Cliente}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/cliente/nuevo'
+        exact
+        component={NuevoCliente}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/cliente/:id'
+        exact
+        component={NuevoCliente}
+      />
 
       {/* Test */}
       <Route path='/test' exact component={ProductsTable} />

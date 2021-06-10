@@ -1,43 +1,37 @@
-import axios from 'axios';
+import { http } from 'api';
 
-export const fetchProducts = async (limit) => {
-  const { data } = await axios.get(
-    `https://fakestoreapi.com/products?limit=${limit}`
+export const getHomeProducts = async () =>
+  http.get(
+    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true`
   );
-  return data;
-};
 
-export const fetchProduct = async (id) => {
-  const { data } = await axios.get(`https://fakestoreapi.com/products/${id}`);
-  return data;
-};
+export const getProduct = async (id) =>
+  http.get(
+    `/items/productos/${id}?fields=codigo,titulo,sku,costo,descripcion,descuento,ieps,peso,unidad_de_medida,imagenes.directus_files_id,inventario.cantidad,categorias.categorias_id.nombre`
+  );
 
-export const fetchCartProducts = (cartItems) => {
-  let newCartItems = [];
+export const getRelatedProducts = async () =>
+  http.get(
+    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true&limit=4`
+  );
+
+export const getCartProducts = async (cartItems) => {
   const cartItemsIds = cartItems.map((cartItem) => cartItem.id);
-  Promise.all(
-    cartItemsIds.map(async (cartItemId, i) => {
-      const { data } = await axios.get(
-        `https://fakestoreapi.com/products/${cartItemId}`
-      );
-      return { ...data, quantity: cartItems[i].quantity };
-    })
-  ).then((values) => {
-    newCartItems.push(...values);
-  });
-  return newCartItems;
-};
-
-export const fetchProductsByName = async (sTitle) => {
-  const { data } = await axios.get(`https://fakestoreapi.com/products`);
-  return data.filter((product) =>
-    product.title.toLowerCase().includes(sTitle.toLowerCase())
+  return http.get(
+    `/items/productos?fields=codigo,titulo,costo,descuento,iva,imagenes.directus_files_id&filter[codigo][_in]=${cartItemsIds.toString()}`
   );
 };
 
-export const fetchProductsByCategory = async (category) => {
-  const { data } = await axios.get(
-    `https://fakestoreapi.com/products/category/${category}`
+export const getProductsByName = async (name, sortBy) =>
+  http.get(
+    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"titulo":{"_contains":"${name}"},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+      sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
+    }`
   );
-  return data;
-};
+
+export const getProductsByCategory = async (category, sortBy) =>
+  http.get(
+    `/items/productos?fields=codigo,titulo,costo,descuento,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+      sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
+    }`
+  );

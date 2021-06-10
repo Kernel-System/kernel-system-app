@@ -1,6 +1,6 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Space, Typography } from 'antd';
-import { getToken } from 'api/auth';
+import { getToken, getUserNivel, getUserRole } from 'api/auth';
 import Heading from 'components/UI/Heading';
 import { useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
@@ -10,6 +10,8 @@ import { emailRules } from 'utils/validations/auth';
 const LoginForm = () => {
   const history = useHistory();
   const login = useStoreActions((actions) => actions.user.login);
+  const setUserRole = useStoreActions((actions) => actions.user.setUserRole);
+  const setUserNivel = useStoreActions((actions) => actions.user.setUserNivel);
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -17,8 +19,30 @@ const LoginForm = () => {
     setLoading(true);
     getToken(email, password)
       .then(({ data: { data } }) => {
-        setLoading(false);
         login(data);
+        getUserRole(data.access_token)
+          .then(({ data: { data } }) => {
+            setUserRole(data.role.name);
+          })
+          .catch(({ response: { status } }) => {
+            if (status !== 401) {
+              message.error(`Lo sentimos, ha ocurrido un error`);
+            }
+            setLoading(false);
+            setHasError(true);
+          });
+        getUserNivel(data.access_token)
+          .then(({ data: { data } }) => {
+            console.log(data);
+            setUserNivel(data.cliente[0].nivel);
+          })
+          .catch(({ response: { status } }) => {
+            if (status !== 401) {
+              message.error(`Lo sentimos, ha ocurrido un error`);
+            }
+            setLoading(false);
+            setHasError(true);
+          });
         history.push('/');
       })
       .catch(({ response: { status } }) => {

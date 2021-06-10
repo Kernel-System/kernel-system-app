@@ -7,8 +7,8 @@ const RelatedProducts = ({ products }) => {
     <>
       <Heading title='Productos relacionados' />
       <Row gutter={[16, 16]}>
-        {products.data.map((product) => (
-          <Col xs={24} md={12} lg={6} key={product.id}>
+        {products.map((product) => (
+          <Col xs={24} md={12} lg={6} key={product.codigo}>
             <ProductCard product={product} small />
           </Col>
         ))}

@@ -1,34 +1,58 @@
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { Button, Form, InputNumber, Space, Typography } from 'antd';
+import { Button, Form, InputNumber, Space, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import { formatPrice } from 'utils/functions';
+import { formatPrice, toPercent } from 'utils/functions';
 const { Title, Paragraph, Text } = Typography;
 
 const ProductOverview = ({ product, addToCart, isAuth }) => {
+  const cantidad = product.inventario.reduce(
+    (acc, product) => acc + product.cantidad,
+    0
+  );
+
   return (
     <>
-      <Paragraph type='secondary' style={{ marginBottom: 0 }}>
-        {product.category.toUpperCase()}
-      </Paragraph>
-      <Title level={2} style={{ marginTop: 0 }}>
-        {product.title}
+      {product.categorias.map((categoria, i) => (
+        <Tag
+          key={categoria.categorias_id.nombre}
+          style={{ marginBottom: '0.5rem' }}
+        >
+          <Link
+            to={`/c/${categoria.categorias_id.nombre.toLowerCase()}`}
+            component={Typography.Link}
+          >
+            {categoria.categorias_id.nombre.toUpperCase()}
+          </Link>
+        </Tag>
+      ))}
+      <Title level={3} style={{ marginBottom: 0 }}>
+        {product.titulo}
       </Title>
-      <Paragraph type='secondary'>SKU#{product.id}</Paragraph>
-      <Paragraph>{product.description}</Paragraph>
-      <Space align='center'>
-        <Title level={2}>
-          {formatPrice(product.price * 0.5 /*descuento*/)}
+      <Paragraph type='secondary'>SKU#{product.sku}</Paragraph>
+      <Paragraph>{product.descripcion}</Paragraph>
+      <Space align='end'>
+        <Title level={2} style={{ display: 'inline-block', marginBottom: 0 }}>
+          {formatPrice(product.costo * toPercent(product.descuento))}
         </Title>
-        <Paragraph type={'secondary'} delete>
-          {formatPrice(product.price)}
-        </Paragraph>
+        {product.descuento > 0 && (
+          <Paragraph type={'secondary'} delete>
+            {formatPrice(product.costo)}
+          </Paragraph>
+        )}
       </Space>
       <Paragraph type='secondary'>
         Precios y disponibilidad válidos en tienda en línea La Paz, Baja
         California Sur al 10 Mar 2021, sujetos a cambio sin previo aviso.
       </Paragraph>
       <Paragraph>
-        Disponibles: <Text type='success'>100</Text>
+        Disponibles:{' '}
+        <Text
+          type={
+            cantidad <= 5 ? 'danger' : cantidad <= 10 ? 'warning' : 'success'
+          }
+        >
+          {cantidad}
+        </Text>
       </Paragraph>
       {isAuth ? (
         <Space>

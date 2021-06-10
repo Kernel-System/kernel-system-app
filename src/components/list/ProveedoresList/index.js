@@ -1,48 +1,67 @@
 import './styles.css';
-import axios from 'axios';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Input } from 'antd';
+import { Popconfirm, List, Button, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
+import { getItems } from 'api/shared/proveedores';
+import { regimenesFiscales } from 'utils/facturas/catalogo';
+const { Option } = Select;
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
-  const fetchItems = async () => {
-    const { data } = await axios.get(
-      'https://kernel-system-api.herokuapp.com/items/proveedores'
-    );
-    return data.data;
-  };
-
-  const onSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    filtrarProveedoresPorRFC(data, value);
-  };
-
-  const filtrarProveedoresPorRFC = async (proveedores, value) => {
-    if (proveedores)
-      setListToShow(
-        proveedores.filter((item) => item.rfc.includes(value.toUpperCase()))
-      );
-  };
-
   const [searchValue, setSearchValue] = useState('');
 
-  const { data } = useQuery('proveedores', async () => {
-    const result = await fetchItems();
-    setListToShow(result);
-    filtrarProveedoresPorRFC(result, searchValue);
-    return result;
+  function filtrarPorProveedor(proveedores, rfc) {
+    if (proveedores && rfc)
+      setListToShow(proveedores.filter((item) => item.rfc === rfc));
+    else {
+      setListToShow(proveedores);
+    }
+  }
+
+  function onChange(value) {
+    setSearchValue(value);
+    filtrarPorProveedor(list, value);
+  }
+
+  function onSearch(value) {
+    if (list && value)
+      setListToShow(
+        list.filter((item) => item.razon_social.includes(value.toUpperCase()))
+      );
+    else setListToShow(list);
+  }
+
+  const { data: list } = useQuery('proveedores', async () => {
+    const { data } = await getItems();
+    const proveedores = data.data;
+    setListToShow(proveedores);
+    return proveedores;
   });
   const [listToShow, setListToShow] = useState([]);
 
   return (
     <>
-      <Input.Search
-        onChange={onSearchChange}
-        placeholder='Buscar por RFC'
+      <Select
+        allowClear
         value={searchValue}
-      ></Input.Search>
+        showSearch
+        style={{ width: '100%' }}
+        placeholder='Buscar por proveedor'
+        autoClearSearchValue={false}
+        onSearch={onSearch}
+        onChange={onChange}
+        filterOption={(input, option) => {
+          return option.children.toLowerCase().includes(input.toLowerCase());
+        }}
+      >
+        {list
+          ? list.map((proveedor, index) => (
+              <Option key={index} value={proveedor.rfc}>
+                {proveedor.razon_social}
+              </Option>
+            ))
+          : []}
+      </Select>
       <br />
       <List
         itemLayout='horizontal'
@@ -84,11 +103,19 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                     margin: 0,
                   }}
                 >
-                  {item.rfc}
+                  {item.razon_social}
                 </p>
               }
-              description={item.razon_social}
+              description={item.rfc}
             />
+            <b
+              style={{
+                display: 'inline',
+                opacity: 0.8,
+              }}
+            >
+              {regimenesFiscales[item.regimen_fiscal]}
+            </b>
           </List.Item>
         )}
       />
