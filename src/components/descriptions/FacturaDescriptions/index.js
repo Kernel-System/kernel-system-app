@@ -5,6 +5,8 @@ import {
   usosCfdi,
   tiposRelacion,
   regimenesFiscales,
+  metodosDePago,
+  formasDePago,
 } from 'utils/facturas/catalogo';
 import moment from 'moment';
 
@@ -27,7 +29,11 @@ const index = ({ factura }) => {
       <Item label='UUID'>{factura.uuid}</Item>
 
       <Item label='Moneda'>{factura.moneda}</Item>
+      <Item label='Forma de pago'>{formasDePago[factura.forma_pago]}</Item>
+      <Item label='Método de pago'>{metodosDePago[factura.metodo_pago]}</Item>
+
       <Item label='Subtotal'>{`$${factura.subtotal}`}</Item>
+      <Item label='Descuento'>{`$${factura.descuento ?? 0}`}</Item>
       <Item label='Total'>{`$${factura.total}`}</Item>
 
       <Item label='RFC Emisor'>{factura.rfc_emisor}</Item>
@@ -47,7 +53,7 @@ const index = ({ factura }) => {
       </Item>
 
       <Item label='CFDIs Relacionados' span={2}>
-        {factura.cfdis_relacionados.length
+        {factura.cfdis_relacionados && factura.cfdis_relacionados.length
           ? factura.cfdis_relacionados.map((elem, indx) => {
               return <p key={indx}>{elem.uuid}</p>;
             })
