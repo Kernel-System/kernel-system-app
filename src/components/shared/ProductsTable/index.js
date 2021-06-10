@@ -1,15 +1,18 @@
 import { MinusSquareOutlined } from '@ant-design/icons';
-import { Button, Image, InputNumber, Table } from 'antd';
+import { Button, Image, InputNumber, Table, Typography } from 'antd';
 import Column from 'antd/lib/table/Column';
 import { useStoreActions } from 'easy-peasy';
 import { Link } from 'react-router-dom';
 import { formatPrice, toPercent } from 'utils/functions';
+import { calcCantidad, calcPrecioVariable } from 'utils/productos';
+const { Paragraph, Text } = Typography;
 
 const ProductsTable = ({
   products,
   loading,
   type = 'carrito',
   removeCartItem,
+  nivel,
 }) => {
   const addOneToItem = useStoreActions((actions) => actions.cart.addOneToItem);
   const subOneToItem = useStoreActions((actions) => actions.cart.subOneToItem);
@@ -50,8 +53,8 @@ const ProductsTable = ({
                 ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagenes[0].directus_files_id}`
                 : undefined
             }
-            fallback='https://st4.depositphotos.com/17828278/24401/v/600/depositphotos_244011872-stock-illustration-no-image-vector-symbol-missing.jpg'
             preview={false}
+            placeholder={!!!imagenes.length}
           />
         )}
       />
@@ -75,10 +78,8 @@ const ProductsTable = ({
       />
       <Column
         title='Precio Unitario'
-        dataIndex='costo'
-        render={(costo, record) =>
-          formatPrice(costo * toPercent(record.descuento))
-        }
+        dataIndex='precios_variables'
+        render={(_, record) => formatPrice(calcPrecioVariable(record, nivel))}
       />
       <Column
         title='Cantidad'
@@ -86,7 +87,7 @@ const ProductsTable = ({
         render={(cantidad, record) => (
           <InputNumber
             min={1}
-            max={99}
+            max={calcCantidad(record)}
             value={cantidad}
             onStep={(_, { type }) => {
               if (type === 'up') {
@@ -102,11 +103,23 @@ const ProductsTable = ({
         title='Subtotal'
         dataIndex='subtotal'
         render={(_, record) => (
-          <strong>
-            {formatPrice(
-              record.costo * toPercent(record.descuento) * record.cantidad
-            )}
-          </strong>
+          <>
+            <Text type='danger' style={{ fontSize: '12px' }}>
+              {formatPrice(
+                calcPrecioVariable(record, nivel) *
+                  toPercent(record.descuento) *
+                  record.cantidad -
+                  calcPrecioVariable(record, nivel)
+              )}
+            </Text>
+            <Paragraph strong>
+              {formatPrice(
+                calcPrecioVariable(record, nivel) *
+                  toPercent(record.descuento) *
+                  record.cantidad
+              )}
+            </Paragraph>
+          </>
         )}
       />
     </Table>

@@ -1,8 +1,9 @@
 import { Button, Card, Divider, Row, Typography } from 'antd';
 import { formatPrice, toPercent } from 'utils/functions';
+import { calcPrecioVariable } from 'utils/productos';
 const { Title, Paragraph, Text } = Typography;
 
-const Summary = ({ products, buttonLabel, buttonAction }) => {
+const Summary = ({ products, buttonLabel, buttonAction, nivel }) => {
   return (
     <Card>
       <Row justify='space-between'>
@@ -10,10 +11,11 @@ const Summary = ({ products, buttonLabel, buttonAction }) => {
         <Paragraph>
           {products &&
             formatPrice(
-              products.reduce(
-                (total, product) => total + product.costo * product.cantidad,
-                0
-              )
+              products.reduce((total, product) => {
+                return (
+                  total + calcPrecioVariable(product, nivel) * product.cantidad
+                );
+              }, 0)
             )}
         </Paragraph>
       </Row>
@@ -26,7 +28,7 @@ const Summary = ({ products, buttonLabel, buttonAction }) => {
                 (total, product) =>
                   total +
                   (product.iva !== 0
-                    ? product.costo *
+                    ? calcPrecioVariable(product, nivel) *
                       product.cantidad *
                       toPercent(product.descuento) *
                       (product.iva / 100)
@@ -46,7 +48,7 @@ const Summary = ({ products, buttonLabel, buttonAction }) => {
                 (total, product) =>
                   total +
                   (product.descuento !== 0
-                    ? product.costo *
+                    ? calcPrecioVariable(product, nivel) *
                       product.cantidad *
                       (product.descuento / 100)
                     : 0),
@@ -70,7 +72,7 @@ const Summary = ({ products, buttonLabel, buttonAction }) => {
               products.reduce(
                 (total, product) =>
                   total +
-                  product.costo *
+                  calcPrecioVariable(product, nivel) *
                     product.cantidad *
                     toPercent(product.descuento) *
                     ((100 + product.iva) / 100),

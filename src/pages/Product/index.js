@@ -12,10 +12,17 @@ import { useParams } from 'react-router-dom';
 const Product = () => {
   const { id } = useParams();
   const isAuth = useStoreState((state) => state.user.isAuth);
+  const nivel = useStoreState((state) => state.user.nivel);
+  const cartItems = useStoreState((state) => state.cart.cartItems);
   const addCartItem = useStoreActions((actions) => actions.cart.addCartItem);
   const product = useQuery(['product', id], () => getProduct(id));
-  const relatedProducts = useQuery('related-products', getRelatedProducts);
   const productData = product.data?.data?.data;
+  const relatedProducts = useQuery(
+    ['related-products', id],
+    () => getRelatedProducts(id, productData.categorias),
+    { enabled: !!productData?.categorias }
+  );
+  const relatedProductsData = relatedProducts.data?.data?.data;
 
   const addToCart = ({ quantity }) => {
     try {
@@ -40,26 +47,28 @@ const Product = () => {
               product={productData}
               isAuth={isAuth}
               addToCart={addToCart}
+              nivel={nivel}
+              cartItems={cartItems}
             />
           </Col>
           <Divider />
           <Col xs={24}>
             <ProductDetails
-              especificaciones={[
-                productData.ieps,
-                productData.peso,
-                productData.unidad_de_medida,
-              ]}
+              especificaciones={{
+                ieps: productData.ieps,
+                peso: productData.peso,
+                unidad_de_medida: productData.unidad_de_medida,
+              }}
             />
           </Col>
         </>
       )}
       <Divider />
-      {relatedProducts.isLoading ? (
+      {product.isLoading || relatedProducts.isLoading ? (
         <CenteredSpinner />
       ) : (
         <Col xs={24}>
-          <RelatedProducts products={relatedProducts.data?.data?.data} />
+          <RelatedProducts products={relatedProductsData} />
         </Col>
       )}
     </Row>
