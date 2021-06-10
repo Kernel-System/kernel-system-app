@@ -34,7 +34,6 @@ const Search = () => {
               defaultValue='default'
               loading={products.isLoading || products.isFetching}
               onChange={(value) => {
-                console.log(value);
                 setSortBy(value);
                 focusManager.setFocused(true);
                 queryClient.invalidateQueries('search-products');
