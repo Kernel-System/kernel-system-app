@@ -1,13 +1,4 @@
-import {
-  Button,
-  Row,
-  Col,
-  Form,
-  Select,
-  message,
-  DatePicker,
-  Upload,
-} from 'antd';
+import { Button, Row, Col, Form, Select, message, DatePicker } from 'antd';
 import { FormasDePago, tiposDeMoneda } from 'utils/facturas/catalogo';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import InputForm from 'components/shared/InputForm';
@@ -15,11 +6,11 @@ import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
 import DocumentList from 'components/table/DocumentTable';
+import { useStoreState } from 'easy-peasy';
 import { useState } from 'react';
-import { useHistory, useRouteMatch } from 'react-router';
+import { useHistory } from 'react-router';
 import { http } from 'api';
 const { Option } = Select;
-const { Dragger } = Upload;
 
 const Index = () => {
   const breakpoint = useBreakpoint();
@@ -29,6 +20,12 @@ const Index = () => {
   const [documentos, setDocumentos] = useState([]);
   const [fecha, setFecha] = useState();
   const history = useHistory();
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   const onFinish = (value: any) => {
     let errorDocument = false;
@@ -45,28 +42,36 @@ const Index = () => {
     if (!errorDocument) {
       console.log(value);
       http
-        .post('/items/pagos/', {
-          fecha_pago: fecha,
-          forma_de_pago_p: value.forma_de_pago_p,
-          moneda_p: value.moneda_p,
-          tipo_cambio_p: value.tipo_cambio_p,
-          monto: value.monto,
-          num_operacion: value.num_operacion,
-          rfc_emisor_cta_ord: value.rfc_emisor_cta_ord,
-          nom_banco_ord_ext: value.nom_banco_ord_ext,
-          cta_ordenante: value.cta_ordenante,
-          rfc_emisor_cta_ben: value.rfc_emisor_cta_ben,
-          cta_beneficiario: value.cta_beneficiario,
-          tipo: value.tipo,
-        })
+        .post(
+          '/items/pagos/',
+          {
+            fecha_pago: fecha,
+            forma_de_pago_p: value.forma_de_pago_p,
+            moneda_p: value.moneda_p,
+            tipo_cambio_p: value.tipo_cambio_p,
+            monto: value.monto,
+            num_operacion: value.num_operacion,
+            rfc_emisor_cta_ord: value.rfc_emisor_cta_ord,
+            nom_banco_ord_ext: value.nom_banco_ord_ext,
+            cta_ordenante: value.cta_ordenante,
+            rfc_emisor_cta_ben: value.rfc_emisor_cta_ben,
+            cta_beneficiario: value.cta_beneficiario,
+            tipo: value.tipo,
+          },
+          putToken
+        )
         .then((resul_pago) => {
           console.log(resul_pago);
           http
-            .post('/items/pagos_factura/', {
-              pagos_id: resul_pago.data.data.id,
-              collection: value.tipo,
-              item: value.folio_factura,
-            })
+            .post(
+              '/items/pagos_factura/',
+              {
+                pagos_id: resul_pago.data.data.id,
+                collection: value.tipo,
+                item: value.folio_factura,
+              },
+              putToken
+            )
             .then((resul_pfactura) => {
               console.log(resul_pfactura);
               if (documentos.length !== 0) {
@@ -87,7 +92,7 @@ const Index = () => {
                   });
                 });
                 http
-                  .post('/items/doctos_relacionados/', newDocumento)
+                  .post('/items/doctos_relacionados/', newDocumento, putToken)
                   .then((resul) => {
                     console.log(resul);
                     Mensaje();
@@ -122,8 +127,7 @@ const Index = () => {
       value === 'facturas_internas'
         ? `/items/facturas_internas/`
         : `/items/facturas_externas/`;
-    http.get(dir).then((resul) => {
-      console.log(resul.data.data);
+    http.get(dir, putToken).then((resul) => {
       setFacturas(resul.data.data);
     });
   };
@@ -170,7 +174,7 @@ const Index = () => {
           onChange={handleChange}
         >
           <Option value='facturas_internas'>Facturas Internas</Option>
-          <Option value='facturas_externas'>Externa</Option>
+          <Option value='facturas_externas'>Facturas Externa</Option>
         </Select>
       </Form.Item>
       <Row key='columnas' gutter={[16, 8]} style={{ marginBottom: '10px' }}>

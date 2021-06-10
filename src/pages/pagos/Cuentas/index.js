@@ -2,8 +2,6 @@ import CuentasList from 'components/list/CuentasList';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
-import Modal from 'components/empleados/ModalEmpleado';
-import { useState } from 'react';
 import HeadingBack from 'components/UI/HeadingBack';
 
 const Index = () => {
