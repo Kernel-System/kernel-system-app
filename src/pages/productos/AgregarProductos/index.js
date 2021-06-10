@@ -17,11 +17,10 @@ import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
+import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
-import { PlusOutlined } from '@ant-design/icons';
-import { useStoreState } from 'easy-peasy';
 const { TextArea } = Input;
 const { Option } = Select;
 

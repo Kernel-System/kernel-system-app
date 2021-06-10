@@ -1,4 +1,3 @@
-import { Route, Switch } from 'react-router';
 import ProductsTable from 'components/shared/ProductsTable';
 import GuestRoute from 'components/utils/GuestRoute';
 import PrivateRoute from 'components/utils/PrivateRoute';
@@ -7,6 +6,7 @@ import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
+import Compras from 'pages/compras/Compras';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
 import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
@@ -25,10 +25,16 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import ProfileAdmin from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
-import Compras from 'pages/compras/Compras';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-import FacturasExternas from 'pages/facturas/FacturasExternas';
-
+import { Route, Switch } from 'react-router';
+import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
+import Almacen from './pages/administrador/almacenes/Almacenes';
+import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
+import Cliente from './pages/administrador/clientes/Clientes';
+import NuevoEmpleado from './pages/administrador/empleados/AgregarEmpleado';
+import Empleado from './pages/administrador/empleados/Empleados';
+import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
+import Sucursal from './pages/administrador/sucursales/Sucursales';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 import Tranferencias from './pages/almacen/Transferencias';
 import Cuentas from './pages/pagos/Cuentas';
@@ -36,18 +42,6 @@ import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
-
-import Sucursal from './pages/administrador/sucursales/Sucursales';
-import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
-
-import Almacen from './pages/administrador/almacenes/Almacenes';
-import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
-
-import Empleado from './pages/administrador/empleados/Empleados';
-import NuevoEmpleado from './pages/administrador/empleados/AgregarEmpleado';
-
-import Cliente from './pages/administrador/clientes/Clientes';
-import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -354,7 +348,7 @@ const Rutas = () => {
         allowedRoles={['administrador']}
         path='/admin/'
         exact
-        component={ProfileAdmid}
+        component={ProfileAdmin}
       />
 
       <PrivateRoute
