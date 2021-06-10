@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 import './style.css';
-import { Table, Input, InputNumber, Popconfirm, Form, Button, Col } from 'antd';
+import { Table, Input, InputNumber, Popconfirm, Form, Button } from 'antd';
 
 import {
   EditOutlined,
@@ -9,7 +9,6 @@ import {
   CloseOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-const originData = [];
 
 const EditableCell = ({
   editing,
