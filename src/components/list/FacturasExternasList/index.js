@@ -173,8 +173,7 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
                     margin: 0,
                   }}
                 >
-                  {usosCfdi[item.uso_cfdi]} -{' '}
-                  {moment(new Date(item.fecha)).format(formatoFecha)}
+                  {item.nombre_emisor ?? item.rfc_emisor}
                 </p>
               }
               description={
@@ -183,7 +182,8 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
                     margin: 0,
                   }}
                 >
-                  Emisor: {<b>{item.nombre_emisor}</b>}
+                  <b>{usosCfdi[item.uso_cfdi]} - </b>
+                  {moment(new Date(item.fecha)).format(formatoFecha)}
                 </p>
               }
               key={index}
