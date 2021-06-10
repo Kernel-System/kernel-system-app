@@ -18,3 +18,8 @@ export const resetPassword = (token, password) =>
     token,
     password,
   });
+
+export const getUserRole = (token) =>
+  http.get('/users/me?fields=role.name', {
+    headers: { Authorization: `Bearer ${token}` },
+  });

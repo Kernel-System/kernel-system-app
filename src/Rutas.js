@@ -22,7 +22,7 @@ import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
-import ProfileAdmid from 'pages/profile/ProfileAdmid';
+import ProfileAdmin from 'pages/profile/ProfileAdmid';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import { Route, Switch } from 'react-router';
@@ -34,7 +34,6 @@ import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
 
-import Principal from './pages/administrador/Principal';
 import Sucursal from './pages/administrador/sucursales/Sucursales';
 import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
 
@@ -175,23 +174,23 @@ const Rutas = () => {
       </Route>
 
       {/* Administrador */}
-      <Route path='/admid/' exact component={ProfileAdmid} />
+      <Route path='/admin/' exact component={ProfileAdmin} />
 
-      <Route path='/admid/sucursal' exact component={Sucursal} />
-      <Route path='/admid/sucursal/nuevo' exact component={NuevaSucursal} />
-      <Route path='/admid/sucursal/:clave' exact component={NuevaSucursal} />
+      <Route path='/admin/sucursal' exact component={Sucursal} />
+      <Route path='/admin/sucursal/nuevo' exact component={NuevaSucursal} />
+      <Route path='/admin/sucursal/:clave' exact component={NuevaSucursal} />
 
-      <Route path='/admid/almacen' exact component={Almacen} />
-      <Route path='/admid/almacen/nuevo' exact component={NuevoAlmacen} />
-      <Route path='/admid/almacen/:clave' exact component={NuevoAlmacen} />
+      <Route path='/admin/almacen' exact component={Almacen} />
+      <Route path='/admin/almacen/nuevo' exact component={NuevoAlmacen} />
+      <Route path='/admin/almacen/:clave' exact component={NuevoAlmacen} />
 
-      <Route path='/admid/empleado' exact component={Empleado} />
-      <Route path='/admid/empleado/nuevo' exact component={NuevoEmpleado} />
-      <Route path='/admid/empleado/:rfc' exact component={NuevoEmpleado} />
+      <Route path='/admin/empleado' exact component={Empleado} />
+      <Route path='/admin/empleado/nuevo' exact component={NuevoEmpleado} />
+      <Route path='/admin/empleado/:rfc' exact component={NuevoEmpleado} />
 
-      <Route path='/admid/cliente' exact component={Cliente} />
-      <Route path='/admid/cliente/nuevo' exact component={NuevoCliente} />
-      <Route path='/admid/cliente/:id' exact component={NuevoCliente} />
+      <Route path='/admin/cliente' exact component={Cliente} />
+      <Route path='/admin/cliente/nuevo' exact component={NuevoCliente} />
+      <Route path='/admin/cliente/:id' exact component={NuevoCliente} />
 
       {/* Test */}
       <Route path='/test' exact component={ProductsTable} />
