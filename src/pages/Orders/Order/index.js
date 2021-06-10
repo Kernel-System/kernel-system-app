@@ -51,11 +51,11 @@ const Order = () => {
           <Col xs={24} md={12}>
             <TextLabel
               title='Razón social'
-              subtitle={orderData?.rfc_cliente.razon_social}
+              subtitle={orderData?.id_cliente.razon_social}
             />
             <TextLabel
               title='Número de teléfono'
-              subtitle={formatPhoneNumber(orderData?.rfc_cliente.telefono)}
+              subtitle={formatPhoneNumber(orderData?.id_cliente.telefono)}
             />
             {query.get('tipo') === 'envio' && (
               <>

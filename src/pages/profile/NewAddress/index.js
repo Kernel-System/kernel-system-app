@@ -6,7 +6,7 @@ import {
   insertUserDireccion,
   updateUserDireccion,
 } from 'api/shared/addresses';
-import Heading from 'components/UI/Heading';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -44,12 +44,12 @@ const NewAddress = () => {
 
   const addAddress = (values) => {
     setLoading(true);
-    getUserDireccionesCount(user.data.cliente.rfc, token)
+    getUserDireccionesCount(user.data.cliente.id, token)
       .then(({ data: { meta } }) => {
         const newAddress = {
           ...values,
           fiscal: meta.filter_count === 0 ? 1 : 0,
-          rfc_cliente: user.data.cliente.rfc,
+          id_cliente: user.data.cliente.id,
         };
         insertUserDireccion(newAddress, token)
           .then(() => {
@@ -86,7 +86,7 @@ const NewAddress = () => {
 
   return (
     <>
-      <Heading
+      <HeadingBack
         title={
           pathname.substring(13) === 'nueva'
             ? 'Añadir nueva dirección'

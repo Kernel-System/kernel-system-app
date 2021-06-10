@@ -11,10 +11,11 @@ import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const token = useStoreState((state) => state.user.token.access_token);
+  const nivel = useStoreState((state) => state.user.nivel);
   const user = useQuery('user', () => getUserData(token));
   const direccionFiscal = useQuery(
     'direccionesFiscal',
-    () => getUserDireccionFiscal(user.data.cliente.rfc, token),
+    () => getUserDireccionFiscal(user.data.cliente.id, token),
     { enabled: !!user?.data?.cliente }
   );
 
@@ -22,6 +23,7 @@ const Profile = () => {
     <>
       <HeadingBack
         title='Mi perfil'
+        extra={`Nivel: ${nivel}`}
         actions={[
           <Link to='/perfil' key='1'>
             <Button type='primary'>Mi perfil</Button>
