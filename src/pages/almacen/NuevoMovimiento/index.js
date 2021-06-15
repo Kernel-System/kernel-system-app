@@ -680,8 +680,6 @@ const Index = () => {
     } else return col;
   });
 
-  //#endregion
-
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
     lista.push({
@@ -700,6 +698,7 @@ const Index = () => {
     });
     setListProducts(lista);
   };
+  //#endregion
 
   return (
     <div>

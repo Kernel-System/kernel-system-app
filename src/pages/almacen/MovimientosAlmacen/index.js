@@ -34,7 +34,7 @@ const Index = () => {
       <HeadingBack title={`Movimientos de almacén`} />
       <MovimientosAlmacenList onClickItem={changeMovimiento} />
       <br />
-      <Link to='/movimiento_almacen/nuevo'>
+      <Link to='/movimiento-almacen/nuevo'>
         <Button
           type='primary'
           size='large'
