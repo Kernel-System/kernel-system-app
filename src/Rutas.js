@@ -1,3 +1,4 @@
+import { Route, Switch } from 'react-router';
 import ProductsTable from 'components/shared/ProductsTable';
 import GuestRoute from 'components/utils/GuestRoute';
 import PrivateRoute from 'components/utils/PrivateRoute';
@@ -25,7 +26,10 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-import { Route, Switch } from 'react-router';
+
+import FacturasExternas from 'pages/facturas/FacturasExternas';
+import FacturasInternas from 'pages/facturas/FacturasInternas';
+
 import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
 import Almacen from './pages/administrador/almacenes/Almacenes';
 import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
@@ -204,6 +208,23 @@ const Rutas = () => {
         component={AñadirProveedor}
       />
 
+      {/* Facturas Externas */}
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/facturas-externas'
+        exact
+      >
+        <FacturasExternas />
+      </PrivateRoute>
+
+      {/* Facturas Internas */}
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/facturas-internas'
+        exact
+      >
+        <FacturasInternas />
+      </PrivateRoute>
       {/* Compras */}
       <PrivateRoute
         allowedRoles={['encargado de compras']}

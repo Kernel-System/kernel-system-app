@@ -1,11 +1,12 @@
 import './styles.css';
 import { useState } from 'react';
+import { useStoreState } from 'easy-peasy';
 import Header from 'components/UI/Heading';
 import { Popconfirm, List, Typography, Button, Select } from 'antd';
 import { DeleteFilled, EyeFilled } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { useQuery } from 'react-query';
-import { getItems } from 'api/shared/facturas_externas';
+import { getItems } from 'api/shared/facturas_internas';
 import {
   tiposDeComprobante,
   usosCfdi,
@@ -21,9 +22,9 @@ const { Option } = Select;
 const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
   const [searchValue, setSearchValue] = useState('');
 
-  function filtrarPorProveedor(facturas, rfc) {
+  function filtrarPorCliente(facturas, rfc) {
     if (facturas && rfc)
-      setListToShow(facturas.filter((item) => item.rfc_emisor === rfc));
+      setListToShow(facturas.filter((item) => item.rfc_receptor === rfc));
     else {
       setListToShow(facturas);
     }
@@ -31,13 +32,17 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
 
   function onChange(value) {
     setSearchValue(value);
-    filtrarPorProveedor(list, value);
+    filtrarPorCliente(list, value);
   }
 
   function onSearch(value) {
     if (list && value)
       setListToShow(
-        list.filter((item) => item.nombre_emisor.includes(value.toUpperCase()))
+        list.filter((item) =>
+          item.nombre_receptor
+            ? item.nombre_receptor.includes(value.toUpperCase())
+            : item.rfc_receptor.includes(value.toUpperCase())
+        )
       );
     else setListToShow(list);
   }
@@ -62,32 +67,33 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
         break;
     }
   }
+  const token = useStoreState((state) => state.user.token.access_token);
 
-  const { data: list } = useQuery('facturas_externas', async () => {
-    const { data } = await getItems();
+  const { data: list } = useQuery('facturas_internas', async () => {
+    const { data } = await getItems(token);
     const datosOrdenados = ordenarPorRecientes(data.data);
-    const facturas_externas = [];
-    const newProveedores = [];
+    const facturas_internas = [];
+    const newClientes = [];
     datosOrdenados.forEach((factura) => {
-      const rfc = factura.rfc_emisor;
-      facturas_externas.push(factura);
-      if (!newProveedores.some((prov) => prov.rfc === rfc))
-        newProveedores.push({
+      const rfc = factura.rfc_receptor;
+      facturas_internas.push(factura);
+      if (!newClientes.some((prov) => prov.rfc === rfc))
+        newClientes.push({
           rfc,
-          razon_social: factura.nombre_emisor,
+          razon_social: factura.nombre_receptor ?? rfc,
         });
     });
-    setListToShow(facturas_externas);
-    setProveedores(newProveedores);
-    filtrarPorProveedor(facturas_externas, searchValue);
-    return facturas_externas;
+    setListToShow(facturas_internas);
+    setClientes(newClientes);
+    filtrarPorCliente(facturas_internas, searchValue);
+    return facturas_internas;
   });
-  const [proveedores, setProveedores] = useState([]);
+  const [clientes, setClientes] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
   return (
     <>
-      <Header title='Facturas externas' />
+      <Header title='Facturas internas' />
       <Row gutter={[16, 12]}>
         <Col xs={24} lg={12}>
           <Select
@@ -95,7 +101,7 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
             value={searchValue}
             showSearch
             style={{ width: '100%' }}
-            placeholder='Buscar por proveedor'
+            placeholder='Buscar por cliente'
             autoClearSearchValue={false}
             onSearch={onSearch}
             onChange={onChange}
@@ -105,7 +111,7 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
                 .includes(input.toLowerCase());
             }}
           >
-            {proveedores.map((proveedor, index) => (
+            {clientes.map((proveedor, index) => (
               <Option key={index} value={proveedor.rfc}>
                 {proveedor.razon_social}
               </Option>
@@ -173,7 +179,7 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
                     margin: 0,
                   }}
                 >
-                  {item.nombre_emisor ?? item.rfc_emisor}
+                  {item.nombre_receptor ?? item.rfc_receptor}
                 </p>
               }
               description={

@@ -1,6 +1,7 @@
 import {
   AppstoreOutlined,
   DollarOutlined,
+  FileTextOutlined,
   ImportOutlined,
   ShopOutlined,
   ShoppingOutlined,
@@ -117,6 +118,33 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const FacturasExternasMenuItem = (showIcon) => (
+    <Menu.Item
+      key='facturas-externas'
+      icon={showIcon ? <FileTextOutlined /> : undefined}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/facturas-externas'>Facturas externas</Link>
+    </Menu.Item>
+  );
+
+  const FacturasInternasMenuItem = (showIcon) => (
+    <Menu.Item
+      key='facturas-internas'
+      icon={showIcon ? <FileTextOutlined /> : undefined}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/facturas-internas'>Facturas internas</Link>
+    </Menu.Item>
+  );
+
+  const FacturasSubMenu = (
+    <Menu.SubMenu key='sub1' icon={<FileTextOutlined />} title='Facturas'>
+      {FacturasExternasMenuItem()}
+      {FacturasInternasMenuItem()}
+    </Menu.SubMenu>
+  );
+
   const clienteGuestMenuItems = (
     <>
       {breakpoint.xs && (
@@ -151,6 +179,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {VentaMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
+      {FacturasInternasMenuItem(true)}
     </>
   );
 
@@ -169,6 +198,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {ComprasMenuItem}
       {ProveedoresMenuItem}
       {ProductosMenuItem}
+      {FacturasExternasMenuItem(true)}
     </>
   );
 
@@ -197,6 +227,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {TransferenciaMenuItem}
             {ComprasMenuItem}
             {ProveedoresMenuItem}
+            {FacturasSubMenu}
           </>
         )}
       </Menu>

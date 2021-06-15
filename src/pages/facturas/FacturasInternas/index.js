@@ -1,16 +1,16 @@
 import { useState } from 'react';
+import { useStoreState } from 'easy-peasy';
 import { Button, Modal, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
-import ListaFacturas from 'components/list/FacturasExternasList';
+import ListaFacturas from 'components/list/FacturasInternasList';
 import Descripciones from 'components/descriptions/FacturaDescriptions';
-import { insertItems as insertProveedor } from 'api/shared/proveedores';
-import * as CRUD from 'api/shared/facturas_externas';
+import * as CRUD from 'api/shared/facturas_internas';
 
 const Index = (props) => {
   const onFacturaLeida = async (factura) => {
-    // console.log({ factura });
+    console.log({ factura });
     const cfdi = factura['$'];
     const emisor = factura['cfdi:Emisor'][0].$;
     const receptor = factura['cfdi:Receptor'][0].$;
@@ -24,7 +24,7 @@ const Index = (props) => {
       fecha: cfdi.Fecha,
       condiciones_de_pago: cfdi.CondicionesDePago,
       lugar_expedicion: cfdi.LugarExpedicion,
-      uuid: timbreFiscal.UUID,
+      no_certificado: cfdi.NoCertificado,
 
       moneda: cfdi.Moneda,
       tipo_cambio: cfdi.TipoCambio,
@@ -41,44 +41,15 @@ const Index = (props) => {
       rfc_receptor: receptor.Rfc,
       nombre_receptor: receptor.Nombre,
       uso_cfdi: receptor.UsoCFDI,
-    };
-    const proveedor = {
-      rfc: emisor.Rfc,
-      razon_social: emisor.Nombre,
-      regimen_fiscal: emisor.RegimenFiscal,
-    };
-    const hide0 = message.loading('Registrando proveedor', 0);
-    const rfc_proveedor = await insertarProveedor(proveedor);
 
-    hide0();
-    if (rfc_proveedor.length >= 12)
-      message.success('El proveedor ha sido registrado exitosamente');
-    else if (rfc_proveedor === 0) {
-      message.warn('Este proveedor ya ha sido registrado previamente', 1.5);
-    } else {
-      message.error('Fallo al intentar registrar el proveedor');
-    }
+      uuid: timbreFiscal.UUID,
+      fecha_timbrado: timbreFiscal.FechaTimbrado,
+      no_certificado_sat: timbreFiscal.NoCertificadoSAT,
+      rfc_prov_cert: timbreFiscal.RfcProvCertif,
+    };
 
     const hide = message.loading('Registrando datos de factura', 0);
     insertMutation.mutate(datosFactura, { onSuccess: hide, onError: hide });
-  };
-
-  const insertarProveedor = async (proveedor) => {
-    let rfc = -1;
-    await insertProveedor(proveedor)
-      .then((result) => {
-        if (result.status === 200) {
-          rfc = result.data.data.rfc;
-        }
-      })
-      .catch((error) => {
-        if (
-          error.response.data.errors[0].message.includes('has to be unique')
-        ) {
-          rfc = 0;
-        }
-      });
-    return rfc;
   };
 
   const showModal = (element) => {
@@ -96,10 +67,12 @@ const Index = (props) => {
 
   const queryClient = useQueryClient();
 
+  const token = useStoreState((state) => state.user.token.access_token);
+
   const insertMutation = useMutation(CRUD.insertItems, {
     onSuccess: () => {
       queryClient
-        .invalidateQueries('facturas_externas')
+        .invalidateQueries('facturas_internas')
         .then(message.success('La factura ha sido registrada exitosamente', 2));
     },
     onError: (error) => {
@@ -110,19 +83,22 @@ const Index = (props) => {
       }
     },
   });
-  const deleteMutation = useMutation(CRUD.deleteItem, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('facturas_externas')
-        .then(message.success('Registro eliminado exitosamente'));
-    },
-    onError: (error) => {
-      if (error.response.status === 500)
-        message.error(
-          'Fallo al intentar eliminar la factura. Revise que no haya registros relacionados.'
-        );
-    },
-  });
+  const deleteMutation = useMutation(
+    (values) => CRUD.deleteItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('facturas_internas')
+          .then(message.success('Registro eliminado exitosamente'));
+      },
+      onError: (error) => {
+        if (error.response.status === 500)
+          message.error(
+            'Fallo al intentar eliminar la factura. Revise que no haya registros relacionados.'
+          );
+      },
+    }
+  );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
@@ -135,8 +111,8 @@ const Index = (props) => {
         onConfirmDelete={onConfirmDelete}
       ></ListaFacturas>
       <br />
-      <Link to='/compras/registrar'>
-        <Button type='primary'>Registrar factura de compra</Button>
+      <Link to='/venta'>
+        <Button type='primary'>Registrar factura por venta</Button>
       </Link>
       <LectorFacturas
         onSuccess={onFacturaLeida}
@@ -144,7 +120,7 @@ const Index = (props) => {
         titulo='Registrar solo datos de factura'
       />
       <Modal
-        title={listElement.nombre_emisor}
+        title={listElement.nombre_receptor ?? listElement.rfc_receptor}
         visible={isModalVisible}
         footer={null}
         onCancel={handleCancel}
