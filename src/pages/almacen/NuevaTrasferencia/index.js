@@ -114,7 +114,7 @@ const Index = ({ tipo }) => {
 
   const onAddProductos = (lista) => {
     const arreglo = [];
-    lista.map((producto) => {
+    lista.forEach((producto) => {
       arreglo.push({
         key: arreglo.length.toString(),
         id: producto.id,

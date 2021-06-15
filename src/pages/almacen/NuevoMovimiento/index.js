@@ -274,10 +274,10 @@ const Index = () => {
               .then((result_productos) => {
                 let series = [];
                 let num = 0;
-                listProducts.map((productos) => {
+                listProducts.forEach((productos) => {
                   const idMov = result_productos.data.data[num].id;
                   num = num + 1;
-                  productos.series.map((serie) => {
+                  productos.series.forEach((serie) => {
                     series.push({
                       serie: serie,
                       producto_movimiento: idMov,
@@ -339,7 +339,7 @@ const Index = () => {
 
   const agregarInventarios = (values) => {
     let codigos = [];
-    listProducts.map((producto) => {
+    listProducts.forEach((producto) => {
       codigos.push(producto.codigo);
     });
     http
@@ -353,7 +353,7 @@ const Index = () => {
       )
       .then((inventario) => {
         let codigosInventario = [];
-        inventario.data.data.map((elementoInventario) => {
+        inventario.data.data.forEach((elementoInventario) => {
           codigosInventario.push(elementoInventario.codigo_producto);
         });
         //del inventario
@@ -371,7 +371,7 @@ const Index = () => {
           porAgregar.includes(producto.codigo)
         );
 
-        inventario.data.data.map((producto_inv, index) => {
+        inventario.data.data.forEach((producto_inv, index) => {
           http
             .patch(
               `/items/inventario/${producto_inv.id}`,
@@ -391,7 +391,7 @@ const Index = () => {
             .then((producto_inv_anl) => {
               if (sumar(values.concepto)) {
                 let series = [];
-                productosAgregados[index].series.map((serie) => {
+                productosAgregados[index].series.forEach((serie) => {
                   series.push({
                     serie: serie,
                     inventario: producto_inv_anl.data.data.id,
@@ -400,7 +400,7 @@ const Index = () => {
                 http.post(`/items/series_inventario`, series, putToken);
               } else {
                 let series = [];
-                productosAgregados[index].series.map((serie) => {
+                productosAgregados[index].series.forEach((serie) => {
                   series.push(serie);
                 });
                 http.delete(`/items/series_inventario`, series, putToken);
@@ -408,7 +408,7 @@ const Index = () => {
             });
         });
         let mostrarMensaje = true;
-        productosPorAgregar.map((producto, index) => {
+        productosPorAgregar.forEach((producto, index) => {
           mostrarMensaje = false;
           http
             .post(
@@ -426,7 +426,7 @@ const Index = () => {
             )
             .then((producto_inv_anlf) => {
               let series = [];
-              producto.series.map((serie) => {
+              producto.series.forEach((serie) => {
                 series.push({
                   serie: serie,
                   inventario: producto_inv_anlf.data.data.id,

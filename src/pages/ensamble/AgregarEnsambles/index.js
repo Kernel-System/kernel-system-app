@@ -88,7 +88,7 @@ const Index = () => {
       .then((result_ens) => {
         let productos = [];
         //let productosMovimiento = [];
-        list.productos.map((producto) => {
+        list.productos.forEach((producto) => {
           productos.push({
             codigo: producto.codigo,
             clave: producto.clave,

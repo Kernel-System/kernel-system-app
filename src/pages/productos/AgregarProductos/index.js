@@ -59,7 +59,6 @@ const Index = ({ tipo }) => {
           putToken
         )
         .then((result) => {
-          console.log(result.data.data);
           AgregarValor(result.data.data);
           AgregarLista(result.data.data);
           AgregarPrecioFijo(result.data.data.precio_fijo);

@@ -31,7 +31,7 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (match.params.rfc != window.undefined) {
+    if (match.params.rfc !== window.undefined) {
       http
         .get(
           `/items/empleados/${match.params.rfc}?fields=*,cuenta.id,cuenta.email`,

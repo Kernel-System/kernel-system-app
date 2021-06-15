@@ -163,7 +163,7 @@ const Index = ({ match }) => {
                   )
                   .then((result) => {
                     let componentes = [];
-                    list[0].componentes_ensamble.map((componente) => {
+                    list[0].componentes_ensamble.forEach((componente) => {
                       console.log(componente);
                       componentes.push({
                         codigo: componente.codigo,
@@ -183,10 +183,10 @@ const Index = ({ match }) => {
                       .then((result_com) => {
                         let series = [];
                         let num = 0;
-                        list[0].componentes_ensamble.map((componente) => {
+                        list[0].componentes_ensamble.forEach((componente) => {
                           const idMov = result_com.data.data[num].id;
                           console.log(componente);
-                          componente.series_componentes_ensamble.map(
+                          componente.series_componentes_ensamble.forEach(
                             (serie) => {
                               console.log(serie);
                               if (serie.serie !== '')
@@ -288,7 +288,7 @@ const Index = ({ match }) => {
 
   const agregarInventarios = (list, introducir = false) => {
     let codigos = [];
-    list.componentes_ensamble.map((producto) => {
+    list.componentes_ensamble.forEach((producto) => {
       codigos.push(producto.codigo);
     });
     http
@@ -304,7 +304,7 @@ const Index = ({ match }) => {
         if (!introducir) {
           mostrarMensaje = false;
           console.log(inventario.data.data);
-          inventario.data.data.map((producto_inv, index) => {
+          inventario.data.data.forEach((producto_inv, index) => {
             http
               .patch(
                 `/items/inventario/${producto_inv.id}`,
@@ -322,7 +322,7 @@ const Index = ({ match }) => {
                 let series = [];
                 list.componentes_ensamble[
                   index
-                ].series_componentes_ensamble.map((serie) => {
+                ].series_componentes_ensamble.forEach((serie) => {
                   series.push(serie);
                 });
                 if (series.length !== 0)
