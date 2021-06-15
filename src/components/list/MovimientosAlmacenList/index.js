@@ -3,13 +3,21 @@ import { http } from 'api';
 import { useState } from 'react';
 import { List, Badge, Select, Typography } from 'antd';
 import { useQuery } from 'react-query';
+import { useStoreState } from 'easy-peasy';
 const { Option } = Select;
 const { Text } = Typography;
 
 const Index = ({ onClickItem }) => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const fetchItems = async () => {
     const { data } = await http.get(
-      '/items/movimientos_almacen?fields=*,productos_movimiento.*,productos_movimiento.series_producto_movimiento.*'
+      '/items/movimientos_almacen?fields=*,productos_movimiento.*,productos_movimiento.series_producto_movimiento.*',
+      putToken
     );
     return data.data;
   };
