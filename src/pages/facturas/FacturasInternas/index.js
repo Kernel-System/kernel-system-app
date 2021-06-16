@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStoreState } from 'easy-peasy';
-import { Button, Modal, message } from 'antd';
+import { Button, Modal, message, Space } from 'antd';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
@@ -111,14 +111,16 @@ const Index = (props) => {
         onConfirmDelete={onConfirmDelete}
       ></ListaFacturas>
       <br />
-      <Link to='/venta'>
-        <Button type='primary'>Registrar factura por venta</Button>
-      </Link>
-      <LectorFacturas
-        onSuccess={onFacturaLeida}
-        hideUploadList
-        titulo='Registrar solo datos de factura'
-      />
+      <Space>
+        <Link to='/venta'>
+          <Button type='primary'>Registrar factura por venta</Button>
+        </Link>
+        <LectorFacturas
+          onSuccess={onFacturaLeida}
+          hideUploadList
+          titulo='Registrar solo datos de factura'
+        />
+      </Space>
       <Modal
         title={listElement.nombre_receptor ?? listElement.rfc_receptor}
         visible={isModalVisible}

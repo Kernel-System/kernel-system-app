@@ -1,7 +1,7 @@
 import MovimientosAlmacenList from 'components/list/MovimientosAlmacenList';
 import ModalMovimiento from 'components/almacen/ModalMovimiento';
 import HeadingBack from 'components/UI/HeadingBack';
-import { Button, Divider } from 'antd';
+import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';

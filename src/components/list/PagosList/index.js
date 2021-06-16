@@ -22,7 +22,7 @@ const Index = ({ onClickItem, id_fac, tipo }) => {
     return data.data;
   };
 
-  const { data } = useQuery('clientes', async () => {
+  useQuery('clientes', async () => {
     const result = await fetchItems();
     setListToShow(result);
     return result;
