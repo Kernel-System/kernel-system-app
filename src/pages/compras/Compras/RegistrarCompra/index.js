@@ -3,10 +3,10 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import CompraForm from 'components/forms/CompraForm';
 import Header from 'components/UI/HeadingBack';
 import { message } from 'antd';
-import { insertItems as insertProveedor } from 'api/shared/proveedores';
-import { insertItems as insertFactura } from 'api/shared/facturas_externas';
-import { insertItems as insertCompra } from 'api/shared/compras';
-import { filtrarPorUUID } from 'api/shared/facturas_externas';
+import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import { insertItems as insertFactura } from 'api/compras/facturas_externas';
+import { insertItems as insertCompra } from 'api/compras';
+import { filtrarPorUUID } from 'api/compras/facturas_externas';
 import moment from 'moment';
 
 const Index = () => {

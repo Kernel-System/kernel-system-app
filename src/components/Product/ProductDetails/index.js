@@ -20,7 +20,7 @@ const ProductDetails = ({ especificaciones }) => {
             return (
               <List.Item key={especificacion[0]}>
                 <Paragraph>
-                  ◼ {capitalize(especificacion[0].replaceAll('_', ' '))}:{' '}
+                  - {capitalize(especificacion[0].replaceAll('_', ' '))}:{' '}
                   {capitalize(especificacion[1])}
                 </Paragraph>
               </List.Item>

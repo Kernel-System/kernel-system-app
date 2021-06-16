@@ -5,7 +5,7 @@ import { Popconfirm, List, Typography, Button, Select } from 'antd';
 import { DeleteFilled, EyeFilled } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { useQuery } from 'react-query';
-import { getItems } from 'api/shared/facturas_externas';
+import { getItems } from 'api/compras/facturas_externas';
 import {
   tiposDeComprobante,
   usosCfdi,

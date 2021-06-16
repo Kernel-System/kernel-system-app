@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Popconfirm, List, Button, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
-import { getItems } from 'api/shared/proveedores';
+import { getItems } from 'api/compras/proveedores';
 import { regimenesFiscales } from 'utils/facturas/catalogo';
 const { Option } = Select;
 

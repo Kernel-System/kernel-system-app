@@ -12,18 +12,18 @@ export const capitalize = (word) => {
 };
 
 export const toPercent = (descuento) => {
-  return 1 - descuento / 100;
+  return descuento / 100;
 };
 
-export const formatDate = (date) =>
+export const formatDate = (date, style) =>
   new Intl.DateTimeFormat('es-MX', {
-    dateStyle: 'short',
+    dateStyle: style || 'short',
   }).format(new Date(date));
 
-export const formatDateTime = (date) =>
+export const formatDateTime = (date, dateStyle, timeStyle) =>
   new Intl.DateTimeFormat('es-MX', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+    dateStyle: dateStyle || 'medium',
+    timeStyle: timeStyle || 'short',
   }).format(new Date(date));
 
 export const formatPrice = (price) =>

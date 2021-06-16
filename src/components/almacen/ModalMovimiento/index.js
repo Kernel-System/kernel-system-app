@@ -1,4 +1,4 @@
-import { Modal, Button, Divider } from 'antd';
+import { Modal, Divider } from 'antd';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect, useState } from 'react';
 import { http } from 'api';
@@ -16,9 +16,11 @@ const Index = ({ visible, movimiento, hideModal }) => {
 
   useEffect(() => {
     const codigosImagenes = [];
-    movimiento?.productos_movimiento?.map((producto) => {
+
+    movimiento?.productos_movimiento?.forEach((producto) => {
       codigosImagenes.push(producto.codigo);
     });
+
     http
       .get(
         `/items/productos?fields=codigo,titulo,imagenes.directus_files_id&filter[codigo][_in]=${codigosImagenes.toString()}`,

@@ -5,7 +5,7 @@ import { Popconfirm, List, Typography, Button, Badge, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { useQuery } from 'react-query';
-import { getItems } from 'api/shared/compras';
+import { getItems } from 'api/compras';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 import 'moment/locale/es-mx';

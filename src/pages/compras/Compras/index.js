@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import CompraForm from 'components/forms/CompraForm';
 import ListaCompras from 'components/list/ComprasList';
-import * as CRUD from 'api/shared/compras';
+import * as CRUD from 'api/compras';
 import moment from 'moment';
 import 'moment/locale/es-mx';
 
