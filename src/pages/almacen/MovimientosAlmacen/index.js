@@ -1,7 +1,7 @@
 import MovimientosAlmacenList from 'components/list/MovimientosAlmacenList';
 import ModalMovimiento from 'components/almacen/ModalMovimiento';
 import HeadingBack from 'components/UI/HeadingBack';
-import { Button } from 'antd';
+import { Button, Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
@@ -15,42 +15,41 @@ const Index = () => {
   const token = useStoreState((state) => state.user.token.access_token);
   const rol = useQuery(['rol_empleado'], () => getUserRole(token))?.data?.data
     ?.data.role.name;
+
   const onAccess = () => {
     //ChangeVisible
     if (rol === 'encargado de almacen' || rol === 'administrador') return true;
     else return false;
   };
-  const changeModal = () => {
-    setVisible(!visible);
+
+  const showModal = (element) => {
+    console.log({ element });
+    setMovimiento(element);
+    setVisible(true);
   };
 
-  const changeMovimiento = (value) => {
-    setMovimiento(value);
-    changeModal();
+  const hideModal = () => {
+    setVisible(false);
   };
 
   return (
     <>
       <HeadingBack title={`Movimientos de almacén`} />
-      <MovimientosAlmacenList onClickItem={changeMovimiento} />
-      <br />
-      <Link to='/movimiento_almacen/nuevo'>
+      <MovimientosAlmacenList onClickItem={showModal} seeItem={showModal} />
+      <Link to='/movimientos/nuevo'>
         <Button
           type='primary'
-          size='large'
           icon={<PlusOutlined />}
           disabled={!onAccess() ? true : false}
         >
           Añadir Nuevo Movimiento
         </Button>
       </Link>
+      <br />
       <ModalMovimiento
         visible={visible}
         movimiento={movimiento}
-        setVis={() => {
-          setVisible(false);
-          setMovimiento('');
-        }}
+        hideModal={hideModal}
       />
     </>
   );
