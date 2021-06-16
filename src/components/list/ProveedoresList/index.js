@@ -8,7 +8,7 @@ import { regimenesFiscales } from 'utils/facturas/catalogo';
 const { Option } = Select;
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(null);
 
   function filtrarPorProveedor(proveedores, rfc) {
     if (proveedores && rfc)
