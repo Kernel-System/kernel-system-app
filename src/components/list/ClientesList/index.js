@@ -1,7 +1,7 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Input, Select } from 'antd';
+import { Popconfirm, List, Button, Input } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';

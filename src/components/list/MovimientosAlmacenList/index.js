@@ -5,6 +5,7 @@ import { List, Select, Typography, Row, Col, Button } from 'antd';
 import { useQuery } from 'react-query';
 import { conceptosMovimientos } from 'utils/almacen';
 import { EyeFilled } from '@ant-design/icons';
+import { useStoreState } from 'easy-peasy';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 
@@ -16,7 +17,8 @@ const Index = ({ onClickItem, seeItem }) => {
   const getItems = async (sort) => {
     const { data } = await http.get(
       '/items/movimientos_almacen?fields=*,productos_movimiento.*,productos_movimiento.series_producto_movimiento.*, rfc_empleado.rfc,rfc_empleado.nombre' +
-        `&sort[]=${sort === 'recent' ? '-' : '+'}fecha`
+        `&sort[]=${sort === 'recent' ? '-' : '+'}fecha`,
+      token
     );
     return data.data;
   };
@@ -40,6 +42,8 @@ const Index = ({ onClickItem, seeItem }) => {
     } else if (movimientos)
       return movimientos.filter((item) => item.concepto.includes(value));
   };
+
+  const token = useStoreState((state) => state.user.token.access_token);
 
   const [sortValue, setSortValue] = useState('recent');
   const [searchValue, setSearchValue] = useState('');

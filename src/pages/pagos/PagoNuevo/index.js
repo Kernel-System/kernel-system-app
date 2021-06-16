@@ -76,7 +76,7 @@ const Index = () => {
               console.log(resul_pfactura);
               if (documentos.length !== 0) {
                 let newDocumento = [];
-                documentos.map((documento) => {
+                documentos.forEach((documento) => {
                   newDocumento.push({
                     id_pago: resul_pago.data.data.id,
                     id_documento: documento.id_documento, //25

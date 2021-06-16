@@ -59,7 +59,6 @@ const Index = ({ tipo }) => {
           putToken
         )
         .then((result) => {
-          console.log(result.data.data);
           AgregarValor(result.data.data);
           AgregarLista(result.data.data);
           AgregarPrecioFijo(result.data.data.precio_fijo);
@@ -200,21 +199,19 @@ const Index = ({ tipo }) => {
           .post(`/items/productos_categorias`, categorias, putToken)
           .then((resul2) => {
             console.log(resul2);
-            if (datos.tipo_de_venta !== 'Fijo')
-              http
-                .post(
-                  `/items/precios_variables`,
-                  {
-                    ...valor,
-                    codigo_producto: datos.codigo,
-                  },
-                  putToken
-                )
-                .then((resul3) => {
-                  console.log(resul3);
-                  Mensaje();
-                });
-            else Mensaje();
+            http
+              .post(
+                `/items/precios_variables`,
+                {
+                  ...valor,
+                  codigo_producto: datos.codigo,
+                },
+                putToken
+              )
+              .then((resul3) => {
+                console.log(resul3);
+                Mensaje();
+              });
           });
       })
       .catch((error) => {
@@ -558,6 +555,7 @@ const Index = ({ tipo }) => {
               <Option value='Mark Up'>Mark Up</Option>
               <Option value='Margen'>Margen</Option>
               <Option value='Volumen'>Volúmen</Option>
+              <Option value='Servicio'>Servicio</Option>
             </Select>
           </Form.Item>
           <TextLabel title='Costeo' />
@@ -660,7 +658,7 @@ const Index = ({ tipo }) => {
           style={{ fontSize: '20' }}
         />
       </Form.Item>
-      {valor.tipo_de_venta !== 'Fijo' ? (
+      {valor.tipo_de_venta !== 'Fijo' && valor.tipo_de_venta !== 'Servicio' ? (
         <div>
           <TextLabel title='Precios Variables' />
           <Row

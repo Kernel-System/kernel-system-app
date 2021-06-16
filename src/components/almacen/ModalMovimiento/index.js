@@ -31,7 +31,7 @@ const Index = ({ visible, movimiento, hideModal }) => {
 
   const onSetImagenes = (lista) => {
     const newLista = [];
-    lista.map((producto, index) => {
+    lista.forEach((producto, index) => {
       newLista.push({ ...movimiento.productos_movimiento[index], ...producto });
     });
     setImagenes(newLista);

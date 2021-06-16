@@ -45,6 +45,8 @@ import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
+import AgregarCotizacionClientes from './pages/cotizacion_clientes/CrearCotizacion';
+import CotizacionClientes from './pages/cotizacion_clientes/Cotizaciones';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -174,6 +176,21 @@ const Rutas = () => {
         path='/venta'
         exact
         component={PuntoDeVenta}
+      />
+
+      {/* Cotizacion a clientes */}
+
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/cotizacion-cliente'
+        exact
+        component={CotizacionClientes}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/cotizacion-cliente/nuevo'
+        exact
+        component={AgregarCotizacionClientes}
       />
 
       {/* Proveedores */}
