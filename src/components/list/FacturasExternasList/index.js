@@ -11,6 +11,7 @@ import {
   usosCfdi,
   tiposRelacion,
 } from 'utils/facturas/catalogo';
+import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 
 const formatoFecha = 'DD MMMM YYYY, h:mm:ss a';
@@ -19,56 +20,42 @@ const { Text } = Typography;
 const { Option } = Select;
 
 const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(null);
 
   function filtrarPorProveedor(facturas, rfc) {
-    if (facturas && rfc)
-      setListToShow(facturas.filter((item) => item.rfc_emisor === rfc));
-    else {
-      setListToShow(facturas);
-    }
+    if (facturas && rfc) {
+      return facturas.filter((item) => item.rfc_emisor === rfc);
+    } else return facturas?.slice();
   }
 
   function onChange(value) {
+    const filteredData = filtrarPorProveedor(list, value);
+    const sortedData = sortData(filteredData, sortValue);
     setSearchValue(value);
-    filtrarPorProveedor(list, value);
+    setListToShow(sortedData);
   }
 
   function onSearch(value) {
-    if (list && value)
-      setListToShow(
-        list.filter((item) => item.nombre_emisor.includes(value.toUpperCase()))
+    if (list && value) {
+      const filteredData = list.filter((item) =>
+        item.nombre_emisor.toUpperCase().includes(value.toUpperCase())
       );
-    else setListToShow(list);
-  }
-
-  function ordenarPorRecientes(lista) {
-    return lista.slice().sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  }
-
-  function ordenarPorAntiguos(lista) {
-    return lista.slice().sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      const sortedData = sortData(filteredData, sortValue);
+      setListToShow(sortedData);
+    } else if (list) setListToShow(sortData(list, sortValue));
   }
 
   function handleSort(value) {
-    switch (value) {
-      case 'antigua':
-        setListToShow(ordenarPorAntiguos(list));
-        break;
-      case 'reciente':
-        setListToShow(ordenarPorRecientes(list));
-        break;
-      default:
-        break;
-    }
+    setSortValue(value);
+    setListToShow(sortData(listToShow, value));
   }
 
   const { data: list } = useQuery('facturas_externas', async () => {
-    const { data } = await getItems();
-    const datosOrdenados = ordenarPorRecientes(data.data);
+    const { data } = await getItems(sortValue);
+    const datos = data.data;
     const facturas_externas = [];
     const newProveedores = [];
-    datosOrdenados.forEach((factura) => {
+    datos.forEach((factura) => {
       const rfc = factura.rfc_emisor;
       facturas_externas.push(factura);
       if (!newProveedores.some((prov) => prov.rfc === rfc))
@@ -79,9 +66,12 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
     });
     setListToShow(facturas_externas);
     setProveedores(newProveedores);
-    filtrarPorProveedor(facturas_externas, searchValue);
-    return facturas_externas;
+    const filteredresult = filtrarPorProveedor(facturas_externas, searchValue);
+    setListToShow(filteredresult);
+    return filteredresult;
   });
+
+  const [sortValue, setSortValue] = useState('recent');
   const [proveedores, setProveedores] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
@@ -122,14 +112,12 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
           </Text>
         </Col>
         <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <Select
-            defaultValue='reciente'
-            style={{ width: '100%' }}
+          <SortSelect
             onChange={handleSort}
-          >
-            <Option value='reciente'>Más reciente</Option>
-            <Option value='antigua'>Más antigua</Option>
-          </Select>
+            value={sortValue}
+            recentText='Más reciente'
+            oldestText='Más antiguo'
+          />
         </Col>
       </Row>
       <br />

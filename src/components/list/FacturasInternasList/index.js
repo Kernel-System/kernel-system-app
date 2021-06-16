@@ -12,6 +12,7 @@ import {
   usosCfdi,
   tiposRelacion,
 } from 'utils/facturas/catalogo';
+import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 
 const formatoFecha = 'DD MMMM YYYY, h:mm:ss a';
@@ -20,74 +21,62 @@ const { Text } = Typography;
 const { Option } = Select;
 
 const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(null);
 
   function filtrarPorCliente(facturas, rfc) {
-    if (facturas && rfc)
-      setListToShow(facturas.filter((item) => item.rfc_receptor === rfc));
-    else {
-      setListToShow(facturas);
-    }
+    if (facturas && rfc) {
+      return facturas.filter((item) => item.rfc_receptor === rfc);
+    } else return facturas?.slice();
   }
 
   function onChange(value) {
+    const filteredData = filtrarPorCliente(list, value);
+    const sortedData = sortData(filteredData, sortValue);
     setSearchValue(value);
-    filtrarPorCliente(list, value);
+    setListToShow(sortedData);
   }
 
   function onSearch(value) {
-    if (list && value)
-      setListToShow(
-        list.filter((item) =>
-          item.nombre_receptor
-            ? item.nombre_receptor.includes(value.toUpperCase())
-            : item.rfc_receptor.includes(value.toUpperCase())
-        )
+    if (list && value) {
+      const filteredData = list.filter((item) =>
+        item.nombre_receptor
+          ? item.nombre_receptor.toUpperCase().includes(value.toUpperCase())
+          : item.rfc_receptor.toUpperCase().includes(value.toUpperCase())
       );
-    else setListToShow(list);
-  }
-
-  function ordenarPorRecientes(lista) {
-    return lista.slice().sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  }
-
-  function ordenarPorAntiguos(lista) {
-    return lista.slice().sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      const sortedData = sortData(filteredData, sortValue);
+      setListToShow(sortedData);
+    } else if (list) setListToShow(sortData(list, sortValue));
   }
 
   function handleSort(value) {
-    switch (value) {
-      case 'antigua':
-        setListToShow(ordenarPorAntiguos(list));
-        break;
-      case 'reciente':
-        setListToShow(ordenarPorRecientes(list));
-        break;
-      default:
-        break;
-    }
+    setSortValue(value);
+    setListToShow(sortData(listToShow, value));
   }
   const token = useStoreState((state) => state.user.token.access_token);
 
   const { data: list } = useQuery('facturas_internas', async () => {
-    const { data } = await getItems(token);
-    const datosOrdenados = ordenarPorRecientes(data.data);
+    const { data } = await getItems(sortValue, token);
+    const datos = data.data;
     const facturas_internas = [];
     const newClientes = [];
-    datosOrdenados.forEach((factura) => {
+    datos.forEach((factura) => {
       const rfc = factura.rfc_receptor;
       facturas_internas.push(factura);
-      if (!newClientes.some((prov) => prov.rfc === rfc))
+      if (!newClientes.some((prov) => prov.rfc === rfc)) {
         newClientes.push({
           rfc,
           razon_social: factura.nombre_receptor ?? rfc,
         });
+      }
     });
     setListToShow(facturas_internas);
     setClientes(newClientes);
-    filtrarPorCliente(facturas_internas, searchValue);
+    const filteredresult = filtrarPorCliente(facturas_internas, searchValue);
+    setListToShow(filteredresult);
     return facturas_internas;
   });
+
+  const [sortValue, setSortValue] = useState('recent');
   const [clientes, setClientes] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
@@ -128,14 +117,12 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
           </Text>
         </Col>
         <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <Select
-            defaultValue='reciente'
-            style={{ width: '100%' }}
+          <SortSelect
             onChange={handleSort}
-          >
-            <Option value='reciente'>Más reciente</Option>
-            <Option value='antigua'>Más antigua</Option>
-          </Select>
+            value={sortValue}
+            recentText='Más reciente'
+            oldestText='Más antiguo'
+          />
         </Col>
       </Row>
       <br />

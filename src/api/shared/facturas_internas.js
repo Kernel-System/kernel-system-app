@@ -23,10 +23,13 @@ export const insertItems = (values, token) => {
   );
 };
 
-export const getItems = (token) => {
-  return http.get('/items/facturas_internas', {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getItems = (sort, token) => {
+  return http.get(
+    `/items/facturas_internas?&sort[]=${sort === 'recent' ? '-' : '+'}fecha`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 };
 
 export const filtrarPorUUID = (uuid, token) => {

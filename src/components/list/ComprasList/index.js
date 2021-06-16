@@ -6,6 +6,7 @@ import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/shared/compras';
+import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 import 'moment/locale/es-mx';
 import locale from 'antd/es/date-picker/locale/es_ES';
@@ -17,60 +18,42 @@ const { Text } = Typography;
 const { Option } = Select;
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(null);
 
   function filtrarPorProveedor(compras, rfc) {
-    if (compras && rfc)
-      setListToShow(compras.filter((item) => item.rfc_emisor === rfc));
-    else {
-      setListToShow(compras);
-    }
+    if (compras && rfc) {
+      return compras.filter((item) => item.rfc_emisor === rfc);
+    } else return compras?.slice();
   }
 
   function onChange(value) {
+    const filteredData = filtrarPorProveedor(list, value);
+    const sortedData = sortData(filteredData, compraSort);
     setSearchValue(value);
-    filtrarPorProveedor(list, value);
+    setListToShow(sortedData);
   }
 
   function onSearch(value) {
-    if (list && value)
-      setListToShow(
-        list.filter((item) => item.nombre_emisor.includes(value.toUpperCase()))
+    if (list && value) {
+      const filteredData = list.filter((item) =>
+        item.nombre_emisor.toUpperCase().includes(value.toUpperCase())
       );
-    else setListToShow(list);
-  }
-
-  function ordenarPorRecientes(lista) {
-    return lista
-      .slice()
-      .sort((a, b) => new Date(b.fecha_compra) - new Date(a.fecha_compra));
-  }
-
-  function ordenarPorAntiguos(lista) {
-    return lista
-      .slice()
-      .sort((a, b) => new Date(a.fecha_compra) - new Date(b.fecha_compra));
+      const sortedData = sortData(filteredData, compraSort);
+      setListToShow(sortedData);
+    } else if (list) setListToShow(sortData(list, compraSort));
   }
 
   function handleSort(value) {
-    switch (value) {
-      case 'antigua':
-        setListToShow(ordenarPorAntiguos(list));
-        break;
-      case 'reciente':
-        setListToShow(ordenarPorRecientes(list));
-        break;
-      default:
-        break;
-    }
+    setCompraSort(value);
+    setListToShow(sortData(listToShow, value));
   }
 
   const { data: list } = useQuery('compras', async () => {
-    const { data } = await getItems();
-    const datosOrdenados = ordenarPorRecientes(data.data);
+    const { data } = await getItems(compraSort);
+    const datos = data.data;
     const compras = [];
     const newProveedores = [];
-    datosOrdenados.forEach(({ factura, ...elem }) => {
+    datos.forEach(({ factura, ...elem }) => {
       const { rfc_emisor, nombre_emisor } = factura;
       compras.push({ ...factura, ...elem });
       if (!newProveedores.some((prov) => prov.rfc_emisor === rfc_emisor))
@@ -78,9 +61,12 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
     });
     setListToShow(compras);
     setProveedores(newProveedores);
-    filtrarPorProveedor(compras, searchValue);
+    const filteredresult = filtrarPorProveedor(compras, searchValue);
+    setListToShow(filteredresult);
     return compras;
   });
+
+  const [compraSort, setCompraSort] = useState('recent');
   const [proveedores, setProveedores] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
@@ -121,14 +107,12 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
           </Text>
         </Col>
         <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <Select
-            defaultValue='reciente'
-            style={{ width: '100%' }}
+          <SortSelect
             onChange={handleSort}
-          >
-            <Option value='reciente'>Más reciente</Option>
-            <Option value='antigua'>Más antigua</Option>
-          </Select>
+            value={compraSort}
+            recentText='Compra más reciente'
+            oldestText='Compra más antigua'
+          />
         </Col>
       </Row>
       <br />
