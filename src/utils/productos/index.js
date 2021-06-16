@@ -10,8 +10,10 @@ export const calcPrecioVariable = (producto, nivel) => {
     case 3:
       newPrecioVariable = producto.precios_variables[0].precio_3;
       break;
-    default:
+    case undefined:
       newPrecioVariable = producto.precio_fijo;
+      break;
+    default:
       break;
   }
   return newPrecioVariable;
