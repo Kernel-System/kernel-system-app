@@ -7,7 +7,6 @@ import { conceptosMovimientos } from 'utils/almacen';
 import { EyeFilled } from '@ant-design/icons';
 import { useStoreState } from 'easy-peasy';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
-import { useStoreState } from 'easy-peasy';
 import moment from 'moment';
 
 const formatoFecha = 'DD MMMM YYYY, h:mm:ss a';
@@ -48,13 +47,6 @@ const Index = ({ onClickItem, seeItem }) => {
       return movimientos?.slice();
     } else if (movimientos)
       return movimientos.filter((item) => item.concepto.includes(value));
-  };
-
-  const token = useStoreState((state) => state.user.token.access_token);
-  const putToken = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   };
 
   const [sortValue, setSortValue] = useState('recent');
