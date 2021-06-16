@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Modal, message } from 'antd';
+import { Button, Modal, message, Space } from 'antd';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
@@ -135,14 +135,16 @@ const Index = (props) => {
         onConfirmDelete={onConfirmDelete}
       ></ListaFacturas>
       <br />
-      <Link to='/compras/registrar'>
-        <Button type='primary'>Registrar factura de compra</Button>
-      </Link>
-      <LectorFacturas
-        onSuccess={onFacturaLeida}
-        hideUploadList
-        titulo='Registrar solo datos de factura'
-      />
+      <Space>
+        <Link to='/compras/registrar'>
+          <Button type='primary'>Registrar factura de compra</Button>
+        </Link>
+        <LectorFacturas
+          onSuccess={onFacturaLeida}
+          hideUploadList
+          titulo='Registrar solo datos de factura'
+        />
+      </Space>
       <Modal
         title={listElement.nombre_emisor}
         visible={isModalVisible}
