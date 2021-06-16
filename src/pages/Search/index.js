@@ -6,6 +6,7 @@ import Heading from 'components/UI/Heading';
 import { useState } from 'react';
 import { focusManager, useQuery, useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router';
+import { capitalize } from 'utils/functions';
 const { Text } = Typography;
 
 const Search = () => {
@@ -25,7 +26,13 @@ const Search = () => {
     <>
       <Row justify='space-between'>
         <Col>
-          <Heading title={pathname[1] === 'b' ? `Busqueda: ${query}` : query} />
+          <Heading
+            title={
+              pathname[1] === 'b'
+                ? `Busqueda: ${capitalize(query)}`
+                : capitalize(query)
+            }
+          />
         </Col>
         <Col>
           <Space>
