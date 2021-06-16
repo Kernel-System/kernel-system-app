@@ -3,7 +3,7 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/HeadingBack';
 import { message, Typography } from 'antd';
-import { insertItems as insertProveedor } from 'api/shared/proveedores';
+import { insertItems as insertProveedor } from 'api/compras/proveedores';
 
 const { Title } = Typography;
 

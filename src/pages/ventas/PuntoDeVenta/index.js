@@ -15,7 +15,7 @@ import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import {
   getPuntoDeVentaProducts,
   getPuntoDeVentaServices,
-} from 'api/puntodeventa';
+} from 'api/ventas/punto_de_venta';
 import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';

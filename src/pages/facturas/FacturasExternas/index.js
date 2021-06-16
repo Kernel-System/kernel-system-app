@@ -5,8 +5,8 @@ import { useMutation, useQueryClient } from 'react-query';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ListaFacturas from 'components/list/FacturasExternasList';
 import Descripciones from 'components/descriptions/FacturaDescriptions';
-import { insertItems as insertProveedor } from 'api/shared/proveedores';
-import * as CRUD from 'api/shared/facturas_externas';
+import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import * as CRUD from 'api/compras/facturas_externas';
 
 const Index = (props) => {
   const onFacturaLeida = async (factura) => {

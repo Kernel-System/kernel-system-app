@@ -7,8 +7,8 @@ import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/Heading';
 import CsvReader from 'components/shared/CsvReader';
 import ListaProveedores from 'components/list/ProveedoresList';
-import { filtrarPorProveedor } from 'api/shared/facturas_externas';
-import * as CRUD from 'api/shared/proveedores';
+import { filtrarPorProveedor } from 'api/compras/facturas_externas';
+import * as CRUD from 'api/compras/proveedores';
 
 const Index = (props) => {
   const showModal = (listElemenToShow) => {
