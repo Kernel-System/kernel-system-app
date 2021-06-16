@@ -8,7 +8,7 @@ const Index = ({ children }) => {
       <Content
         style={{
           padding: 24,
-          minHeight: 'calc(100vh - 88px)',
+          minHeight: 'calc(100vh - 64px)',
           backgroundColor: '#fff',
         }}
       >
