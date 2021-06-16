@@ -1,8 +1,10 @@
 import { http } from 'api';
 
-export const getItems = (token) => {
+export const getItems = (sort, token) => {
   return http.get(
-    '/items/compras?fields=*, productos_comprados.*, factura.*',
+    `/items/compras?fields=*, productos_comprados.*, factura.*&sort[]=${
+      sort === 'recent' ? '-' : '+'
+    }fecha_compra`,
     token === undefined
       ? token
       : {

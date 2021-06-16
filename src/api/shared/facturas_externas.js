@@ -23,9 +23,11 @@ export const insertItems = (values, token) => {
   );
 };
 
-export const getItems = (token) => {
+export const getItems = (sort, token) => {
   return http.get(
-    '/items/facturas_externas?fields=*, cfdis_relacionados.*',
+    `/items/facturas_externas?fields=*, cfdis_relacionados.*&sort[]=${
+      sort === 'recent' ? '-' : '+'
+    }fecha`,
     token === undefined
       ? token
       : {
