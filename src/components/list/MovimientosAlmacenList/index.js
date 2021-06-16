@@ -18,7 +18,7 @@ const Index = ({ onClickItem, seeItem }) => {
     const { data } = await http.get(
       '/items/movimientos_almacen?fields=*,productos_movimiento.*,productos_movimiento.series_producto_movimiento.*, rfc_empleado.rfc,rfc_empleado.nombre' +
         `&sort[]=${sort === 'recent' ? '-' : '+'}fecha`,
-      token
+      putToken
     );
     return data.data;
   };
@@ -44,6 +44,11 @@ const Index = ({ onClickItem, seeItem }) => {
   };
 
   const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   const [sortValue, setSortValue] = useState('recent');
   const [searchValue, setSearchValue] = useState('');
