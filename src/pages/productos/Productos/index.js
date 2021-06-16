@@ -28,15 +28,31 @@ const Index = () => {
 
   const insertMutation = useMutation((formData) => insertItems(formData), {
     onSuccess: () => {
-      message.success('Proveedores importados exitosamente');
-      queryClient.invalidateQueries('proveedores');
+      message.success('Productos importados exitosamente');
+      queryClient.invalidateQueries('productos');
+    },
+  });
+
+  const deleteItem = async (values) => {
+    return http.delete('/items/productos/' + values.codigo, putToken);
+  };
+
+  const onConfirmDelete = (item) => {
+    deleteMutation.mutate(item);
+  };
+
+  const deleteMutation = useMutation(deleteItem, {
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries('productos')
+        .then(message.success('El producto se ha eliminado exitosamente'));
     },
   });
 
   return (
     <>
       <Header title='Productos' putToken={putToken} />
-      <ProductosList />
+      <ProductosList onConfirmDelete={onConfirmDelete} putToken={putToken} />
       <br />
       <Space direction='horizontal' align='baseline' style={{ width: '100%' }}>
         <Link to='/productos/nuevo'>

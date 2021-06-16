@@ -138,23 +138,30 @@ const Index = ({ tipo }) => {
 
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
-    console.log(item);
-    lista.push({
-      key: lista.length.toString(),
-      titulo: item.titulo,
-      codigo: item.codigo,
-      clave: item.clave,
-      clave_unidad: item.unidad_cfdi,
-      estado: 'Por transferir',
-      //productimage:'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-      cantidad: 1,
-    });
-    console.log(lista);
+    const dato = lista.findIndex((producto) => producto.codigo === item.codigo);
+    if (dato === -1)
+      lista.push({
+        key: lista.length.toString(),
+        titulo: item.titulo,
+        codigo: item.codigo,
+        clave: item.clave,
+        clave_unidad: item.unidad_cfdi,
+        estado: 'Por transferir',
+        productimage:
+          item.imagenes.length !== 0
+            ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
+            : '',
+        cantidad: 1,
+      });
+    else lista[dato] = { ...lista[dato], cantidad: lista[dato].cantidad + 1 };
     setListProducts(lista);
   };
 
   const fetchProducts = async () => {
-    const { data } = await http.get(`/items/productos`, putToken);
+    const { data } = await http.get(
+      `/items/productos?fields=*,imagenes.directus_files_id,categorias.*`,
+      putToken
+    );
     return data.data;
   };
 
@@ -182,7 +189,7 @@ const Index = ({ tipo }) => {
 
   const [listToShow, setListProductsToShow] = useState([]);
 
-  const onFinish = (datos: any) => {
+  const onFinish = (datos) => {
     console.log(datos);
 
     if (listProducts.length !== 0) {
@@ -234,7 +241,7 @@ const Index = ({ tipo }) => {
     }
   };
 
-  const onFinishChange = (datos: any) => {
+  const onFinishChange = (datos) => {
     console.log();
     http
       .patch(
@@ -263,7 +270,7 @@ const Index = ({ tipo }) => {
       .then(() => history.goBack());
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     message.error('Error al llenar los datos.');
   };
 

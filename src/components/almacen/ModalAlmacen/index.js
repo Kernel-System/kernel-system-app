@@ -5,7 +5,7 @@ const Index = ({ visible, almacen, setVis }) => {
   return (
     <>
       <Modal
-        title={`Sucursal. ${almacen.clave}`}
+        title={`Almacen. ${almacen.clave}`}
         centered
         visible={visible}
         onOk={() => {

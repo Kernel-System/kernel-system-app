@@ -5,15 +5,8 @@ import { Popconfirm, List, Button, Input } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { useStoreState } from 'easy-peasy';
 
-const Index = ({ onConfirmDelete, onClickItem }) => {
-  const token = useStoreState((state) => state.user.token.access_token);
-  const putToken = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
+const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
   const fetchItems = async () => {
     const { data } = await http.get('/items/almacenes', putToken);
     return data.data;

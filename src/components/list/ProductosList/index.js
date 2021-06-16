@@ -6,9 +6,10 @@ import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
-const Index = ({ putToken }) => {
+const Index = ({ putToken, onConfirmDelete }) => {
   const fetchProducts = async () => {
     const { data } = await http.get('/items/productos', putToken);
+    console.log(data.data);
     return data.data;
   };
 
@@ -59,15 +60,18 @@ const Index = ({ putToken }) => {
                 <Link to={`/productos/editar/${item.codigo}`}>
                   <Button icon={<EditFilled />} />
                 </Link>
-                <Popconfirm
-                  placement='left'
-                  title='¿Está seguro de querer borrar este registro?'
-                  okText='Sí'
-                  cancelText='No'
-                  //onConfirm={() => onConfirmDelete(item)}
-                >
-                  <Button danger icon={<DeleteFilled />} />
-                </Popconfirm>
+                {item?.productos_solicitados?.length === 0 &&
+                item?.inventario?.length === 0 ? (
+                  <Popconfirm
+                    placement='left'
+                    title='¿Está seguro de querer borrar este registro?'
+                    okText='Sí'
+                    cancelText='No'
+                    onConfirm={() => onConfirmDelete(item)}
+                  >
+                    <Button danger icon={<DeleteFilled />} />
+                  </Popconfirm>
+                ) : null}
               </Space>,
             ]}
           >

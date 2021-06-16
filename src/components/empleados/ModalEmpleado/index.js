@@ -54,7 +54,7 @@ const Index = ({ visible, sucursal, setVis }) => {
         <TextLabel
           title='Correo Electrónico'
           subtitle={
-            Object.keys(sucursal).length !== 0 ? sucursal.cuenta.email : null
+            Object.keys(sucursal)?.length !== 0 ? sucursal?.cuenta?.email : null
           }
         />
         <TextLabel title='Puesto' subtitle={switchPuesto(sucursal.puesto)} />

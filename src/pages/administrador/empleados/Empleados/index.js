@@ -1,12 +1,21 @@
 import EmpleadosList from 'components/list/EmpleadosList';
-import { Button } from 'antd';
+import { http } from 'api';
+import { Button, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
 import Modal from 'components/empleados/ModalEmpleado';
 import { useState } from 'react';
 import HeadingBack from 'components/UI/HeadingBack';
+import { useMutation, useQueryClient } from 'react-query';
+import { useStoreState } from 'easy-peasy';
 
 const Index = () => {
+  const token = useStoreState((state) => state.user.token.access_token);
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   const [visible, setVisible] = useState(false);
   const [sucursal, setSucursal] = useState({});
 
@@ -18,6 +27,24 @@ const Index = () => {
     setSucursal(value);
     changeModal();
   };
+
+  const queryClient = useQueryClient();
+
+  const deleteItem = async (values) => {
+    return http.delete('/items/empleados/' + values.rfc, putToken);
+  };
+
+  const onConfirmDelete = (item) => {
+    deleteMutation.mutate(item);
+  };
+
+  const deleteMutation = useMutation(deleteItem, {
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries('empleados')
+        .then(message.success('Empleado eliminado exitosamente'));
+    },
+  });
 
   return (
     <div>
@@ -43,8 +70,8 @@ const Index = () => {
       />
       <EmpleadosList
         onClickItem={changeSucursal}
-        //editItem={showModal}
-        //onConfirmDelete={onConfirmDelete}
+        putToken={putToken}
+        onConfirmDelete={onConfirmDelete}
       />
       <br />
       <Link to='/admin/empleado/nuevo'>

@@ -56,7 +56,7 @@ const Index = () => {
     setEmpleados(newLista);
   };
 
-  const onFinish = (datos: any) => {
+  const onFinish = (datos) => {
     console.log(datos);
     http
       .post(
@@ -81,7 +81,7 @@ const Index = () => {
       });
   };
 
-  const onFinishChange = (datos: any) => {
+  const onFinishChange = (datos) => {
     console.log(datos);
     console.log(`/items/almacenes/${match.params.clave}`);
     http
@@ -109,7 +109,7 @@ const Index = () => {
       .then(() => history.goBack());
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
@@ -144,7 +144,6 @@ const Index = () => {
         <TextLabel title='Dimensiones' />
         <InputForm
           titulo='dimensiones'
-          enable={match.params.clave === window.undefined}
           //valueDef={dato.unidad_de_medida}
           mensaje='Asigna un nombre.'
           placeholder='Nombre'
@@ -201,7 +200,7 @@ const Index = () => {
             {sucursales.map((sucursal) => {
               return (
                 <Option value={sucursal.clave} key={sucursal.clave}>
-                  {sucursal.nombre}
+                  {`${sucursal.clave} : ${sucursal.nombre}`}
                 </Option>
               );
             })}

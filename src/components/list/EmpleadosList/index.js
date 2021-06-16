@@ -5,16 +5,9 @@ import { Popconfirm, List, Button, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { useStoreState } from 'easy-peasy';
 const { Option } = Select;
 
-const Index = ({ onConfirmDelete, onClickItem }) => {
-  const token = useStoreState((state) => state.user.token.access_token);
-  const putToken = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
+const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
   const fetchItems = async () => {
     const { data } = await http.get(
       '/items/empleados?fields=*,cuenta.id,cuenta.email',
@@ -24,14 +17,12 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
   };
 
   const onSearchChange = (e) => {
-    console.log(e);
     const value = e;
     setSearchValue(value);
     filtrarEmpleadoPorPuesto(data, value);
   };
 
   const filtrarEmpleadoPorPuesto = async (empleados, value) => {
-    console.log(empleados);
     if (value === 'Todo') {
       setListToShow(empleados);
     } else if (empleados)
@@ -138,22 +129,28 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
                 <Link to={`/admin/empleado/${item.rfc}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
-                <Popconfirm
-                  placement='left'
-                  title='¿Está seguro de querer borrar este registro?'
-                  okText='Sí'
-                  cancelText='No'
-                  onConfirm={() => onConfirmDelete(item)}
-                >
-                  <Button danger icon={<DeleteFilled />}></Button>
-                </Popconfirm>,
+                item?.cotizaciones?.length === 0 &&
+                item?.ordenes_compra?.length === 0 &&
+                item?.solicitudes_transferencia?.length === 0 &&
+                item?.ventas?.length === 0 &&
+                item?.ordenes_ensamble?.length === 0 &&
+                item?.ordenes_ensamble_2?.length === 0 ? (
+                  <Popconfirm
+                    placement='left'
+                    title='¿Está seguro de querer borrar este registro?'
+                    okText='Sí'
+                    cancelText='No'
+                    onConfirm={() => onConfirmDelete(item)}
+                  >
+                    <Button danger icon={<DeleteFilled />}></Button>
+                  </Popconfirm>
+                ) : null,
               ]}
             >
               <List.Item.Meta
                 title={
                   <p
                     onClick={() => {
-                      console.log(item);
                       onClickItem(item);
                     }}
                     style={{

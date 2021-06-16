@@ -1,4 +1,14 @@
-import { Typography, Button, Form, Select, message, Row, Col } from 'antd';
+import {
+  Typography,
+  Button,
+  Form,
+  Select,
+  message,
+  Row,
+  Col,
+  Input,
+} from 'antd';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useHistory, useRouteMatch } from 'react-router';
 import HeadingBack from 'components/UI/HeadingBack';
 import InputForm from 'components/shared/InputForm';
@@ -251,19 +261,30 @@ const Index = () => {
           max={45}
         />
         <Title level={5}>Contraseña</Title>
-        <InputForm
-          titulo='password'
-          //valueDef={dato.unidad_de_medida}
-          mensaje='Asigna una contraseña.'
-          placeholder='Contraseña'
-          //required={false}
-          max={45}
-        />
+        <Form.Item
+          key='password'
+          name='password'
+          rules={[
+            {
+              required: true,
+              message: `${'Agrega una contraseña'}`,
+            },
+          ]}
+        >
+          <Input.Password
+            key={`contraseñainput`}
+            placeholder='Asigna una contraseña.'
+            maxLength={45}
+            iconRender={(visible) =>
+              visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+            }
+          />
+        </Form.Item>
         <Row key='Row1' gutter={[16, 24]} style={{ marginBottom: '10px' }}>
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Row key='Row2' gutter={[16, 24]}>
               <Col className='gutter-row' span={8}>
-                <Title level={5}>Extension</Title>
+                <Title level={5}>Extension (Opc.)</Title>
                 <NumericInputForm
                   titulo='extension'
                   valueDef={dato.extension}
@@ -280,7 +301,7 @@ const Index = () => {
                   type='number'
                   valueDef={dato.telefono}
                   min='1'
-                  max='11'
+                  max='10'
                   placeholder='Clave'
                   rules={{
                     pattern: '[0-9]{10}',
@@ -292,13 +313,13 @@ const Index = () => {
             </Row>
           </Col>
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
-            <Title level={5}>Whatsapp</Title>
-            <NumericInputForm
+            <Title level={5}>Whatsapp (Opcional)</Title>
+            <InputForm
               titulo='telefono_2'
               valueDef={dato.telefono_2}
               type='number'
               min='1'
-              max='9999999999'
+              max='10'
               rules={{ pattern: '[0-9]{10}', message: '10 digitos numericos' }}
               placeholder='Whatsapp'
               required={false}

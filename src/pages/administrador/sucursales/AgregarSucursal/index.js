@@ -44,7 +44,7 @@ const Index = () => {
     setSucursal([newLista]);
   };
 
-  const onFinish = (datos: any) => {
+  const onFinish = (datos) => {
     console.log(datos);
     http
       .post(
@@ -81,7 +81,7 @@ const Index = () => {
       });
   };
 
-  const onFinishChange = (datos: any) => {
+  const onFinishChange = (datos) => {
     console.log(datos);
     console.log(`/items/sucursales/${match.params.clave}`);
     http
@@ -121,7 +121,7 @@ const Index = () => {
       .then(() => history.goBack());
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 

@@ -682,20 +682,23 @@ const Index = () => {
 
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
-    lista.push({
-      key: lista.length.toString(),
-      expand: true,
-      titulo: item.titulo,
-      codigo: item.codigo,
-      clave: item.clave,
-      clave_unidad: item.unidad_cfdi,
-      series: [],
-      productimage:
-        item.imagenes.length !== 0
-          ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
-          : '',
-      cantidad: 1,
-    });
+    const dato = lista.findIndex((producto) => producto.codigo === item.codigo);
+    if (dato === -1)
+      lista.push({
+        key: lista.length.toString(),
+        expand: true,
+        titulo: item.titulo,
+        codigo: item.codigo,
+        clave: item.clave,
+        clave_unidad: item.unidad_cfdi,
+        series: [],
+        productimage:
+          item.imagenes.length !== 0
+            ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
+            : '',
+        cantidad: 1,
+      });
+    else lista[dato] = { ...lista[dato], cantidad: lista[dato].cantidad + 1 };
     setListProducts(lista);
   };
   //#endregion
