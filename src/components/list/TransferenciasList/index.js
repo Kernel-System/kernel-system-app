@@ -2,7 +2,7 @@ import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
 import { List, Button, Input, Space } from 'antd';
-import { EditFilled } from '@ant-design/icons';
+import { EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -67,6 +67,9 @@ const Index = () => {
           <List.Item
             key={item.id}
             actions={[
+              <Link to={`/transferencia/mostrar/${item.id}`}>
+                <Button icon={<EyeFilled />}></Button>
+              </Link>,
               <Space>
                 <Link to={`/transferencia/editar/${item.id}`}>
                   <Button icon={<EditFilled />} />
@@ -89,7 +92,16 @@ const Index = () => {
               }
               description={item.fecha_solicitud}
             />
-            {item.estado}
+            {
+              <span
+                style={{
+                  display: 'inline',
+                  opacity: 0.8,
+                }}
+              >
+                Estado: <b>{item.estado}</b>
+              </span>
+            }
           </List.Item>
         )}
       />

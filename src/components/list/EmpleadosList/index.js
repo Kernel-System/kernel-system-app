@@ -2,7 +2,7 @@ import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
 import { Popconfirm, List, Button, Select } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 const { Option } = Select;
@@ -126,6 +126,10 @@ const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
             <List.Item
               key={item.rfc}
               actions={[
+                <Button
+                  icon={<EyeFilled />}
+                  onClick={() => onClickItem(item)}
+                ></Button>,
                 <Link to={`/admin/empleado/${item.rfc}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
@@ -163,7 +167,16 @@ const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
                 }
                 description={`${switchPuesto(item.puesto)}`}
               />
-              {`${item.nombre}`}
+              {
+                <span
+                  style={{
+                    display: 'inline',
+                    opacity: 0.8,
+                  }}
+                >
+                  Nombre: <b>{item.nombre}</b>
+                </span>
+              }
             </List.Item>
           );
         }}

@@ -2,7 +2,7 @@ import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
 import { Popconfirm, List, Button, Input } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
@@ -58,6 +58,10 @@ const Index = ({ putToken, onConfirmDelete, onClickItem }) => {
             <List.Item
               key={item.clave}
               actions={[
+                <Button
+                  icon={<EyeFilled />}
+                  onClick={() => onClickItem(item)}
+                ></Button>,
                 <Link to={`/admin/sucursal/${item.clave}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
@@ -78,7 +82,6 @@ const Index = ({ putToken, onConfirmDelete, onClickItem }) => {
                 title={
                   <p
                     onClick={() => {
-                      console.log(item);
                       onClickItem(item);
                     }}
                     style={{
@@ -91,7 +94,16 @@ const Index = ({ putToken, onConfirmDelete, onClickItem }) => {
                 }
                 description={item.rfc}
               />
-              {item.nombre}
+              {
+                <span
+                  style={{
+                    display: 'inline',
+                    opacity: 0.8,
+                  }}
+                >
+                  Nombre: <b>{item.nombre}</b>
+                </span>
+              }
             </List.Item>
           );
         }}

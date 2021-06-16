@@ -1,11 +1,14 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { List, Badge, Input } from 'antd';
+import { List, Input, Button, Row, Col, Typography } from 'antd';
+import { EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { useStoreState } from 'easy-peasy';
+import SortSelect, { sortData } from 'components/shared/SortSelect';
+const { Text } = Typography;
 
-const Index = ({ onConfirmDelete, onClickItem }) => {
+const Index = ({ onClickItem }) => {
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
     headers: {
@@ -35,7 +38,14 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
       );
   };
 
+  const [sortValue, setSortValue] = useState('recent');
   const [searchValue, setSearchValue] = useState('');
+  const [listToShow, setListToShow] = useState([]);
+
+  function handleSort(value) {
+    setSortValue(value);
+    setListToShow(sortData(listToShow, value));
+  }
 
   const { data } = useQuery('cotizaciones', async () => {
     const result = await fetchItems();
@@ -43,15 +53,44 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
     filtrarClientePorRFC(result, searchValue);
     return result;
   });
-  const [listToShow, setListToShow] = useState([]);
 
   return (
     <>
-      <Input.Search
-        onChange={onSearchChange}
-        placeholder='Buscar por nombre de cliente'
-        value={searchValue}
-      />
+      <Row gutter={[16, 12]}>
+        <Col>
+          <Text
+            style={{
+              verticalAlign: 'sub',
+            }}
+          >
+            Filtrar por Nombre:
+          </Text>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Input.Search
+            onChange={onSearchChange}
+            placeholder='Buscar por nombre de cliente'
+            value={searchValue}
+          />
+        </Col>
+        <Col>
+          <Text
+            style={{
+              verticalAlign: 'sub',
+            }}
+          >
+            Ordenar por:
+          </Text>
+        </Col>
+        <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
+          <SortSelect
+            onChange={handleSort}
+            value={sortValue}
+            recentText='Más reciente'
+            oldestText='Más antiguo'
+          />
+        </Col>
+      </Row>
       <br />
       <List
         itemLayout='horizontal'
@@ -65,27 +104,42 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
         dataSource={listToShow}
         renderItem={(item) => {
           return (
-            <Badge.Ribbon text={`${item.fecha_creacion}`}>
-              <List.Item key={item.folio}>
-                <List.Item.Meta
-                  title={
-                    <p
-                      onClick={() => {
-                        onClickItem(item);
-                      }}
-                      style={{
-                        cursor: 'pointer',
-                        margin: 0,
-                      }}
-                    >
-                      {`Folio : ${item.folio}`}
-                    </p>
-                  }
-                  description={`${item.nombre_cliente}`}
-                />
-                {`${item.empresa}`}
-              </List.Item>
-            </Badge.Ribbon>
+            <List.Item
+              key={item.folio}
+              actions={[
+                <Button
+                  icon={<EyeFilled />}
+                  onClick={() => onClickItem(item)}
+                ></Button>,
+              ]}
+            >
+              <List.Item.Meta
+                title={
+                  <p
+                    onClick={() => {
+                      onClickItem(item);
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    {`Folio : ${item.folio}`}
+                  </p>
+                }
+                description={`${item.nombre_cliente} - ${item.empresa}`}
+              />
+              {
+                <span
+                  style={{
+                    display: 'inline',
+                    opacity: 0.8,
+                  }}
+                >
+                  Fecha: <b>{item.fecha_creacion}</b>
+                </span>
+              }
+            </List.Item>
           );
         }}
       />

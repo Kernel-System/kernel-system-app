@@ -2,7 +2,7 @@ import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
 import { Popconfirm, List, Button, Input } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
@@ -70,6 +70,10 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
             <List.Item
               key={item.id}
               actions={[
+                <Button
+                  icon={<EyeFilled />}
+                  onClick={() => onClickItem(item)}
+                ></Button>,
                 <Link to={`/admin/cliente/${item.id}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
@@ -100,7 +104,16 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
                 }
                 description={`${item.nombre_comercial}`}
               />
-              {`${item.razon_social}`}
+              {
+                <span
+                  style={{
+                    display: 'inline',
+                    opacity: 0.8,
+                  }}
+                >
+                  Razón Social: <b>{item.razon_social}</b>
+                </span>
+              }
             </List.Item>
           );
         }}

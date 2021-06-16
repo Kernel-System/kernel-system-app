@@ -2,7 +2,7 @@ import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
 import { Popconfirm, List, Button, Input } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
@@ -59,6 +59,10 @@ const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
             <List.Item
               key={item.clave}
               actions={[
+                <Button
+                  icon={<EyeFilled />}
+                  onClick={() => onClickItem(item)}
+                ></Button>,
                 <Link to={`/admin/almacen/${item.clave}`}>
                   <Button icon={<EditFilled />}></Button>
                 </Link>,
@@ -92,7 +96,16 @@ const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
                 }
                 description={`Encargado: ${item.rfc_encargado}`}
               />
-              {`Sucursal: ${item.clave_sucursal}`}
+              {
+                <span
+                  style={{
+                    display: 'inline',
+                    opacity: 0.8,
+                  }}
+                >
+                  Sucursal: <b>{item.clave_sucursal}</b>
+                </span>
+              }
             </List.Item>
           );
         }}

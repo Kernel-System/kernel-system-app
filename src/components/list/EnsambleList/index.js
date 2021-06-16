@@ -1,7 +1,8 @@
 import './styles.css';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { List, Badge, Select } from 'antd';
+import { List, Select, Button } from 'antd';
+import { EyeFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { http } from 'api';
 const { Option } = Select;
@@ -52,7 +53,7 @@ const Index = ({ putToken }) => {
         <Option value='Ingresado en almacén'>Ingresado en almacén</Option>
       </Select>
       <List
-        itemLayout='vertical'
+        itemLayout='horizontal'
         size='default'
         pagination={{
           onChange: (page) => {
@@ -62,18 +63,49 @@ const Index = ({ putToken }) => {
         }}
         dataSource={listToShow}
         renderItem={(item) => (
-          <Badge.Ribbon text={item.estado}>
-            <Link to={`/ensambles/${item.folio}`}>
-              <List.Item key={item.folio}>
-                <List.Item.Meta
-                  //avatar={<Avatar src={item.avatar} />}
-                  title={`Folio ${item.folio}`}
-                  description={item.fecha_orden}
-                />
-                {item.descripcion}
-              </List.Item>
-            </Link>
-          </Badge.Ribbon>
+          <List.Item
+            key={item.folio}
+            actions={[
+              <Link to={`/ensambles/${item.folio}`}>
+                <Button
+                  icon={
+                    item.estado === 'Ingresado en almacén' ? (
+                      <EyeFilled />
+                    ) : (
+                      <EditFilled />
+                    )
+                  }
+                ></Button>
+              </Link>,
+            ]}
+          >
+            <List.Item.Meta
+              //avatar={<Avatar src={item.avatar} />}
+              title={
+                <Link to={`/ensambles/${item.folio}`}>
+                  <p
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    {`Folio ${item.folio}`}
+                  </p>
+                </Link>
+              }
+              description={`${item.descripcion}: ${item.fecha_orden}`}
+            />
+            {
+              <span
+                style={{
+                  display: 'inline',
+                  opacity: 0.8,
+                }}
+              >
+                <b>{item.estado}</b>
+              </span>
+            }
+          </List.Item>
         )}
       />
     </>
