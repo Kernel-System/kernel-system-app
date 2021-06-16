@@ -20,25 +20,19 @@ const LoginForm = () => {
     getToken(email, password)
       .then(({ data: { data } }) => {
         login(data);
-        getUserRole(data.access_token)
-          .then(({ data: { data } }) => {
-            setUserRole(data.role.name);
+        Promise.all([
+          getUserRole(data.access_token),
+          getUserNivel(data.access_token),
+        ])
+          .then((result) => {
+            setUserRole(result[0].data.data.role.name);
+            setUserNivel(result[1].data.data?.cliente[0]?.nivel);
           })
           .catch(() => {
             message.error(`Lo sentimos, ha ocurrido un error`);
             setLoading(false);
             setHasError(true);
           });
-        getUserNivel(data.access_token)
-          .then(({ data: { data } }) => {
-            setUserNivel(data?.cliente[0]?.nivel);
-          })
-          .catch(() => {
-            message.error(`Lo sentimos, ha ocurrido un error`);
-            setLoading(false);
-            setHasError(true);
-          });
-        history.push('/');
       })
       .catch(() => {
         message.error(`Lo sentimos, ha ocurrido un error`);

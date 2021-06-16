@@ -1,7 +1,7 @@
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Button, Form, InputNumber, Space, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import { formatPrice, toPercent } from 'utils/functions';
+import { formatDate, formatPrice, toPercent } from 'utils/functions';
 import { calcCantidad, calcPrecioVariable } from 'utils/productos';
 const { Title, Paragraph, Text } = Typography;
 
@@ -29,7 +29,8 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
       <Space align='end'>
         <Title level={2} style={{ display: 'inline-block', marginBottom: 0 }}>
           {formatPrice(
-            calcPrecioVariable(product, nivel) * toPercent(product.descuento)
+            calcPrecioVariable(product, nivel) -
+              calcPrecioVariable(product, nivel) * toPercent(product.descuento)
           )}
         </Title>
         {product.descuento > 0 && (
@@ -40,7 +41,8 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
       </Space>
       <Paragraph type='secondary'>
         Precios y disponibilidad válidos en tienda en línea La Paz, Baja
-        California Sur al 10 Mar 2021, sujetos a cambio sin previo aviso.
+        California Sur al {formatDate(new Date())}, sujetos a cambio sin previo
+        aviso.
       </Paragraph>
       <Paragraph>
         Disponibles:{' '}
@@ -57,7 +59,11 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
           {calcCantidad(product)}
         </Text>
       </Paragraph>
-      {isAuth ? (
+      {calcCantidad(product) === 0 ? (
+        <Button type='primary' disabled>
+          Producto agotado
+        </Button>
+      ) : isAuth ? (
         <Space>
           <Form
             name='addToCartForm'

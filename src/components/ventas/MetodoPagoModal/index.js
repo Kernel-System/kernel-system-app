@@ -10,15 +10,20 @@ import {
   Space,
   Typography,
 } from 'antd';
+import { useStoreState } from 'easy-peasy';
 import { useCallback, useEffect, useState } from 'react';
+import { formatPrice, toPercent } from 'utils/functions';
+import { calcPrecioVariable } from 'utils/productos';
 const { Text } = Typography;
 
-const MetodoPagoModal = ({ visible, onOk, onCancel }) => {
+const MetodoPagoModal = ({ products, visible, onOk, onCancel }) => {
+  const nivel = useStoreState((state) => state.user.nivel);
   const [years, setYears] = useState([]);
+  const [cantidadRecibida, setCantidadRecibida] = useState(0);
 
   const getYears = useCallback(() => {
     let actualYear = new Date().getFullYear();
-    for (let i = actualYear; i <= actualYear + 15; i++) {
+    for (let i = actualYear; i <= actualYear + 10; i++) {
       setYears((prevYears) => [...prevYears, i.toString().substr(-2)]);
     }
   }, []);
@@ -41,10 +46,34 @@ const MetodoPagoModal = ({ visible, onOk, onCancel }) => {
         <Collapse.Panel header='Pago en efectivo' key='1'>
           <Form layout='vertical'>
             <Form.Item label='Cantidad recibida'>
-              <InputNumber style={{ width: '100%' }} />
+              <InputNumber
+                style={{ width: '100%' }}
+                onChange={setCantidadRecibida}
+              />
             </Form.Item>
             <Form.Item label='Cambio'>
-              <InputNumber style={{ width: '100%' }} />
+              <InputNumber
+                style={{ width: '100%' }}
+                formatter={(value) => formatPrice(value)}
+                parser={(value) => formatPrice(value)}
+                readOnly
+                min={0}
+                value={
+                  products && cantidadRecibida
+                    ? cantidadRecibida -
+                      products.reduce(
+                        (total, product) =>
+                          total +
+                          calcPrecioVariable(product, nivel) *
+                            product.cantidad -
+                          calcPrecioVariable(product, nivel) *
+                            product.cantidad *
+                            toPercent(product.descuento),
+                        0
+                      )
+                    : 0
+                }
+              />
             </Form.Item>
           </Form>
         </Collapse.Panel>
