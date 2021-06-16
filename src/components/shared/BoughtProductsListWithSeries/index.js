@@ -5,6 +5,7 @@ const BoughtProductsList = ({ products }) => {
   return (
     <List
       dataSource={products}
+      split={false}
       renderItem={(item) => (
         <List.Item>
           <List.Item.Meta

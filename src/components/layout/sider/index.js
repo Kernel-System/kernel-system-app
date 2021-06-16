@@ -80,11 +80,11 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const MovimientosAlmacenMenuItem = (
     <Menu.Item
-      key='movimiento-almacen'
+      key='movimientos'
       icon={<ImportOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
-      <Link to='/movimiento-almacen'>Movimientos de Almacén</Link>
+      <Link to='/movimientos'>Movimientos de Almacén</Link>
     </Menu.Item>
   );
 

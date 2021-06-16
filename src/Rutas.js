@@ -283,13 +283,13 @@ const Rutas = () => {
       {/* Movimientos de almacen */}
       <PrivateRoute
         allowedRoles={['encargado de almacen']}
-        path='/movimiento-almacen'
+        path='/movimientos'
         exact
         component={MovimientosAlmacen}
       />
       <PrivateRoute
         allowedRoles={['encargado de almacen']}
-        path='/movimiento-almacen/nuevo'
+        path='/movimientos/nuevo'
         exact
         component={NuevoMovimiento}
       />

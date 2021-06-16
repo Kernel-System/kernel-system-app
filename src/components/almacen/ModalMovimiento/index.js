@@ -1,11 +1,11 @@
-import { Modal, Button } from 'antd';
+import { Modal, Button, Divider } from 'antd';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect, useState } from 'react';
 import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
 import BoughtProductsListWithSeries from 'components/shared/BoughtProductsListWithSeries';
 
-const Index = ({ visible, movimiento, setVis }) => {
+const Index = ({ visible, movimiento, hideModal }) => {
   const [imagenes, setImagenes] = useState(movimiento.productos_movimiento);
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
@@ -42,29 +42,17 @@ const Index = ({ visible, movimiento, setVis }) => {
         title={`Ensamble No. ${movimiento.id}`}
         centered
         visible={visible}
-        onOk={() => {
-          setVis();
-        }}
-        onCancel={() => {
-          setVis();
-        }}
+        onCancel={hideModal}
         width={'85%'}
-        footer={[
-          <Button
-            key='submit'
-            type='primary'
-            onClick={() => {
-              setVis();
-            }}
-          >
-            Confirmar
-          </Button>,
-        ]}
+        footer={null}
       >
         <TextLabel title='Fecha' subtitle={movimiento.fecha} />
         <TextLabel title='Concepto' subtitle={movimiento.concepto} />
         <TextLabel title='Almacén' subtitle={movimiento.clave_almacen} />
-        <TextLabel title='Empleado' subtitle={movimiento.rfc_empleado} />
+        <TextLabel
+          title='Empleado'
+          subtitle={movimiento.rfc_empleado?.nombre}
+        />
         {movimiento.comentario !== null ? (
           <TextLabel title='Comentario' subtitle={`${movimiento.comentario}`} />
         ) : null}
@@ -78,7 +66,6 @@ const Index = ({ visible, movimiento, setVis }) => {
             subtitle={`${movimiento.compras}`}
           />
         ) : null}
-        {console.log(movimiento)}
         {movimiento?.ventas !== null ? (
           <TextLabel
             title='Número de Ventas'
@@ -109,6 +96,7 @@ const Index = ({ visible, movimiento, setVis }) => {
             subtitle={movimiento.no_transferencia}
           />
         ) : null}
+        <Divider />
         <TextLabel title='Productos con series' />
         <BoughtProductsListWithSeries products={imagenes} />
       </Modal>

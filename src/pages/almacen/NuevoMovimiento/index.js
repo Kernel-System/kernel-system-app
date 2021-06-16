@@ -27,6 +27,7 @@ import { http } from 'api';
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useStoreState } from 'easy-peasy';
+import { conceptosMovimientos } from 'utils/almacen';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -447,7 +448,7 @@ const Index = () => {
       });
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     message.warn('Falta llenar datos');
   };
 
@@ -730,22 +731,11 @@ const Index = () => {
             optionFilterProp='children'
             defaultValue='Compra'
           >
-            <Option value='Compra'>Compra</Option>
-            <Option value='Venta'>Venta</Option>
-            <Option value='Devolución a cliente'>Devolución a cliente</Option>
-            <Option value='Regreso de mercancía'>Regreso de mercancía</Option>
-            <Option value='Entrada por transferencia'>
-              Entrada por transferencia
-            </Option>
-            <Option value='Salida por transferencia'>
-              Salida por transferencia
-            </Option>
-            <Option value='Entrada de componente defectuoso'>
-              Entrada por transferencia
-            </Option>
-            <Option value='Salida de componente para emsamble'>
-              Salida por transferencia
-            </Option>
+            {Object.keys(conceptosMovimientos).map((concepto, indx) => (
+              <Option key={indx} value={concepto}>
+                {concepto}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
         {empleado.puesto === 'd5432f92-7a74-4372-907c-9868507e0fd5' ? (
