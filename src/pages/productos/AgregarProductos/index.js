@@ -12,7 +12,7 @@ import {
   Switch,
   Tag,
 } from 'antd';
-import { http } from 'api';
+import { http, httpSAT } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
@@ -21,13 +21,15 @@ import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
-const { TextArea } = Input;
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+const { TextArea, Search } = Input;
 const { Option } = Select;
 
 //https://ant.design/components/upload/
 
 const Index = ({ tipo }) => {
   let match = useRouteMatch();
+  const breakpoint = useBreakpoint();
   const history = useHistory();
   const [list, setList] = useState([]);
   const [agregar, setAgregar] = useState(true);
@@ -44,6 +46,9 @@ const Index = ({ tipo }) => {
     valor_4: 1,
     precio_4: 1,
   });
+  const [listPS, setListPS] = useState([]);
+  const [listUnidad, setListUnidad] = useState([]);
+
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
     headers: {
@@ -68,6 +73,23 @@ const Index = ({ tipo }) => {
       AgregarPrecioFijo(0);
     }
   }, []);
+
+  const onSearch = (value) => {
+    httpSAT
+      .get(`https://apisandbox.facturama.mx/Catalogs/Units?keyword=${value}`)
+      .then((result) => {
+        setListUnidad(result.data);
+      });
+  };
+
+  const onSearchPS = (value) => {
+    httpSAT
+      .get(`/Catalogs/ProductsOrServices?keyword=${value}`)
+      .then((result) => {
+        console.log(result.data);
+        setListPS(result.data);
+      });
+  };
 
   const AgregarLista = (lista) => {
     const newList = JSON.parse(JSON.stringify(lista));
@@ -302,6 +324,7 @@ const Index = ({ tipo }) => {
     <Form
       key={1}
       name='basic'
+      onKeyDown={(e) => (e.keyCode === 13 ? e.preventDefault() : '')}
       initialValues={{
         remember: true,
         codigo: dato.codigo,
@@ -463,20 +486,63 @@ const Index = ({ tipo }) => {
             titulo='unidad_de_medida'
             valueDef={dato.unidad_de_medida}
             mensaje='Asigna una unidad de medida.'
-            placeholder='Tipo de Compra'
+            placeholder='Unidad de medida'
             required={false}
             max={100}
           />
           <TextLabel title='Clave de Producto/Servicio' />
-          <NumericInputForm
-            enable={tipo === 'mostrar'}
-            titulo='clave'
-            valueDef={dato.clave}
-            min='01010101'
-            max='95141904'
-            placeholder='Clave'
-            mensaje='Asigna una clave de producto/servicio.'
-          />
+          <Row key='Row4' gutter={[16, 24]}>
+            {tipo !== 'mostrar' ? (
+              <Col
+                className='gutter-row'
+                style={{ width: '100%' }}
+                span={breakpoint.lg ? 8 : 24}
+              >
+                <Search
+                  placeholder='Buscar por nombre de producto'
+                  onSearch={onSearchPS}
+                  style={{ width: '100%' }}
+                />
+              </Col>
+            ) : null}
+            <Col
+              className='gutter-row'
+              style={{ width: '100%' }}
+              span={tipo !== 'mostrar' ? (breakpoint.lg ? 16 : 24) : 24}
+            >
+              <Form.Item
+                name='clave'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Ingrese un tipo de moneda',
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  style={{ width: '100%' }}
+                  disabled={tipo === 'mostrar'}
+                  placeholder='Selecciona el producto/servicio.'
+                  optionFilterProp='children'
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0 ||
+                    option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {listPS.map((item) => {
+                    return (
+                      <Option value={item.Value} key={item.Value}>
+                        {`${item.Value} : ${item.Name}`}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
           <TextLabel title='Mínimo de Producto' />
           <NumericInputForm
             enable={tipo === 'mostrar'}
@@ -549,7 +615,6 @@ const Index = ({ tipo }) => {
                 });
               }}
               //onFocus={onFocus}
-              //onSearch={onSearch}
             >
               <Option value='Fijo'>Fijo</Option>
               <Option value='Mark Up'>Mark Up</Option>
@@ -570,14 +635,58 @@ const Index = ({ tipo }) => {
           />
           {/*<TextLabel title='Tipo de IEPS (Opcional)' />*/}
           <TextLabel title='Clave Unidad de CFDI' />
-          <InputForm
-            enable={tipo === 'mostrar'}
-            titulo='unidad_cfdi'
-            valueDef={dato.unidad_cfdi}
-            mensaje='Asigna una unidad CFDI.'
-            placeholder='Unidad CFDI'
-            max={3}
-          />
+          <Row key='Row4' gutter={[16, 24]}>
+            {tipo !== 'mostrar' ? (
+              <Col
+                className='gutter-row'
+                style={{ width: '100%' }}
+                span={breakpoint.lg ? 8 : 24}
+              >
+                <Search
+                  placeholder='Buscar por nombre'
+                  onSearch={onSearch}
+                  style={{ width: '100%' }}
+                />
+              </Col>
+            ) : null}
+            <Col
+              className='gutter-row'
+              style={{ width: '100%' }}
+              span={tipo !== 'mostrar' ? (breakpoint.lg ? 16 : 24) : 24}
+            >
+              <Form.Item
+                name='unidad_cfdi'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Ingrese un tipo de moneda',
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  style={{ width: '100%' }}
+                  disabled={tipo === 'mostrar'}
+                  placeholder='Selecciona la unidad'
+                  optionFilterProp='children'
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0 ||
+                    option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {listUnidad.map((item) => {
+                    return (
+                      <Option value={item.Value} key={item.Value}>
+                        {`${item.Value} : ${item.Name}`}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
           <TextLabel title='Categorias' />
 
           {tipo === 'agregar' ? (
@@ -883,7 +992,10 @@ const Index = ({ tipo }) => {
         align='baseline'
         style={{ width: '100%', justifyContent: 'center' }}
       >
-        <Form.Item name='boton'>
+        <Form.Item
+          name='boton'
+          onKeyDown={(e) => (e.keyCode === 13 ? e.preventDefault() : '')}
+        >
           <Button
             disabled={tipo === 'mostrar'}
             type='primary'

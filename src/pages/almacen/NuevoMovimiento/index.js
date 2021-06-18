@@ -96,9 +96,6 @@ const Index = () => {
   };
 
   useEffect(() => {
-    http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
-      onSetArreglo(result.data.data.empleado[0], setEmpleado);
-    });
     http
       .get(`/items/devoluciones_proveedores/?fields=folio`, putToken)
       .then((result) => {
