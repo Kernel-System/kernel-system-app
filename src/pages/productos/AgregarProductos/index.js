@@ -205,6 +205,7 @@ const Index = ({ tipo }) => {
           descuento: datos.descuento,
           disponibilidad: datos.disponibilidad,
           clave: datos.clave,
+          nombre_unidad_cfdi: nombreUnidad,
         },
         putToken
       )
@@ -252,6 +253,8 @@ const Index = ({ tipo }) => {
   };
 
   const onFinishChange = (datos) => {
+    const nombreU =
+      nombreUnidad !== '' ? { nombre_unidad_cfdi: nombreUnidad } : {};
     http
       .patch(
         `/items/productos/${datos.codigo}`,
@@ -278,6 +281,7 @@ const Index = ({ tipo }) => {
           descuento: datos.descuento,
           disponibilidad: datos.disponibilidad,
           clave: datos.clave,
+          ...nombreU,
         },
         putToken
       )
@@ -318,6 +322,12 @@ const Index = ({ tipo }) => {
           message.error('Codigo ya existente');
         } else message.error('Un error ha ocurrido');
       });
+  };
+
+  const [nombreUnidad, setNombreUnidad] = useState(''); //  nombre_unidad_cfdi;
+
+  const handleChange = (value, data) => {
+    setNombreUnidad(data.nombre);
   };
 
   return list.map((dato) => (
@@ -429,14 +439,13 @@ const Index = ({ tipo }) => {
             />
           </Form.Item>
           <TextLabel title='Peso (Opcional)' />
-          <NumericInputForm
+          <InputForm
             enable={tipo === 'mostrar'}
             valueDef={dato.peso}
             titulo='peso'
             placeholder='Peso'
             required={false}
-            max={8}
-            paso={0.01}
+            max={100}
           />
           <TextLabel title='Tipo de Compra (Opcional)' />
           <InputForm
@@ -669,6 +678,7 @@ const Index = ({ tipo }) => {
                   disabled={tipo === 'mostrar'}
                   placeholder='Selecciona la unidad'
                   optionFilterProp='children'
+                  onChange={(value, data) => handleChange(value, data)}
                   filterOption={(input, option) =>
                     option.children
                       .toLowerCase()
@@ -678,7 +688,11 @@ const Index = ({ tipo }) => {
                 >
                   {listUnidad.map((item) => {
                     return (
-                      <Option value={item.Value} key={item.Value}>
+                      <Option
+                        value={item.Value}
+                        key={item.Value}
+                        nombre={item.Name}
+                      >
                         {`${item.Value} : ${item.Name}`}
                       </Option>
                     );
@@ -891,7 +905,7 @@ const Index = ({ tipo }) => {
                   <NumericInputForm
                     enable={tipo === 'mostrar'}
                     titulo='precio_1'
-                    min='10'
+                    min='1'
                     placeholder='Ingrese el Precio 1.'
                     mensaje='Asigne un precio.'
                     valueDef={valor.precio_1}
@@ -901,7 +915,7 @@ const Index = ({ tipo }) => {
                   <NumericInputForm
                     enable={tipo === 'mostrar'}
                     titulo='precio_2'
-                    min='10'
+                    min='1'
                     placeholder='Ingrese el Precio 2.'
                     valueDef={valor.precio_2}
                     mensaje='Asigne un precio.'
@@ -911,7 +925,7 @@ const Index = ({ tipo }) => {
                   <NumericInputForm
                     enable={tipo === 'mostrar'}
                     titulo='precio_3'
-                    min='10'
+                    min='1'
                     placeholder='Ingrese el Precio 3.'
                     valueDef={valor.precio_3}
                     mensaje='Asigne un precio.'
@@ -921,7 +935,7 @@ const Index = ({ tipo }) => {
                   <NumericInputForm
                     enable={tipo === 'mostrar'}
                     titulo='precio_4'
-                    min='10'
+                    min='1'
                     placeholder='Ingrese el Precio 4.'
                     valueDef={valor.precio_4}
                     mensaje='Asigne un precio.'
