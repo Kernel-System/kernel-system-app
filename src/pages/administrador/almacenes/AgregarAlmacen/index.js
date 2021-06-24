@@ -105,7 +105,7 @@ const Index = () => {
 
   const Mensaje = () => {
     message
-      .success('El almacen ha sido registrada exitosamente', 3)
+      .success('El almacen ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 
@@ -215,8 +215,8 @@ const Index = () => {
             size='large'
           >
             {match.params.clave === window.undefined
-              ? 'Agregar Sucursal'
-              : `Modificar Sucursal`}
+              ? 'Agregar Almacen'
+              : `Modificar Almacen`}
           </Button>
         </Form.Item>
       </Form>

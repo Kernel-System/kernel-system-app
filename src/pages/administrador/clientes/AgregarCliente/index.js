@@ -147,7 +147,7 @@ const Index = () => {
 
   const Mensaje = () => {
     message
-      .success('La cliente ha sido registrado exitosamente', 3)
+      .success('El cliente ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 

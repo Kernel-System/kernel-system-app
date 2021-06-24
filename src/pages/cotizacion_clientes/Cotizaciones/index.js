@@ -30,7 +30,7 @@ const Index = () => {
       <br />
       <Link to='/cotizacion-cliente/nuevo'>
         <Button type='primary' size='large' icon={<PlusOutlined />}>
-          Añadir Nuevo Cliente
+          Añadir Nueva Cotización
         </Button>
       </Link>
       <Modal visible={visible} cotizacion={cotizacion} setVis={changeModal} />

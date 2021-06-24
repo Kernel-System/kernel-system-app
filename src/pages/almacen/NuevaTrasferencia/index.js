@@ -658,7 +658,7 @@ const Index = ({ tipo }) => {
             type='primary'
             htmlType='submit'
           >
-            Realizar Transferencia
+            Añadir Transferencia
           </Button>
         </Form.Item>
       </Form>

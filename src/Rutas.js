@@ -48,6 +48,8 @@ import Productos from './pages/productos/Productos';
 import AgregarCotizacionClientes from './pages/cotizacion_clientes/CrearCotizacion';
 import CotizacionClientes from './pages/cotizacion_clientes/Cotizaciones';
 
+import Inventario from './pages/inventarios/Inventario';
+
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
 const asyncLogout = asyncComponent(() => import('pages/auth/Logout'));
@@ -379,6 +381,15 @@ const Rutas = () => {
       >
         {<AgregarProductos tipo={'mostrar'} />}
       </PrivateRoute>
+
+      {/* Inventario */}
+
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/inventario'
+        exact
+        component={Inventario}
+      />
 
       {/* Administrador */}
 
