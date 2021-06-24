@@ -3,31 +3,26 @@ import {
   Button,
   Typography,
   Form,
+  Col,
+  Row,
   Select,
   message,
-  Row,
-  Col,
   Table,
   InputNumber,
   Popconfirm,
   Image,
   Checkbox,
 } from 'antd';
-import {
-  EditOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import HeadingBack from 'components/UI/HeadingBack';
-import TextLabel from 'components/UI/TextLabel';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
 import { useHistory } from 'react-router';
 import { http } from 'api';
 import { useState, useEffect } from 'react';
-import { useQuery } from 'react-query';
-import { useStoreState } from 'easy-peasy';
 import { conceptosMovimientos } from 'utils/almacen';
+import { useStoreState } from 'easy-peasy';
+import { itemsToGrid } from 'utils/gridUtils';
+import TextLabel from 'components/UI/TextLabel';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -71,6 +66,7 @@ const EditableCell = ({
 
 const Index = () => {
   const [facturas, setFacturas] = useState([]);
+  const [factura, setFactura] = useState('');
   const [tipo, setTipo] = useState('');
   const [enabled, setEnabled] = useState(true);
   const [searchValue, setSearchValue] = useState('');
@@ -84,6 +80,9 @@ const Index = () => {
   const [compras, setCompras] = useState([]);
   const [ventas, setVentas] = useState([]);
   const [almacenes, setAlmacenes] = useState([]);
+  const [productos, setProductos] = useState([]);
+  const [almacen, setAlmacen] = useState('1');
+  const [concepto, setConcepto] = useState('Compra');
 
   const [visible, setVisible] = useState(false);
   const history = useHistory();
@@ -98,6 +97,14 @@ const Index = () => {
   useEffect(() => {
     http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
       onSetArreglo(result.data.data.empleado[0], setEmpleado);
+      if (
+        result.data.data.empleado[0].puesto ===
+        'd5432f92-7a74-4372-907c-9868507e0fd5'
+      ) {
+        onSetAlmacen(1);
+      } else {
+        onSetAlmacen(result.data.data.empleado[0].almacen);
+      }
     });
     http
       .get(`/items/devoluciones_proveedores/?fields=folio`, putToken)
@@ -134,19 +141,57 @@ const Index = () => {
         onSetArreglo(result.data.data, setTransferencias);
       });
     http
-      .get(`/items/compras/?fields=no_compra,fecha_compra`, putToken)
+      .get(`/items/compras/?fields=*,productos_comprados.*`, putToken)
       .then((result) => {
+        console.log(result.data.data);
         onSetArreglo(result.data.data, setCompras);
       });
-    http
-      .get(`/items/ventas/?fields=no_venta,fecha_venta`, putToken)
-      .then((result) => {
-        onSetArreglo(result.data.data, setVentas);
-      });
+    http.get(`/items/ventas/?fields=*`, putToken).then((result) => {
+      onSetArreglo(result.data.data, setVentas);
+    });
     http.get(`/items/almacenes/`, putToken).then((result) => {
       onSetArreglo(result.data.data, setAlmacenes);
     });
   }, []);
+
+  const onSetAlmacen = (value) => {
+    setAlmacen(value);
+  };
+
+  useEffect(() => {
+    http
+      .get(
+        `/items/productos?fields=*,imagenes.directus_files_id,inventario.*`,
+        putToken
+      )
+      .then((result) => {
+        onSetProductos(result.data.data);
+      });
+  }, [almacen, concepto]);
+
+  const onSetProductos = (lista) => {
+    const newData = JSON.parse(JSON.stringify(lista));
+    const newProductos = [];
+    lista.forEach((producto, index) => {
+      let inventarios = [];
+      producto.inventario.forEach((inventario) => {
+        if (sumar(concepto)) {
+          inventarios.push(inventario);
+        } else if (
+          inventario.clave_almacen === almacen &&
+          inventario.cantidad !== 0
+        )
+          inventarios.push(inventario);
+      });
+      if (inventarios.length !== 0 || sumar(concepto)) {
+        newData[index].inventario = inventarios;
+        newProductos.push(newData[index]);
+      }
+    });
+    setProductos(newProductos);
+    setListProducts([]);
+    setListProductsToShow(newProductos);
+  };
 
   const onSetArreglo = (lista, asignar) => {
     const newLista = JSON.parse(JSON.stringify(lista));
@@ -193,7 +238,7 @@ const Index = () => {
           values.devolucion_clientes !== '' &&
           values.devolucion_clientes !== undefined
         );
-      case 'Regreso de mercancía':
+      case 'Devolución a proveedor':
         return values.rma !== '' && values.rma !== undefined;
       case 'Entrada por transferencia':
         return (
@@ -205,11 +250,11 @@ const Index = () => {
           values.no_transferencia !== '' &&
           values.no_transferencia !== undefined
         );
-      case 'Entrada de componente defectuoso':
+      case 'Componente defectuoso':
         return (
           values.folio_ensamble !== '' && values.folio_ensamble !== undefined
         );
-      case 'Salida de componente para emsamble':
+      case 'Componente para ensamble':
         return (
           values.folio_ensamble !== '' && values.folio_ensamble !== undefined
         );
@@ -260,16 +305,29 @@ const Index = () => {
               );
             }
             let productos = [];
-            listProducts.map((producto) => {
-              return productos.push({
+            let productosCoV = [];
+            listProducts.forEach((producto) => {
+              productos.push({
                 codigo: producto.codigo,
                 clave: producto.clave,
                 cantidad: producto.cantidad,
-                descripcion: producto.titulo,
+                titulo: producto.titulo,
                 clave_unidad: producto.clave_unidad,
                 id_movimiento: result.data.data.id,
               });
+              if (concepto === 'Compra')
+                productosCoV.push({
+                  id: producto.id,
+                  cantidad: producto.cantidad,
+                });
             });
+            console.log(productosCoV);
+            if (concepto === 'Compra')
+              http.post(
+                '/custom/productos-compras/',
+                { productos: productosCoV },
+                putToken
+              );
             http
               .post(`/items/productos_movimiento/`, productos, putToken)
               .then((result_productos) => {
@@ -302,7 +360,7 @@ const Index = () => {
 
   const Mensaje = () => {
     message
-      .success('La empleado ha sido registrada exitosamente', 3)
+      .success('El movimiento ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 
@@ -323,14 +381,49 @@ const Index = () => {
     } else return false;
   };
 
-  //+ Compra, Entrada por transferencia, Entrada de componente defectuoso
-  //- Venta, Devolución a cliente, Regreso de mercancía, Salida por transferencia, Salida de componente para emsamble
+  const onChangeCompra = (all) => {
+    setTipo('facturas_externas');
+    console.log(compras[all.index]);
+    if (compras[all.index]?.factura !== undefined) {
+      const catalogos = [];
+
+      compras[all.index].productos_comprados.forEach((producto) => {
+        if (producto.producto_catalogo !== null) {
+          catalogos.push(producto);
+        }
+      });
+      console.log(catalogos);
+      let lista = [];
+      catalogos.forEach((producto) => {
+        lista.push({
+          key: lista.length.toString(),
+          expand: true,
+          titulo: producto.descripcion,
+          codigo: producto.producto_catalogo,
+          id: producto.id,
+          clave: producto.clave,
+          clave_unidad: producto.clave_unidad,
+          series: [],
+          max: 10,
+          productimage: '',
+          cantidad: 1,
+        });
+      });
+      setListProducts(JSON.parse(JSON.stringify(lista)));
+      setFactura(compras[all.index].factura);
+    } else {
+      setFactura('');
+    }
+  };
+
+  //+ Compra, Entrada por transferencia, Componente defectuoso
+  //- Venta, Devolución a cliente, Devolución a proveedor, Salida por transferencia, Componente para ensamble
 
   const sumar = (concepto) => {
     if (
       concepto === 'Compra' ||
       concepto === 'Entrada por transferencia' ||
-      concepto === 'Entrada de componente defectuoso'
+      concepto === 'Componente defectuoso'
     ) {
       return true; //suma
     } else {
@@ -455,7 +548,7 @@ const Index = () => {
   //#region busqueda de productos
   const onSearchChange = (value) => {
     setSearchValue(value);
-    filtrarProductosPorTitulo(data, value);
+    filtrarProductosPorTitulo(productos, value);
   };
 
   const filtrarProductosPorTitulo = async (productos, value) => {
@@ -465,21 +558,6 @@ const Index = () => {
       );
     }
   };
-
-  const fetchProducts = async () => {
-    const { data } = await http.get(
-      `/items/productos?fields=*,imagenes.directus_files_id`,
-      putToken
-    );
-    return data.data;
-  };
-
-  const { data } = useQuery('productos', async () => {
-    const result = await fetchProducts();
-    setListProductsToShow(result);
-    filtrarProductosPorTitulo(result, searchValue);
-    return result;
-  });
 
   const changeVisible = () => {
     setVisible(!visible);
@@ -515,43 +593,6 @@ const Index = () => {
     return numeros;
   };
 
-  const edit = (record) => {
-    form.setFieldsValue({
-      titulo: '',
-      cantidad: '',
-      expand: '',
-      ...record,
-    });
-    setEditingKey(record.key);
-  };
-
-  const cancel = () => {
-    setEditingKey('');
-  };
-
-  const save = async (key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...listProducts];
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const cantidad = newData[index].cantidad;
-        const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
-        if (row.cantidad < cantidad)
-          newData[index].series.splice(cantidad - 2, row.cantidad);
-        setListProducts(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setListProducts(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-  };
-
   const changeCheck = async (key) => {
     const newData = JSON.parse(JSON.stringify(listProducts));
     const index = newData.findIndex((item) => key === item.key);
@@ -567,14 +608,26 @@ const Index = () => {
 
   const typeColumn = (type) => {
     switch (type) {
-      case 'cantidad':
-        return 'number';
+      //case 'cantidad':
+      //return 'number';
       case 'image':
         return 'image';
       case 'expand':
         return null;
       default:
         return 'text';
+    }
+  };
+
+  const onChangeCantidad = (value, index) => {
+    if (value !== 0) {
+      const newData = JSON.parse(JSON.stringify(listProducts));
+      const cantidad = newData[index].cantidad;
+      if (value < cantidad) newData[index].series.splice(cantidad - 2, value);
+      newData[index].cantidad = value;
+      setListProducts(newData);
+      setEditingKey('');
+      setListProducts(newData);
     }
   };
 
@@ -599,6 +652,30 @@ const Index = () => {
       title: 'CANTIDAD',
       dataIndex: 'cantidad',
       width: '30px',
+      render: (_, record) => {
+        if (sumar(concepto)) {
+          return (
+            <InputNumber
+              min={1}
+              defaultValue={record.cantidad}
+              onChange={(value) => {
+                onChangeCantidad(value, record.key);
+              }}
+            />
+          );
+        } else {
+          return (
+            <InputNumber
+              max={record.max}
+              min={1}
+              defaultValue={record.cantidad}
+              onChange={(value) => {
+                onChangeCantidad(value, record.key);
+              }}
+            />
+          );
+        }
+      },
       editable: true,
     },
     {
@@ -607,14 +684,12 @@ const Index = () => {
       width: '30px',
       editable: true,
       render: (_, record) => {
-        const editable = isEditing(record);
         return (
           <Checkbox
             onClick={() => {
               changeCheck(record.key);
             }}
             checked={record.expand}
-            disabled={!editable}
           />
         );
       },
@@ -623,40 +698,15 @@ const Index = () => {
       title: '',
       dataIndex: 'operation',
       //fixed: breakpoint.lg ? "left": false,
-      width: '50px',
+      width: '20px',
       render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Button
-              type='link'
-              onClick={() => save(record.key)}
-              icon={<CheckOutlined />}
-              style={{
-                marginRight: 8,
-              }}
-            />
-            <Popconfirm title='¿Estas seguro de cancelar?' onConfirm={cancel}>
-              <CloseOutlined />
-            </Popconfirm>
-          </span>
-        ) : (
-          <span>
-            <Button
-              icon={<EditOutlined />}
-              type='link'
-              disabled={editingKey !== ''}
-              onClick={() => edit(record)}
-            >
-              Editar
-            </Button>
-            <Popconfirm
-              title='¿Estas seguro de querer eliminar?'
-              onConfirm={() => handleDelete(record.key)}
-            >
-              <DeleteOutlined />
-            </Popconfirm>
-          </span>
+        return (
+          <Popconfirm
+            title='¿Estas seguro de querer eliminar?'
+            onConfirm={() => handleDelete(record.key)}
+          >
+            <DeleteOutlined />
+          </Popconfirm>
         );
       },
     },
@@ -684,6 +734,7 @@ const Index = () => {
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
     const dato = lista.findIndex((producto) => producto.codigo === item.codigo);
+    console.log(lista);
     if (dato === -1)
       lista.push({
         key: lista.length.toString(),
@@ -693,111 +744,151 @@ const Index = () => {
         clave: item.clave,
         clave_unidad: item.unidad_cfdi,
         series: [],
+        max: item.inventario
+          .map((inventario) => inventario.cantidad)
+          .reduce((cantidad, sum) => cantidad + sum, 0),
         productimage:
           item.imagenes.length !== 0
             ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
             : '',
         cantidad: 1,
       });
-    else lista[dato] = { ...lista[dato], cantidad: lista[dato].cantidad + 1 };
     setListProducts(lista);
   };
   //#endregion
 
-  return (
-    <div>
-      <Form
-        name='nuevo_movimiento'
-        initialValues={{ remember: true, concepto: 'Compra' }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+  const camposGenerales = (
+    <>
+      <Form.Item
+        label='Concepto'
+        name='concepto'
+        rules={[
+          {
+            required: true,
+            message: `Seleccione un concepto.`,
+          },
+        ]}
       >
-        <HeadingBack title='Almacén' />
-        <Title level={5}>Concepto</Title>
+        <Select
+          showSearch
+          style={{ width: '100%' }}
+          placeholder='Concepto'
+          optionFilterProp='children'
+          onChange={(value) => {
+            setTipo('sin_factura');
+            setFactura('');
+            setConcepto(value);
+          }}
+        >
+          {Object.keys(conceptosMovimientos).map((concepto, indx) => (
+            <Option key={indx} value={concepto}>
+              {concepto}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+      {empleado.puesto === 'd5432f92-7a74-4372-907c-9868507e0fd5' ? (
         <Form.Item
-          key='concepto'
-          name='concepto'
+          label='Almacén'
+          name='almacen'
           rules={[
             {
               required: true,
-              message: `Seleccione un concepto.`,
+              message: `Seleccione un almacen.`,
             },
           ]}
         >
           <Select
             showSearch
-            style={{ width: '50%' }}
-            placeholder='Concepto'
-            optionFilterProp='children'
-            defaultValue='Compra'
+            style={{ width: '100%' }}
+            placeholder='Almacén'
+            onChange={(value) => {
+              onSetAlmacen(value);
+            }}
           >
-            {Object.keys(conceptosMovimientos).map((concepto, indx) => (
-              <Option key={indx} value={concepto}>
-                {concepto}
-              </Option>
+            {almacenes.map((almacen) => (
+              <Option
+                value={almacen.clave}
+                key={almacen.clave}
+              >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
             ))}
           </Select>
         </Form.Item>
-        {empleado.puesto === 'd5432f92-7a74-4372-907c-9868507e0fd5' ? (
-          <div>
-            <Title level={5}>Almacén</Title>
-            <Form.Item
-              key='almacen'
-              name='almacen'
-              rules={[
-                {
-                  required: true,
-                  message: `Seleccione un almacen.`,
-                },
-              ]}
-            >
-              <Select
-                showSearch
-                style={{ width: '100%' }}
-                placeholder='Agrega un almacén.'
-              >
-                {almacenes.map((almacen) => (
-                  <Option
-                    value={almacen.clave}
-                    key={almacen.clave}
-                  >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </div>
-        ) : null}
+      ) : null}
+      <Form.Item
+        label='Comentario'
+        name='comentario'
+        rules={[
+          {
+            required: false,
+          },
+        ]}
+      >
+        <TextArea
+          autoSize={{ minRows: 2, maxRows: 5 }}
+          showCount
+          maxLength={100}
+          style={{ fontSize: '20' }}
+        />
+      </Form.Item>
+    </>
+  );
 
-        <Title level={4}>Justificación</Title>
-        <Text type='secondary'>
-          Debe llenar mínimo 1 de los campos a continuación.
-        </Text>
-        <Title level={5}>Número de Compra</Title>
-        <Form.Item key='compras' name='compras'>
+  const camposJustificacion = (
+    <>
+      {concepto === 'Compra' ? (
+        <Form.Item
+          label='Número de Compra'
+          name='compras'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un número de compra',
+            },
+          ]}
+        >
           <Select
             showSearch
             style={{ width: '100%' }}
-            placeholder='Agrega un Número de Devolución.'
-            defaultValue=''
+            placeholder='Justifica una entrada por compra a proveedor'
+            initialvalues=''
+            onChange={(value, all) => {
+              onChangeCompra(all);
+            }}
           >
             <Option key='' value=''>
               Ninguna
             </Option>
-            {compras.map((compra) => {
+            {compras.map((compra, index) => {
               return (
-                <Option key={compra.no_compra} value={compra.no_compra}>
+                <Option
+                  key={compra.no_compra}
+                  value={compra.no_compra}
+                  index={index}
+                >
                   {`${compra.no_compra} : ${compra.fecha_compra}`}
                 </Option>
               );
             })}
           </Select>
         </Form.Item>
-        <Title level={5}>Número de Venta</Title>
-        <Form.Item key='ventas' name='ventas'>
+      ) : null}
+      {concepto === 'Venta' ? (
+        <Form.Item
+          label='Número de Venta'
+          name='ventas'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un número de venta',
+            },
+          ]}
+        >
           <Select
             showSearch
             style={{ width: '100%' }}
-            placeholder='Agrega un Número de Devolución.'
-            defaultValue=''
+            placeholder='Justifica una salida por venta a cliente'
+            initialvalues=''
           >
             <Option key='' value=''>
               Ninguna
@@ -811,13 +902,53 @@ const Index = () => {
             })}
           </Select>
         </Form.Item>
-        <Title level={5}>Folio de RMA</Title>
-        <Form.Item key='rma' name='rma'>
+      ) : null}
+      {concepto === 'Devolución a cliente' ? (
+        <Form.Item
+          label='Número de Devolución'
+          name='devolucion_clientes'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un número de devolución',
+            },
+          ]}
+        >
           <Select
             showSearch
             style={{ width: '100%' }}
-            placeholder='Agrega un folio de RMA.'
-            defaultValue=''
+            placeholder='Justifica una entrada por devolución del cliente'
+            initialvalues=''
+          >
+            <Option key='' value=''>
+              Ninguna
+            </Option>
+            {devolucionesClientes.map((dev) => {
+              return (
+                <Option key={dev.id} value={dev.id}>
+                  {`${dev.id} : ${dev.diagnostico}`}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+      ) : null}
+      {concepto === 'Devolución a proveedor' ? (
+        <Form.Item
+          label='Folio de RMA'
+          name='rma'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un RMA',
+            },
+          ]}
+        >
+          <Select
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Justifica una salida por devolución a proveedor'
+            initialvalues=''
           >
             <Option key='' value=''>
               Ninguna
@@ -831,29 +962,99 @@ const Index = () => {
             })}
           </Select>
         </Form.Item>
-        <Row key='columnas' gutter={[16, 8]}>
-          <Col className='gutter-row' span={12}>
-            <TextLabel title='Tipo de Factura' />
-            <Form.Item key='tipo' name='tipo'>
+      ) : null}
+      {concepto === 'Componente defectuoso' ||
+      concepto === 'Componente para ensamble' ? (
+        <Form.Item
+          label='Folio de Ensamble'
+          name='folio_ensamble'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un número de folio de ensamble',
+            },
+          ]}
+        >
+          <Select
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Justifica un movimiento por ensamble'
+            initialvalues=''
+          >
+            <Option key='' value=''>
+              Ninguna
+            </Option>
+            {ensambles.map((ensamble) => {
+              return (
+                <Option key={ensamble.folio} value={ensamble.folio}>
+                  {`${ensamble.folio} : ${ensamble.descripcion}`}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+      ) : null}
+      {concepto === 'Entrada por transferencia' ||
+      concepto === 'Salida por transferencia' ? (
+        <Form.Item
+          label='Solicitud de Transferencia'
+          name='no_transferencia'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un número de transferencia',
+            },
+          ]}
+        >
+          <Select
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Justifica un movimiento por transferencia'
+            initialvalues=''
+          >
+            <Option key='' value=''>
+              Ninguna
+            </Option>
+            {transferencias.map((transferencia) => {
+              return (
+                <Option key={transferencia.id} value={transferencia.id}>
+                  {`${transferencia.id} : ${transferencia.almacen_origen} a ${transferencia.almacen_destino}`}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+      ) : null}
+      {concepto !== 'Compra' && concepto !== 'Venta' ? (
+        <Row gutter={16} key='Facturas'>
+          <Col xs={24} lg={12} key={1}>
+            <Form.Item label='Tipo de Factura' name='tipo'>
               <Select
-                //defaultValue='transferencia'
                 style={{ width: '100%' }}
                 onChange={handleChangeTipo}
+                value='sin_factura'
               >
-                <Option value='facturas_internas'>Facturas Internas</Option>
-                <Option value='facturas_externas'>Facturas Externas</Option>
+                <Option key='sin_factura' value='sin_factura'>
+                  Sin Factura
+                </Option>
+                <Option key='facturas_internas' value='facturas_internas'>
+                  Facturas Internas
+                </Option>
+                <Option key='facturas_externas' value='facturas_externas'>
+                  Facturas Externas
+                </Option>
               </Select>
             </Form.Item>
           </Col>
-          <Col className='gutter-row' span={12}>
-            <Title level={5}>Número de Factura</Title>
-            <Form.Item key='folio_factura' name='folio_factura'>
+          <Col xs={24} lg={12} key={2}>
+            <Form.Item label='Folio de Factura' name='folio_factura'>
               <Select
                 showSearch
                 style={{ width: '100%' }}
-                placeholder='Agrega un folio de factura.'
+                placeholder='Folio de la factura'
                 disabled={enabled}
-                defaultValue=''
+                initialvalues=''
+                onChange={(value) => setFactura(value)}
               >
                 <Option key='' value=''>
                   Ninguna
@@ -873,85 +1074,35 @@ const Index = () => {
             </Form.Item>
           </Col>
         </Row>
-        <Title level={5}>Número de Devolución</Title>
-        <Form.Item key='devolucion_clientes' name='devolucion_clientes'>
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Agrega un Número de Devolución.'
-            defaultValue=''
-          >
-            <Option key='' value=''>
-              Ninguna
-            </Option>
-            {devolucionesClientes.map((dev) => {
-              return (
-                <Option key={dev.id} value={dev.id}>
-                  {`${dev.id} : ${dev.diagnostico}`}
-                </Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
-        <Title level={5}>Folio de Ensamble</Title>
-        <Form.Item key='folio_ensamble' name='folio_ensamble'>
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Agrega un Número de Devolución.'
-            defaultValue=''
-          >
-            <Option key='' value=''>
-              Ninguna
-            </Option>
-            {ensambles.map((ensamble) => {
-              return (
-                <Option key={ensamble.folio} value={ensamble.folio}>
-                  {`${ensamble.folio} : ${ensamble.descripcion}`}
-                </Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
-        <Title level={5}>Solicitud de Transferencia</Title>
-        <Form.Item key='no_transferencia' name='no_transferencia'>
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Agrega un Número de Transferencia.'
-            defaultValue=''
-          >
-            <Option key='' value=''>
-              Ninguna
-            </Option>
-            {transferencias.map((transferencia) => {
-              return (
-                <Option key={transferencia.id} value={transferencia.id}>
-                  {`${transferencia.id} : ${transferencia.almacen_origen} a ${transferencia.almacen_destino}`}
-                </Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
-        <Title level={5}>Comentario</Title>
-        <Form.Item
-          name='comentario'
-          rules={[
-            {
-              required: false,
-            },
-          ]}
-        >
-          <TextArea
-            //value={value}
-            //placeholder='Controlled autosize'observaciones
-            autoSize={{ minRows: 2, maxRows: 5 }}
-            showCount
-            maxLength={100}
-            style={{ fontSize: '20' }}
-          />
-        </Form.Item>
-        <Title level={5}>Productos</Title>
+      ) : factura !== '' ? (
+        <TextLabel
+          title={`${
+            tipo === 'facturas_externas'
+              ? 'Factura Externa ID : ' + factura
+              : 'Factura Interna folio : ' + factura
+          }`}
+        />
+      ) : null}
+    </>
+  );
+
+  return (
+    <div>
+      <Form
+        name='nuevo_movimiento'
+        initialValues={{ remember: true, concepto: 'Compra' }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <HeadingBack title='Movimiento de Almacén' />
+        <TextLabel title='Datos generales' />
+        {itemsToGrid(camposGenerales.props.children, 'auto', 2, 16)}
+        <TextLabel title='Justificación' />
+        <Text type='secondary' style={{ display: 'block', marginBottom: 10 }}>
+          Debe llenar mínimo 1 de los campos a continuación.
+        </Text>
+        {camposJustificacion}
+        <TextLabel title='Productos' />
         <Search
           placeholder='Ingrese nombre del producto.'
           allowClear
@@ -999,7 +1150,7 @@ const Index = () => {
             type='primary'
             htmlType='submit'
           >
-            Realizar Movimiento
+            Añadir Movimiento
           </Button>
         </Form.Item>
       </Form>
