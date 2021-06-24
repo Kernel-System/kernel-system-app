@@ -75,8 +75,8 @@ const Index = () => {
         },
         putToken
       )
-      .then((resul) => {
-        console.log(resul);
+      .then((resul1) => {
+        console.log(resul1);
         http
           .post(
             '/items/empleados/',
@@ -97,13 +97,22 @@ const Index = () => {
               cp: dato.cp,
               entre_calle_1: dato.entre_calle_1,
               entre_calle_2: dato.entre_calle_2,
-              cuenta: resul.data.data.id,
             },
             putToken
           )
           .then((resul) => {
             console.log(resul);
-            Mensaje();
+            http
+              .patch(
+                `/users/${resul1.data.data.id}`,
+                {
+                  rfc: dato.rfc,
+                },
+                putToken
+              )
+              .then(() => {
+                Mensaje();
+              });
           })
           .catch((error) => {
             if (
