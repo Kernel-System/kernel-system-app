@@ -43,7 +43,13 @@ export const userModel = {
     state.nivel = undefined;
   }),
 
-  isAuth: computed((state) => !isEmptyObject(state.token)),
+  isAuth: computed((state) =>
+    state.role !== 'administrador'
+      ? !isEmptyObject(state.token) &&
+        state.role !== undefined &&
+        state.nivel !== undefined
+      : !isEmptyObject(state.token) && state.role !== undefined
+  ),
 
   login: thunk((actions, payload) => {
     actions.setUserToken(payload);

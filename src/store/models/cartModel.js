@@ -33,6 +33,13 @@ export const cartModel = {
     state.cartItems[existingItemId].quantity -= 1;
   }),
 
+  setQuantityToItem: action((state, payload) => {
+    const existingItemId = state.cartItems.findIndex(
+      (item) => item.id === payload.id
+    );
+    state.cartItems[existingItemId].quantity = payload.cantidad;
+  }),
+
   removeCartItem: action((state, payload) => {
     state.cartItems = state.cartItems.filter(
       (cartItem) => cartItem.id !== payload

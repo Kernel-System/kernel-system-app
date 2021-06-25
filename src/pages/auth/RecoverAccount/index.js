@@ -18,7 +18,7 @@ const RecoverAccount = () => {
         );
       })
       .catch(() => {
-        message.error(`Lo sentimos, ha ocurrido un error`);
+        message.error('Lo sentimos, ha ocurrido un error');
       });
   };
 

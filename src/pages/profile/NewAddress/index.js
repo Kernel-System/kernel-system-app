@@ -5,7 +5,7 @@ import {
   getUserDireccionesCount,
   insertUserDireccion,
   updateUserDireccion,
-} from 'api/shared/addresses';
+} from 'api/profile/addresses';
 import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
@@ -54,18 +54,18 @@ const NewAddress = () => {
         insertUserDireccion(newAddress, token)
           .then(() => {
             setLoading(false);
-            message.success(`Se ha creado la dirección correctamente`, 2, () =>
+            message.success('Se ha creado la dirección correctamente', 2, () =>
               history.push('/direcciones')
             );
           })
           .catch(() => {
             setLoading(false);
-            message.error(`Lo sentimos, ha ocurrido un error`);
+            message.error('Lo sentimos, ha ocurrido un error');
           });
       })
       .catch(() => {
         setLoading(false);
-        message.error(`Lo sentimos, ha ocurrido un error`);
+        message.error('Lo sentimos, ha ocurrido un error');
       });
   };
 
@@ -74,13 +74,13 @@ const NewAddress = () => {
     updateUserDireccion(id, updatedAddress, token)
       .then(() => {
         setLoading(false);
-        message.success(`Se ha actualizado la dirección correctamente`, 2, () =>
+        message.success('Se ha actualizado la dirección correctamente', 2, () =>
           history.push('/direcciones')
         );
       })
       .catch(() => {
         setLoading(false);
-        message.error(`Lo sentimos, ha ocurrido un error`);
+        message.error('Lo sentimos, ha ocurrido un error');
       });
   };
 
@@ -179,7 +179,9 @@ const NewAddress = () => {
               <Col xs={24}>
                 <Form.Item>
                   <Button type='primary' htmlType='submit' loading={loading}>
-                    Guardar cambios
+                    {pathname.substring(13) === 'nueva'
+                      ? 'Añadir dirección'
+                      : 'Guardar cambios'}
                   </Button>
                 </Form.Item>
               </Col>

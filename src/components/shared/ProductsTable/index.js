@@ -1,5 +1,13 @@
-import { MinusSquareOutlined } from '@ant-design/icons';
-import { Button, Image, InputNumber, Space, Table, Typography } from 'antd';
+import { MinusOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Image,
+  InputNumber,
+  Popconfirm,
+  Space,
+  Table,
+  Typography,
+} from 'antd';
 import { Link } from 'react-router-dom';
 import { formatPrice, toPercent } from 'utils/functions';
 import { calcCantidad, calcPrecioVariable } from 'utils/productos';
@@ -29,24 +37,30 @@ const ProductsTable = ({
     bordered
   >
     <Table.Column
+      align='center'
       title=''
       key='action'
       render={(_, record) => (
-        <Button
-          icon={<MinusSquareOutlined />}
-          type='link'
-          danger
-          onClick={() => {
+        <Popconfirm
+          title='¿Está seguro que quiere eliminar el producto?'
+          placement='topRight'
+          okText='Eliminar'
+          okType='danger'
+          cancelText='Cancelar'
+          onConfirm={() => {
             if (removeItem.mutate) {
               removeItem.mutate(record.codigo);
             } else {
               removeItem(record.codigo);
             }
           }}
-        />
+        >
+          <Button icon={<MinusOutlined />} danger />
+        </Popconfirm>
       )}
     />
     <Table.Column
+      align='center'
       title='Imagen'
       dataIndex='imagenes'
       render={(imagenes) => (
@@ -75,6 +89,7 @@ const ProductsTable = ({
       }
     />
     <Table.Column
+      align='right'
       title='Descuento(%)'
       dataIndex='descuento'
       render={(descuento, record) =>
@@ -100,7 +115,8 @@ const ProductsTable = ({
       }
     />
     <Table.Column
-      title='Precio Unitario(MX$)'
+      align='right'
+      title='Precio Unitario'
       dataIndex='precios_variables'
       render={(_, record) =>
         record.tipo_de_venta === 'Servicio' ? (
@@ -124,6 +140,7 @@ const ProductsTable = ({
       }
     />
     <Table.Column
+      align='right'
       title='Cantidad'
       dataIndex='cantidad'
       render={(cantidad, record) => (
@@ -134,9 +151,10 @@ const ProductsTable = ({
                 fontSize: '12px',
                 position: 'absolute',
                 top: 9,
+                right: '1rem',
               }}
             >
-              Stock: {calcCantidad(record)}
+              Disponibles: {calcCantidad(record)}
             </Text>
           )}
           <InputNumber
@@ -153,20 +171,31 @@ const ProductsTable = ({
               }
             }}
             onBlur={({ target: { value } }) =>
-              setQuantityToItem(record.codigo, value)
+              setQuantityToItem(
+                type === 'carrito'
+                  ? { id: record.codigo, cantidad: value }
+                  : record.codigo,
+                value
+              )
             }
           />
         </>
       )}
     />
     <Table.Column
+      align='right'
       title='Subtotal'
       dataIndex='subtotal'
       render={(_, record) => (
         <>
           <Text
             type='danger'
-            style={{ fontSize: '12px', position: 'absolute', top: 16 }}
+            style={{
+              fontSize: '12px',
+              position: 'absolute',
+              top: 16,
+              right: '1rem',
+            }}
           >
             -
             {formatPrice(

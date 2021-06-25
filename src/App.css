@@ -13,3 +13,16 @@
 .ant-layout-header {
   padding: 0 32px;
 }
+
+.ant-input-number-input {
+  text-align: right;
+}
+
+.ant-input-number {
+  transition-delay: 0.25s;
+}
+
+.ant-input-number:hover {
+  padding-right: 1rem;
+  transition-delay: initial;
+}

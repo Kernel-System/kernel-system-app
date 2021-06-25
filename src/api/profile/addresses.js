@@ -1,13 +1,13 @@
 import { http } from 'api';
 
 export const insertUserDireccion = (newAddress, token) =>
-  http.post(`/items/domicilios_cliente`, newAddress, {
+  http.post('/items/domicilios_cliente', newAddress, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const getUserDirecciones = (id, token) =>
+export const getUserDirecciones = (id, page, token) =>
   http.get(
-    `/items/domicilios_cliente?filter[id_cliente][id][_eq]=${id}&sort=-fiscal`,
+    `/items/domicilios_cliente?filter[id_cliente][id][_eq]=${id}&sort=-fiscal&page=${page}&limit=10&meta=filter_count`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

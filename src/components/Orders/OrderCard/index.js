@@ -11,9 +11,15 @@ import {
   Typography,
 } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import Text from 'antd/lib/typography/Text';
 import { Link } from 'react-router-dom';
-import { formatDate, formatPrice } from 'utils/functions';
-const { Paragraph } = Typography;
+import {
+  capitalize,
+  formatDate,
+  formatPrice,
+  toPercent,
+} from 'utils/functions';
+const { Title } = Typography;
 
 const OrderCard = ({ details }) => {
   const breakpoint = useBreakpoint();
@@ -32,10 +38,6 @@ const OrderCard = ({ details }) => {
                 value={formatDate(details.fecha_solicitud)}
               />
               <Statistic title='Total' value={formatPrice(details.total)} />
-              <Statistic
-                title='Enviar a'
-                value={details.id_cliente.razon_social}
-              />
             </Space>
           </Col>
           <Col>
@@ -49,13 +51,31 @@ const OrderCard = ({ details }) => {
       }
     >
       <Row gutter={[24, 24]} align='middle'>
-        <Col xs={24} lg={19}>
+        <Col xs={24} md={19}>
           {/* <Title level={4} style={{ marginBottom: 0 }}>
             Fecha prevista: 20 de mayo
           </Title>
           <Paragraph type='success'>Enviado</Paragraph> */}
-          <Collapse defaultActiveKey={['1']} ghost>
-            <Collapse.Panel header='Productos adquiridos' key='1'>
+          <Title
+            level={5}
+            strong
+            type={
+              details.estado === 'aprobada'
+                ? 'success'
+                : details.estado === 'rechazada'
+                ? 'danger'
+                : 'secondary'
+            }
+          >
+            {capitalize(details.estado)}
+          </Title>
+          <Collapse ghost>
+            <Collapse.Panel
+              header={`Productos ${
+                details.estado === 'aprobada' ? 'adquiridos' : 'solicitados'
+              }`}
+              key='1'
+            >
               <List
                 size='small'
                 dataSource={details.productos_solicitados}
@@ -65,31 +85,59 @@ const OrderCard = ({ details }) => {
                       avatar={
                         <Avatar
                           shape='square'
-                          src={`${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.codigo_producto.imagenes[0].directus_files_id}`}
-                        />
+                          src={
+                            item.codigo_producto.imagenes.length
+                              ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.codigo_producto.imagenes[0].directus_files_id}`
+                              : undefined
+                          }
+                        >
+                          {item.codigo_producto.titulo[0]}
+                        </Avatar>
                       }
                       title={
                         <Link to={`/producto/${item.codigo_producto.codigo}`}>
                           {item.codigo_producto.titulo}
                         </Link>
                       }
-                      description={formatPrice(420)}
+                      description={
+                        <>
+                          <Space>
+                            <Text type='secondary'>
+                              {item.cantidad} x{' '}
+                              {formatPrice(
+                                (item.precio_ofrecido -
+                                  item.precio_ofrecido *
+                                    toPercent(item.descuento_ofrecido)) *
+                                  item.cantidad
+                              )}
+                            </Text>
+                            <Text type='danger' delete>
+                              {formatPrice(
+                                item.precio_ofrecido * item.cantidad
+                              )}
+                            </Text>
+                          </Space>
+                        </>
+                      }
                     />
-                    <Paragraph>x {item.cantidad}</Paragraph>
                   </List.Item>
                 )}
               />
             </Collapse.Panel>
           </Collapse>
         </Col>
-        <Col xs={24} lg={5}>
+        <Col xs={24} md={5}>
           <Space direction='vertical' style={{ width: '100%' }}>
             <Link to={`/solicitudes-de-compra/${details.id}?tipo=recoger`}>
               <Button block type='primary'>
                 Ver detalles
               </Button>
             </Link>
-            <Button block>Solicitar factura</Button>
+            {details.estado === 'aprobada' && (
+              <Link to='/facturacion?id=1'>
+                <Button block>Solicitar factura</Button>
+              </Link>
+            )}
           </Space>
         </Col>
       </Row>
