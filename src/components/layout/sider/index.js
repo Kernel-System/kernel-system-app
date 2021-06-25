@@ -3,6 +3,7 @@ import {
   DollarOutlined,
   FileTextOutlined,
   ImportOutlined,
+  PictureOutlined,
   ShopOutlined,
   ShoppingOutlined,
   SwapOutlined,
@@ -118,6 +119,26 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const AnunciosMenuItem = (
+    <Menu.Item
+      key='anuncios'
+      icon={<PictureOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/admin/anuncio'>Anuncios</Link>
+    </Menu.Item>
+  );
+
+  const SolicitudesCompraMenuItem = (
+    <Menu.Item
+      key='solicitudes-de-compra'
+      icon={<FileTextOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/empleado/solicitudes-de-compra'>Solicitudes de compra</Link>
+    </Menu.Item>
+  );
+
   const FacturasExternasMenuItem = (showIcon) => (
     <Menu.Item
       key='facturas-externas'
@@ -179,6 +200,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {VentaMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
+      {SolicitudesCompraMenuItem}
       {FacturasInternasMenuItem(true)}
     </>
   );
@@ -228,6 +250,8 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {ComprasMenuItem}
             {ProveedoresMenuItem}
             {FacturasSubMenu}
+            {AnunciosMenuItem}
+            {SolicitudesCompraMenuItem}
           </>
         )}
       </Menu>
