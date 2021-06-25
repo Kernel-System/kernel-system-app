@@ -1,6 +1,6 @@
 import { Button, Col, Divider, Row } from 'antd';
 import { getUserData } from 'api/profile';
-import { getUserDireccionFiscal } from 'api/shared/addresses';
+import { getUserDireccionFiscal } from 'api/profile/addresses';
 import ProfileOverview from 'components/profile/Profile/ProfileOverview';
 import AssignAddressCard from 'components/shared/AssignAddressCard';
 import CenteredSpinner from 'components/UI/CenteredSpinner';
@@ -36,26 +36,24 @@ const Profile = () => {
           </Link>,
         ]}
       />
-      {user.isLoading ? (
+      {user.isLoading || direccionFiscal.isLoading ? (
         <CenteredSpinner />
       ) : (
-        <Row gutter={[24, 24]}>
-          <ProfileOverview user={user.data} />
-        </Row>
+        <>
+          <Row gutter={[24, 24]}>
+            <ProfileOverview user={user.data} />
+          </Row>
+          <Divider />
+          <Row gutter={[16, 16]}>
+            <Col xs={24}>
+              <AssignAddressCard
+                address={direccionFiscal.data?.data?.data[0]}
+                tipo='Fiscal'
+              />
+            </Col>
+          </Row>
+        </>
       )}
-      <Divider />
-      <Row gutter={[16, 16]}>
-        <Col xs={24}>
-          {direccionFiscal.isIdle || direccionFiscal.isLoading ? (
-            <CenteredSpinner />
-          ) : (
-            <AssignAddressCard
-              address={direccionFiscal.data?.data?.data[0]}
-              tipo='Fiscal'
-            />
-          )}
-        </Col>
-      </Row>
     </>
   );
 };

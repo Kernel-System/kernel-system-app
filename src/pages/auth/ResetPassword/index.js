@@ -1,12 +1,12 @@
 import { Button, Col, Form, Input, message, Row } from 'antd';
 import { resetPassword } from 'api/auth';
 import Heading from 'components/UI/Heading';
-import { useQuery } from 'hooks/useQuery';
+import { useQueryParams } from 'hooks/useQueryParams';
 import { useHistory } from 'react-router';
 import { passwordRules } from 'utils/validations/auth';
 
 const ResetPassword = () => {
-  const query = useQuery();
+  const query = useQueryParams();
   const history = useHistory();
 
   const onSubmit = ({ newPassword }) => {
