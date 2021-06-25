@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react';
+import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import {
-  Typography,
-  Input,
-  Space,
   Button,
+  Col,
   Form,
-  Select,
+  Input,
+  InputNumber,
   message,
   Row,
-  Col,
-  InputNumber,
+  Select,
+  Space,
+  Typography,
 } from 'antd';
-import { useHistory } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
-import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { http } from 'api';
-import { useStoreState } from 'easy-peasy';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { http } from 'api';
+import HeadingBack from 'components/UI/HeadingBack';
+import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -58,6 +58,7 @@ const Index = () => {
     http.get(`/items/productos/`, putToken).then((result) => {
       onChangeDato(result.data.data, setProductEns);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ const Index = () => {
       .then((result) => {
         onSetProductos(result.data.data);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [almacen]);
 
   const onSetProductos = (lista) => {

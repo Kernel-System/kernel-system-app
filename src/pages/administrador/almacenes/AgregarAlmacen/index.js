@@ -1,11 +1,11 @@
-import { Button, Form, Select, message } from 'antd';
-import { useHistory, useRouteMatch } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
-import InputForm from 'components/shared/InputForm';
-import { useEffect, useState } from 'react';
+import { Button, Form, message, Select } from 'antd';
 import { http } from 'api';
+import InputForm from 'components/shared/InputForm';
+import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { useHistory, useRouteMatch } from 'react-router';
 const { Option } = Select;
 
 const Index = () => {
@@ -37,6 +37,7 @@ const Index = () => {
           onSetAlmacen(resul.data.data);
         });
     } else onSetAlmacen([{}]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetAlmacen = (lista) => {

@@ -15,7 +15,7 @@ import Text from 'antd/lib/typography/Text';
 import {
   getPuntoDeVentaProducts,
   getPuntoDeVentaServices,
-} from 'api/puntodeventa';
+} from 'api/ventas/punto_de_venta';
 import {
   getSolicitudCompra,
   updateSolicitudCompra,

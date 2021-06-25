@@ -1,34 +1,34 @@
 import {
-  Input,
-  Button,
-  Typography,
-  Row,
-  Col,
-  Form,
-  Select,
-  message,
-  DatePicker,
-  Table,
-  InputNumber,
-  Popconfirm,
-  Image,
-} from 'antd';
-
-import {
-  EditOutlined,
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
-import HeadingBack from 'components/UI/HeadingBack';
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Image,
+  Input,
+  InputNumber,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Table,
+  Typography,
+} from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
+import HeadingBack from 'components/UI/HeadingBack';
+import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
-import { useStoreState } from 'easy-peasy';
-import { http } from 'api';
+
 const { Search } = Input;
 const { Option } = Select;
 
@@ -100,6 +100,7 @@ const Index = ({ tipo }) => {
           onAddProductos(result.data.data.productos_transferencia);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const breakpoint = useBreakpoint();

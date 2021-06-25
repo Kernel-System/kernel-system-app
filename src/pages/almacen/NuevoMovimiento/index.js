@@ -1,28 +1,28 @@
+import { DeleteOutlined } from '@ant-design/icons';
 import {
-  Input,
   Button,
-  Typography,
-  Form,
+  Checkbox,
   Col,
+  Form,
+  Image,
+  Input,
+  InputNumber,
+  message,
+  Popconfirm,
   Row,
   Select,
-  message,
   Table,
-  InputNumber,
-  Popconfirm,
-  Image,
-  Checkbox,
+  Typography,
 } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import HeadingBack from 'components/UI/HeadingBack';
-import ModalProducto from 'components/transferencia/ModalTransferencia';
-import { useHistory } from 'react-router';
 import { http } from 'api';
-import { useState, useEffect } from 'react';
-import { conceptosMovimientos } from 'utils/almacen';
-import { useStoreState } from 'easy-peasy';
-import { itemsToGrid } from 'utils/gridUtils';
+import ModalProducto from 'components/transferencia/ModalTransferencia';
+import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
+import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
+import { conceptosMovimientos } from 'utils/almacen';
+import { itemsToGrid } from 'utils/gridUtils';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -69,7 +69,6 @@ const Index = () => {
   const [factura, setFactura] = useState('');
   const [tipo, setTipo] = useState('');
   const [enabled, setEnabled] = useState(true);
-  const [searchValue, setSearchValue] = useState('');
   const [listProducts, setListProducts] = useState([]);
   const [listToShow, setListProductsToShow] = useState([]);
   const [empleado, setEmpleado] = useState('');
@@ -152,6 +151,7 @@ const Index = () => {
     http.get(`/items/almacenes/`, putToken).then((result) => {
       onSetArreglo(result.data.data, setAlmacenes);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetAlmacen = (value) => {
@@ -167,6 +167,7 @@ const Index = () => {
       .then((result) => {
         onSetProductos(result.data.data);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [almacen, concepto]);
 
   const onSetProductos = (lista) => {
@@ -547,7 +548,6 @@ const Index = () => {
 
   //#region busqueda de productos
   const onSearchChange = (value) => {
-    setSearchValue(value);
     filtrarProductosPorTitulo(productos, value);
   };
 

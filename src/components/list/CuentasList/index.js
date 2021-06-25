@@ -1,9 +1,9 @@
-import './styles.css';
+import { Input, List, Select } from 'antd';
 import { http } from 'api';
-import { useState, useEffect } from 'react';
-import { List, Input, Select } from 'antd';
-import { Link } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import './styles.css';
 const { Option } = Select;
 
 const Index = ({ onConfirmDelete, onClickItem }) => {
@@ -20,6 +20,7 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
     http.get(`/items/${tipo}?fields=*`, putToken).then((resul) => {
       onSetFactura(resul.data.data);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo]);
 
   const onSetFactura = (lista) => {

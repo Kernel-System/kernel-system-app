@@ -1,9 +1,9 @@
-import './styles.css';
-import { useState, useEffect } from 'react';
-import { http } from 'api';
-import { List, Select, Typography, Row, Col, Button } from 'antd';
 import { EyeFilled } from '@ant-design/icons';
+import { Button, Col, List, Row, Select, Typography } from 'antd';
+import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import './styles.css';
 const { Option } = Select;
 const { Text } = Typography;
 
@@ -29,6 +29,7 @@ const Index = ({ onClickItem }) => {
       .then((result) => {
         onSetInventarios(result.data.data);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetInventarios = (lista) => {

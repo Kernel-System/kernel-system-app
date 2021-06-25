@@ -1,4 +1,4 @@
-import { Modal, Image, Table, Select } from 'antd';
+import { Modal, Select, Table } from 'antd';
 import TextLabel from 'components/UI/TextLabel';
 import { useEffect, useState } from 'react';
 
@@ -53,6 +53,7 @@ const Index = ({ visible, inventario, alm, hideModal }) => {
       );
       onSetDato(inventario?.codigo_producto?.titulo, setProducto);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventario]);
 
   const columns = [
