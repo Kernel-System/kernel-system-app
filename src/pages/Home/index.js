@@ -1,10 +1,13 @@
+import { getHomeAnuncios } from 'api/home/home_carousel';
 import HomeCarousel from 'components/Home/HomeCarousel';
 import HomeProducts from 'components/Home/HomeProducts';
 import { useStoreState } from 'easy-peasy';
+import { useQuery } from 'react-query';
 import { Redirect } from 'react-router-dom';
 
 const Home = () => {
   const role = useStoreState((state) => state.user.role);
+  const { data, isLoading } = useQuery('home-carousel', getHomeAnuncios);
 
   let redirect = null;
   switch (role) {
@@ -23,6 +26,9 @@ const Home = () => {
     case 'encargado de ventas':
       redirect = <Redirect to='/venta' />;
       break;
+    case 'administrador':
+      redirect = <Redirect to='/empleado/perfil' />;
+      break;
     default:
       break;
   }
@@ -30,7 +36,7 @@ const Home = () => {
   return (
     <>
       {redirect}
-      <HomeCarousel />
+      <HomeCarousel anuncios={data} isLoading={isLoading} />
       <HomeProducts />
     </>
   );
