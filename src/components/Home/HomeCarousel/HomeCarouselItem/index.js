@@ -1,24 +1,15 @@
 import { Image } from 'antd';
-import { useHistory } from 'react-router';
 
-const HomeCarouselItem = ({ url }) => {
-  const history = useHistory();
-
-  const goToOffer = () => {
-    history.push(url);
-  };
-
-  return (
+const HomeCarouselItem = ({ titulo, imagen, url }) => (
+  <a href={url}>
     <Image
-      onClick={goToOffer}
       preview={false}
       style={{ cursor: 'pointer', objectFit: 'cover' }}
       width='100%'
-      height={300}
-      alt={url}
-      src='https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+      height={400}
+      alt={titulo}
+      src={`${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagen}`}
     />
-  );
-};
-
+  </a>
+);
 export default HomeCarouselItem;
