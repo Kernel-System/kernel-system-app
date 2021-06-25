@@ -1,5 +1,5 @@
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
-import { Button, List } from 'antd';
+import { Button, List, Popconfirm } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import Text from 'antd/lib/typography/Text';
 import { useHistory } from 'react-router';
@@ -10,9 +10,9 @@ const AddressesList = ({ addresses, deleteUserDireccion }) => {
 
   return (
     <List
+      style={{ marginBottom: '1rem' }}
       itemLayout={breakpoint.md ? 'horizontal' : 'vertical'}
-      dataSource={addresses?.data?.data?.data}
-      loading={addresses.isLoading}
+      dataSource={addresses}
       renderItem={(address) => (
         <List.Item
           actions={[
@@ -20,13 +20,21 @@ const AddressesList = ({ addresses, deleteUserDireccion }) => {
               onClick={() => history.push(`/direcciones/${address.id}`)}
               icon={<EditFilled />}
               disabled={address.fiscal}
-            ></Button>,
-            <Button
-              danger
-              icon={<DeleteFilled />}
-              onClick={() => deleteUserDireccion.mutate(address.id)}
-              disabled={address.fiscal}
-            ></Button>,
+            />,
+            <Popconfirm
+              title='¿Está seguro que quiere eliminar la dirección?'
+              placement='topLeft'
+              onConfirm={() => deleteUserDireccion.mutate(address.id)}
+              okText='Eliminar'
+              okType='danger'
+              cancelText='Cancelar'
+            >
+              <Button
+                danger
+                icon={<DeleteFilled />}
+                disabled={address.fiscal}
+              />
+            </Popconfirm>,
           ]}
         >
           <List.Item.Meta
