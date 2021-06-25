@@ -1,11 +1,11 @@
-import './styles.css';
-import { http } from 'api';
-import { useState } from 'react';
-import { List, Button } from 'antd';
 import { EditFilled } from '@ant-design/icons';
+import { Button, List } from 'antd';
+import { http } from 'api';
+import { useStoreState } from 'easy-peasy';
+import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { useStoreState } from 'easy-peasy';
+import './styles.css';
 
 const Index = ({ onClickItem, id_fac, tipo }) => {
   const token = useStoreState((state) => state.user.token.access_token);

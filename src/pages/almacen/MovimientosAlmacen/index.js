@@ -1,13 +1,13 @@
-import MovimientosAlmacenList from 'components/list/MovimientosAlmacenList';
-import ModalMovimiento from 'components/almacen/ModalMovimiento';
-import HeadingBack from 'components/UI/HeadingBack';
-import { Button } from 'antd';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { useStoreState } from 'easy-peasy';
-import { useQuery } from 'react-query';
+import { Button } from 'antd';
 import { getUserRole } from 'api/auth';
+import ModalMovimiento from 'components/almacen/ModalMovimiento';
+import MovimientosAlmacenList from 'components/list/MovimientosAlmacenList';
+import HeadingBack from 'components/UI/HeadingBack';
+import { useStoreState } from 'easy-peasy';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   const [visible, setVisible] = useState(false);
