@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  ContainerOutlined,
   DollarOutlined,
   FileTextOutlined,
   ImportOutlined,
@@ -132,7 +133,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const SolicitudesCompraMenuItem = (
     <Menu.Item
       key='solicitudes-de-compra'
-      icon={<FileTextOutlined />}
+      icon={<ContainerOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/empleado/solicitudes-de-compra'>Solicitudes de compra</Link>

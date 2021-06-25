@@ -24,7 +24,8 @@ const EmpleadoProfileOverview = ({ employee }) => {
             {employee.correo}
           </Descriptions.Item>
           <Descriptions.Item label='Número telefónico'>
-            {formatPhoneNumber(employee.empleado.telefono)}
+            {employee.empleado.telefono &&
+              formatPhoneNumber(employee.empleado.telefono)}
           </Descriptions.Item>
         </Descriptions>
       </Col>

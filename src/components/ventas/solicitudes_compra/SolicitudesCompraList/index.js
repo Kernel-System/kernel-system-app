@@ -1,4 +1,4 @@
-import { EyeFilled } from '@ant-design/icons';
+import { EditFilled, EyeFilled } from '@ant-design/icons';
 import { Badge, Button, List } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { capitalize, formatDateTime } from 'utils/functions';
@@ -22,6 +22,7 @@ const SolicitudesCompraList = ({ solicitudes }) => {
           }
         >
           <List.Item
+            style={{ paddingTop: '1.5rem' }}
             actions={[
               <Button
                 onClick={() =>
@@ -29,7 +30,13 @@ const SolicitudesCompraList = ({ solicitudes }) => {
                     `/empleado/solicitudes-de-compra/${solicitud.id}`
                   )
                 }
-                icon={<EyeFilled />}
+                icon={
+                  solicitud.estado === 'pendiente' ? (
+                    <EditFilled />
+                  ) : (
+                    <EyeFilled />
+                  )
+                }
               />,
             ]}
           >
