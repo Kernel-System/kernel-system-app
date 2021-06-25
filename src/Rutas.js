@@ -1,8 +1,8 @@
-import { Route, Switch } from 'react-router';
-import ProductsTable from 'components/shared/ProductsTable';
 import GuestRoute from 'components/utils/GuestRoute';
 import PrivateRoute from 'components/utils/PrivateRoute';
 import asyncComponent from 'hoc/asyncComponent';
+import AgregarAnuncio from 'pages/administrador/anuncios/AgregarAnuncio';
+import Anuncios from 'pages/administrador/anuncios/Anuncios';
 import MovimientosAlmacen from 'pages/almacen/MovimientosAlmacen';
 import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Cart from 'pages/Cart';
@@ -16,6 +16,8 @@ import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
 import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
 import FacturarTicket from 'pages/FacturarTicket';
+import FacturasExternas from 'pages/facturas/FacturasExternas';
+import FacturasInternas from 'pages/facturas/FacturasInternas';
 import Home from 'pages/Home';
 import Order from 'pages/orders/Order';
 import Orders from 'pages/orders/Orders';
@@ -26,10 +28,9 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-
-import FacturasExternas from 'pages/facturas/FacturasExternas';
-import FacturasInternas from 'pages/facturas/FacturasInternas';
-
+import SolicitudDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudDeCompra';
+import SolicitudesDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudesDeCompra';
+import { Route, Switch } from 'react-router';
 import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
 import Almacen from './pages/administrador/almacenes/Almacenes';
 import NuevoCliente from './pages/administrador/clientes/AgregarCliente';
@@ -40,13 +41,13 @@ import NuevaSucursal from './pages/administrador/sucursales/AgregarSucursal';
 import Sucursal from './pages/administrador/sucursales/Sucursales';
 import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 import Tranferencias from './pages/almacen/Transferencias';
+import CotizacionClientes from './pages/cotizacion_clientes/Cotizaciones';
+import AgregarCotizacionClientes from './pages/cotizacion_clientes/CrearCotizacion';
 import Cuentas from './pages/pagos/Cuentas';
 import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
-import AgregarCotizacionClientes from './pages/cotizacion_clientes/CrearCotizacion';
-import CotizacionClientes from './pages/cotizacion_clientes/Cotizaciones';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -67,7 +68,6 @@ const Rutas = () => {
     <Switch>
       {/* Home */}
       <Route path='/' exact component={Home} />
-
       {/* Auth */}
       <GuestRoute path='/iniciar-sesion' exact component={asyncLogin} />
       <GuestRoute
@@ -86,7 +86,6 @@ const Rutas = () => {
         exact
         component={asyncLogout}
       />
-
       {/* Addresses */}
       <PrivateRoute
         allowedRoles={['cliente']}
@@ -106,7 +105,6 @@ const Rutas = () => {
         exact
         component={NewAddress}
       />
-
       {/* Profile */}
       <PrivateRoute
         allowedRoles={['cliente']}
@@ -120,12 +118,10 @@ const Rutas = () => {
         exact
         component={ChangePassword}
       />
-
       {/* Search Product */}
       <Route path='/b/:query' exact component={Search} />
       <Route path='/c/:query' exact component={Search} />
       <Route path='/producto/:id' exact component={Product} />
-
       {/* Cart */}
       <PrivateRoute
         allowedRoles={['cliente']}
@@ -133,7 +129,6 @@ const Rutas = () => {
         exact
         component={Cart}
       />
-
       {/* Checkout */}
       <PrivateRoute
         allowedRoles={['cliente']}
@@ -141,7 +136,6 @@ const Rutas = () => {
         exact
         component={Checkout}
       />
-
       {/* Orders */}
       <PrivateRoute
         allowedRoles={['cliente']}
@@ -155,7 +149,6 @@ const Rutas = () => {
         exact
         component={Order}
       />
-
       {/* Empleados */}
       <PrivateRoute
         allowedRoles={[
@@ -169,7 +162,6 @@ const Rutas = () => {
         exact
         component={EmpleadoProfile}
       />
-
       {/* Punto de venta */}
       <PrivateRoute
         allowedRoles={['encargado de ventas']}
@@ -177,9 +169,7 @@ const Rutas = () => {
         exact
         component={PuntoDeVenta}
       />
-
       {/* Cotizacion a clientes */}
-
       <PrivateRoute
         allowedRoles={['encargado de ventas']}
         path='/cotizacion-cliente'
@@ -192,54 +182,59 @@ const Rutas = () => {
         exact
         component={AgregarCotizacionClientes}
       />
-
+      {/* Solicitudes de compra */}
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/empleado/solicitudes-de-compra'
+        exact
+        component={SolicitudesDeCompra}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/empleado/solicitudes-de-compra/:id'
+        exact
+        component={SolicitudDeCompra}
+      />
       {/* Proveedores */}
       <PrivateRoute
         allowedRoles={['encargado de compras']}
         path='/proveedores'
         exact
-      >
-        <Proveedores />
-      </PrivateRoute>
+        component={Proveedores}
+      />
       <PrivateRoute
         allowedRoles={['encargado de compras']}
         path='/proveedores/nuevo'
         exact
         component={AñadirProveedor}
       />
-
       {/* Facturas Externas */}
       <PrivateRoute
         allowedRoles={['encargado de compras']}
         path='/facturas-externas'
         exact
-      >
-        <FacturasExternas />
-      </PrivateRoute>
-
+        component={FacturasExternas}
+      />
       {/* Facturas Internas */}
       <PrivateRoute
         allowedRoles={['encargado de ventas']}
         path='/facturas-internas'
         exact
-      >
-        <FacturasInternas />
-      </PrivateRoute>
-      {/* Compras */}
+        component={FacturasInternas}
+      />
+      ;{/* Compras */}
       <PrivateRoute
         allowedRoles={['encargado de compras']}
         path='/compras'
         exact
-      >
-        <Compras />
-      </PrivateRoute>
+        component={Compras}
+      />
       <PrivateRoute
         allowedRoles={['encargado de compras']}
         path='/compras/registrar'
         exact
         component={RegistrarCompra}
       />
-
       {/* Ensambles */}
       <PrivateRoute
         allowedRoles={[
@@ -271,7 +266,6 @@ const Rutas = () => {
         exact
         component={ModificarEnsambles}
       />
-
       {/* Facturar ticket */}
       <PrivateRoute
         allowedRoles='*'
@@ -279,7 +273,6 @@ const Rutas = () => {
         exact
         component={FacturarTicket}
       />
-
       {/* Movimientos de almacen */}
       <PrivateRoute
         allowedRoles={['encargado de almacen']}
@@ -293,7 +286,6 @@ const Rutas = () => {
         exact
         component={NuevoMovimiento}
       />
-
       {/* Transferencias */}
       <PrivateRoute
         allowedRoles={['encargado de almacen']}
@@ -306,23 +298,22 @@ const Rutas = () => {
         path='/transferencia/nuevo'
         exact
       >
-        {<NuevaTrasferencia tipo={'agregar'} />}
+        <NuevaTrasferencia tipo={'agregar'} />
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['encargado de almacen']}
         path='/transferencia/mostrar/:id'
         exact
       >
-        {<NuevaTrasferencia tipo={'mostrar'} />}
+        <NuevaTrasferencia tipo={'mostrar'} />
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['encargado de almacen']}
         path='/transferencia/editar/:id'
         exact
       >
-        {<NuevaTrasferencia tipo={'editar'} />}
+        <NuevaTrasferencia tipo={'editar'} />
       </PrivateRoute>
-
       {/* Pagos */}
       <PrivateRoute
         allowedRoles={['cuentas por cobrar']}
@@ -341,16 +332,15 @@ const Rutas = () => {
         path='/cuentas/pagos_int/:id_fac/'
         exact
       >
-        {<Pagos tipo={'facturas_internas'} />}
+        <Pagos tipo={'facturas_internas'} />
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['cuentas por cobrar']}
         path='/cuentas/pagos_ext/:id_fac/'
         exact
       >
-        {<Pagos tipo={'facturas_externas'} />}
+        <Pagos tipo={'facturas_externas'} />
       </PrivateRoute>
-
       {/* Productos */}
       <PrivateRoute
         allowedRoles={['encargado de compras', 'encargado de ventas']}
@@ -363,25 +353,23 @@ const Rutas = () => {
         path='/productos/nuevo'
         exact
       >
-        {<AgregarProductos tipo={'agregar'} />}
+        <AgregarProductos tipo={'agregar'} />
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['encargado de compras', 'encargado de ventas']}
         path='/productos/editar/:codigo'
         exact
       >
-        {<AgregarProductos tipo={'editar'} />}
+        <AgregarProductos tipo={'editar'} />
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['encargado de compras', 'encargado de ventas']}
         path='/productos/mostrar/:codigo'
         exact
       >
-        {<AgregarProductos tipo={'mostrar'} />}
+        <AgregarProductos tipo={'mostrar'} />
       </PrivateRoute>
-
       {/* Administrador */}
-
       <PrivateRoute
         allowedRoles={['administrador']}
         path='/admin/sucursal'
@@ -400,7 +388,6 @@ const Rutas = () => {
         exact
         component={NuevaSucursal}
       />
-
       <PrivateRoute
         allowedRoles={['administrador']}
         path='/admin/almacen'
@@ -419,7 +406,6 @@ const Rutas = () => {
         exact
         component={NuevoAlmacen}
       />
-
       <PrivateRoute
         allowedRoles={['administrador']}
         path='/admin/empleado'
@@ -438,7 +424,6 @@ const Rutas = () => {
         exact
         component={NuevoEmpleado}
       />
-
       <PrivateRoute
         allowedRoles={['administrador']}
         path='/admin/cliente'
@@ -457,10 +442,25 @@ const Rutas = () => {
         exact
         component={NuevoCliente}
       />
-
-      {/* Test */}
-      <Route path='/test' exact component={ProductsTable} />
-
+      {/* Anuncios */}
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/anuncio'
+        exact
+        component={Anuncios}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/anuncio/nuevo'
+        exact
+        component={AgregarAnuncio}
+      />
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/admin/anuncio/:id'
+        exact
+        component={AgregarAnuncio}
+      />
       {/* Not Found */}
       <Route component={asyncNotFound} />
     </Switch>
