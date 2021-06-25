@@ -4,7 +4,19 @@ const ProductImage = ({ images }) => {
   return (
     <Card size='small' style={{ minHeight: '342px' }}>
       {images.length > 0 ? (
-        <Carousel autoplay>
+        <Carousel
+          customPaging={(i) => (
+            <button
+              style={{
+                height: '15px',
+                backgroundColor: '#4b8ef7',
+              }}
+            >
+              {i + 1}
+            </button>
+          )}
+          autoplay
+        >
           {images.map((image) => (
             <Image
               key={image.directus_files_id}
