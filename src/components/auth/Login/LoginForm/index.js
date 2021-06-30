@@ -1,6 +1,6 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Space, Typography } from 'antd';
-import { getToken, getUserNivel, getUserRole } from 'api/auth';
+import { getToken, getUserNivel, getUserRole, getEmployeeId } from 'api/auth';
 import Heading from 'components/UI/Heading';
 import { useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
@@ -12,6 +12,9 @@ const LoginForm = () => {
   const login = useStoreActions((actions) => actions.user.login);
   const setUserRole = useStoreActions((actions) => actions.user.setUserRole);
   const setUserNivel = useStoreActions((actions) => actions.user.setUserNivel);
+  const setEmployeeId = useStoreActions(
+    (actions) => actions.user.setEmployeeId
+  );
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -23,10 +26,12 @@ const LoginForm = () => {
         Promise.all([
           getUserRole(data.access_token),
           getUserNivel(data.access_token),
+          getEmployeeId(data.access_token),
         ])
           .then((result) => {
             setUserRole(result[0].data.data.role.name);
             setUserNivel(result[1].data.data?.cliente[0]?.nivel);
+            setEmployeeId(result[2].data.data?.empleado[0]?.rfc);
           })
           .catch(() => {
             message.error(`Lo sentimos, ha ocurrido un error`);

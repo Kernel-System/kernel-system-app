@@ -13,6 +13,14 @@ export const userModel = {
     state.token = {};
   }),
 
+  setEmployeeId: action((state, payload) => {
+    state.rfc = payload;
+  }),
+
+  removeEmployeeId: action((state) => {
+    state.rfc = undefined;
+  }),
+
   expirationDate: 0,
 
   setExpirationDate: action(
@@ -56,6 +64,7 @@ export const userModel = {
     actions.removeExpirationDate();
     actions.removeUserRole();
     actions.removeUserNivel();
+    actions.removeEmployeeId();
   }),
 
   refreshToken: thunk((actions, _, helpers) => {

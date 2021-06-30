@@ -28,3 +28,8 @@ export const getUserNivel = (token) =>
   http.get('/users/me?fields=cliente.nivel', {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const getEmployeeId = (token) =>
+  http.get('/users/me?fields=empleado.rfc', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
