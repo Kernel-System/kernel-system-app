@@ -11,6 +11,7 @@ const ProductosTable = ({ productos }) => {
       scroll={{ x: true }}
     >
       <Column title='Clave' key='clave' dataIndex='clave' />
+      <Column title='Código' key='codigo' dataIndex='codigo' />
       <Column title='Descripción' key='descripcion' dataIndex='descripcion' />
       <Column title='Cantidad' key='cantidad' dataIndex='cantidad' />
       <Column title='Unidad' key='unidad' dataIndex='unidad' />
