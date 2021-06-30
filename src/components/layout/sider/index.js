@@ -108,6 +108,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const ProductosCompradosMenuItem = (
+    <Menu.Item
+      key='productos-comprados'
+      icon={<ShoppingOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/productos-comprados'>Productos Comprados</Link>
+    </Menu.Item>
+  );
+
   const ProveedoresMenuItem = (
     <Menu.Item
       key='proveedores'
@@ -196,6 +206,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const encargadoDeComprasMenuItems = (
     <>
       {ComprasMenuItem}
+      {ProductosCompradosMenuItem}
       {ProveedoresMenuItem}
       {ProductosMenuItem}
       {FacturasExternasMenuItem(true)}
@@ -226,6 +237,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {MovimientosAlmacenMenuItem}
             {TransferenciaMenuItem}
             {ComprasMenuItem}
+            {ProductosCompradosMenuItem}
             {ProveedoresMenuItem}
             {FacturasSubMenu}
           </>

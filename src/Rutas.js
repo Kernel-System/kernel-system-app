@@ -8,6 +8,7 @@ import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
 import Compras from 'pages/compras/Compras';
+import ProductosComprados from 'pages/compras/ProductosComprados';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
 import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
@@ -232,6 +233,13 @@ const Rutas = () => {
         exact
       >
         <Compras />
+      </PrivateRoute>
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/productos-comprados'
+        exact
+      >
+        <ProductosComprados />
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['encargado de compras']}
