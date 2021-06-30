@@ -41,13 +41,8 @@ const SolicitudesCompraList = ({ solicitudes }) => {
             ]}
           >
             <List.Item.Meta
-              title={<>Cliente: {solicitud.id_cliente.nombre_comercial}</>}
-              description={
-                <>
-                  Fecha de solicitud:{' '}
-                  {formatDateTime(solicitud.fecha_solicitud, 'long')}
-                </>
-              }
+              title={solicitud.id_cliente.nombre_comercial}
+              description={formatDateTime(solicitud.fecha_solicitud, 'long')}
             />
           </List.Item>
         </Badge.Ribbon>

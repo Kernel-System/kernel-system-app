@@ -25,6 +25,7 @@ import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
 import SolicitudesCompraProductsTable from 'components/ventas/solicitudes_compra/SolicitudCompraProductsTable';
 import { useStoreState } from 'easy-peasy';
+import moment from 'moment';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
@@ -32,7 +33,6 @@ import {
   capitalize,
   formatDateTime,
   formatPhoneNumber,
-  formatPrice,
   toPercent,
 } from 'utils/functions';
 import { calcCantidad, calcPrecioVariable } from 'utils/productos';
@@ -46,6 +46,7 @@ const SolicitudDeCompra = () => {
   const [productQuery, setProductQuery] = useState(undefined);
   const [serviceQuery, setServiceQuery] = useState(undefined);
   const [newProducts, setNewProducts] = useState([]);
+  const [comentarios, setComentarios] = useState('');
   const token = useStoreState((state) => state.user.token.access_token);
   const products = useQuery(['punto-de-venta-products', productQuery], () =>
     getPuntoDeVentaProducts(productQuery, token)
@@ -149,7 +150,7 @@ const SolicitudDeCompra = () => {
   const handleSubmit = (estado) => {
     const updatedSolicitud = {
       estado,
-      fecha_ultima_revision: new Date(),
+      fecha_ultima_revision: moment(new Date()).format('YYYY-MM-DDTHH:mm:ss'),
       total: newProducts.reduce(
         (total, product) =>
           total +
@@ -165,6 +166,7 @@ const SolicitudDeCompra = () => {
         iva: product.iva,
         codigo_producto: product.codigo_producto.codigo,
       })),
+      comentarios,
     };
     setLoading(true);
     updateSolicitudCompra(id, updatedSolicitud, token)
@@ -201,9 +203,8 @@ const SolicitudDeCompra = () => {
                 title='Cliente'
                 subtitle={
                   <>
-                    {solicitudData.id_cliente.nombre_comercial} -{' '}
+                    {solicitudData.id_cliente.nombre_comercial} - Tel.
                     <Text underline type='secondary'>
-                      Tel.{' '}
                       {formatPhoneNumber(solicitudData.id_cliente.telefono)}
                     </Text>
                   </>
@@ -219,13 +220,20 @@ const SolicitudDeCompra = () => {
             <Col xs={24} md={12}>
               <TextLabel
                 title='Fecha de solicitud'
-                subtitle={formatDateTime(solicitudData.fecha_solicitud)}
+                subtitle={formatDateTime(solicitudData.fecha_solicitud, 'long')}
               />
             </Col>
             <Col xs={24} md={12}>
               <TextLabel
                 title='Fecha de última revisión'
-                subtitle={formatDateTime(solicitudData.fecha_ultima_revision)}
+                subtitle={
+                  solicitudData.fecha_ultima_revision
+                    ? formatDateTime(
+                        solicitudData.fecha_ultima_revision,
+                        'long'
+                      )
+                    : '-'
+                }
               />
             </Col>
             <Col xs={24} md={12}>
@@ -260,11 +268,11 @@ const SolicitudDeCompra = () => {
             </Col>
             <Col xs={24} md={12}>
               <TextLabel
-                title='Total'
-                subtitle={formatPrice(solicitudData.total)}
+                title='Sucursal'
+                subtitle={`${solicitudData.sucursal.clave} - ${solicitudData.sucursal.nombre}`}
               />
             </Col>
-            <Divider style={{ marginTop: 10 }} />
+            <Divider />
             <Col span={24}>
               <TextLabel title='Productos solicitados' />
               {solicitudData.estado === 'pendiente' && (
@@ -322,38 +330,44 @@ const SolicitudDeCompra = () => {
               <Input.TextArea
                 showCount
                 maxLength={100}
-                value={solicitudData.comentarios}
+                value={
+                  solicitudData.estado === 'pendiente'
+                    ? comentarios
+                    : solicitudData.comentarios
+                }
+                onChange={({ target: { value } }) => setComentarios(value)}
                 disabled={solicitudData.estado !== 'pendiente' ? true : false}
+                style={{ marginBottom: '1rem' }}
               />
+              {solicitudData.estado === 'pendiente' && (
+                <Space>
+                  <Button
+                    type='primary'
+                    icon={<CheckOutlined />}
+                    onClick={() => handleSubmit('aprobada')}
+                    loading={loading}
+                  >
+                    Aprobar
+                  </Button>
+                  <Popconfirm
+                    title='¿Está seguro que quiere rechazar esta solicitud?'
+                    okText='Rechazar'
+                    okType='danger'
+                    cancelText='Cancelar'
+                    onConfirm={() => handleSubmit('rechazada')}
+                  >
+                    <Button danger icon={<CloseOutlined />} loading={loading}>
+                      Rechazar
+                    </Button>
+                  </Popconfirm>
+                </Space>
+              )}
             </Col>
             <Col xs={24} md={12}>
               <TextLabel title='Resumen' />
               <SolicitudDeCompraSummary products={newProducts} />
             </Col>
           </Row>
-          {solicitudData.estado === 'pendiente' && (
-            <Space>
-              <Button
-                type='primary'
-                icon={<CheckOutlined />}
-                onClick={() => handleSubmit('aprobada')}
-                loading={loading}
-              >
-                Aprobar
-              </Button>
-              <Popconfirm
-                title='¿Está seguro que quiere rechazar esta solicitud?'
-                okText='Rechazar'
-                okType='danger'
-                cancelText='Cancelar'
-                onConfirm={() => handleSubmit('rechazada')}
-              >
-                <Button danger icon={<CloseOutlined />} loading={loading}>
-                  Rechazar
-                </Button>
-              </Popconfirm>
-            </Space>
-          )}
         </>
       )}
     </>
