@@ -1,18 +1,18 @@
-import { Typography, Button, Form, message, Row, Col } from 'antd';
-import { useHistory, useRouteMatch } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
+import { Button, Col, Form, message, Row, Typography } from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { useEffect, useState } from 'react';
-import { http } from 'api';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { useHistory, useRouteMatch } from 'react-router';
 import {
   calleRules,
+  coloniaRules,
   cpRules,
   noExtRules,
   noIntRules,
-  coloniaRules,
 } from 'utils/validations/address';
 
 const { Title } = Typography;
@@ -36,6 +36,7 @@ const Index = () => {
           onSetSucursal(resul.data.data);
         });
     } else onSetSucursal([{}]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetSucursal = (lista) => {

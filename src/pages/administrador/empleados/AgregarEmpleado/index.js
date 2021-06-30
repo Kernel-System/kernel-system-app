@@ -1,17 +1,17 @@
-import { Typography, Button, Form, Select, message, Row, Col } from 'antd';
-import { useHistory, useRouteMatch } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
+import { Button, Col, Form, message, Row, Select, Typography } from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { useEffect, useState } from 'react';
-import { http } from 'api';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { useHistory, useRouteMatch } from 'react-router';
 import {
   calleRules,
+  coloniaRules,
   cpRules,
   noIntRules,
-  coloniaRules,
 } from 'utils/validations/address';
 
 const { Title } = Typography;
@@ -46,6 +46,7 @@ const Index = () => {
       console.log(result.data.data);
       onSetAlmacenes(result.data.data);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetEmpleado = (lista) => {
@@ -75,8 +76,8 @@ const Index = () => {
         },
         putToken
       )
-      .then((resul) => {
-        console.log(resul);
+      .then((resul1) => {
+        console.log(resul1);
         http
           .post(
             '/items/empleados/',
@@ -97,13 +98,22 @@ const Index = () => {
               cp: dato.cp,
               entre_calle_1: dato.entre_calle_1,
               entre_calle_2: dato.entre_calle_2,
-              cuenta: resul.data.data.id,
             },
             putToken
           )
           .then((resul) => {
             console.log(resul);
-            Mensaje();
+            http
+              .patch(
+                `/users/${resul1.data.data.id}`,
+                {
+                  rfc: dato.rfc,
+                },
+                putToken
+              )
+              .then(() => {
+                Mensaje();
+              });
           })
           .catch((error) => {
             if (

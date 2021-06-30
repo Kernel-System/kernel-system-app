@@ -1,23 +1,36 @@
-import { Pagination, Select, Space, Typography } from 'antd';
+import { Empty, Pagination, Select, Space, Typography } from 'antd';
 import { getUserData } from 'api/profile';
-import { getUserOrders } from 'api/profile/orders';
+import { getUserOrders, getUserOrdersYears } from 'api/profile/orders';
 import OrderCard from 'components/Orders/OrderCard';
 import CenteredSpinner from 'components/UI/CenteredSpinner';
 import Heading from 'components/UI/Heading';
 import { useStoreState } from 'easy-peasy';
+import { useState } from 'react';
 import { useQuery } from 'react-query';
 const { Text } = Typography;
 
 const Orders = () => {
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [page, setPage] = useState(1);
   const token = useStoreState((state) => state.user.token.access_token);
   const user = useQuery('user', () => getUserData(token));
-  const orders = useQuery(
-    'solicitudDeCompra',
-    () => getUserOrders(user.data.cliente.id, token),
+  const years = useQuery(
+    'solicitudes-de-compra-years',
+    () => getUserOrdersYears(user.data.cliente.id, token),
     { enabled: !!user?.data?.cliente }
   );
+  const yearsData = years?.data?.data?.data;
+  const orders = useQuery(
+    ['solicitudes-de-compra', page, year],
+    () => getUserOrders(user.data.cliente.id, page, year, token),
+    { enabled: !!user?.data?.cliente }
+  );
+  const ordersData = orders?.data?.data?.data;
 
-  const orderData = orders?.data?.data?.data;
+  const handleChangeYear = (year) => {
+    setYear(year);
+    setPage(1);
+  };
 
   return (
     <>
@@ -26,30 +39,52 @@ const Orders = () => {
         <Text>Solicitudes realizadas en:</Text>
         <Select
           defaultValue={new Date().getFullYear()}
-          loading={user.isLoading || orders.isLoading}
+          loading={years.isLoading}
+          onChange={handleChangeYear}
         >
-          {orderData?.map((order) => (
-            <Select.Option
-              value={new Date(order.fecha_solicitud).getFullYear()}
-            >
-              {new Date(order.fecha_solicitud).getFullYear()}
-            </Select.Option>
-          ))}
+          {yearsData
+            ?.filter(
+              (order, i, array) =>
+                array.findIndex(
+                  (ord) =>
+                    new Date(ord.fecha_solicitud).getFullYear() ===
+                    new Date(order.fecha_solicitud).getFullYear()
+                ) === i
+            )
+            .map((order) => (
+              <Select.Option
+                key={order.id}
+                value={new Date(order.fecha_solicitud).getFullYear()}
+              >
+                {new Date(order.fecha_solicitud).getFullYear()}
+              </Select.Option>
+            ))}
         </Select>
       </Space>
       {user.isLoading || orders.isLoading ? (
         <CenteredSpinner />
       ) : (
         <>
-          <Space
-            direction='vertical'
-            style={{ width: '100%', marginBottom: '1em' }}
-          >
-            {orderData?.map((order) => (
-              <OrderCard key={order.id} details={order} />
-            ))}
-          </Space>
-          <Pagination defaultCurrent={1} />
+          {ordersData.length ? (
+            <>
+              <Space
+                direction='vertical'
+                style={{ width: '100%', marginBottom: '1em' }}
+              >
+                {ordersData.map((order) => (
+                  <OrderCard key={order.id} details={order} />
+                ))}
+              </Space>
+              <Pagination
+                current={page}
+                total={orders.data.data.meta.filter_count}
+                pageSize={3}
+                onChange={(page) => setPage(page)}
+              />
+            </>
+          ) : (
+            <Empty description='No has realizado ninguna solicitud de compra' />
+          )}
         </>
       )}
     </>

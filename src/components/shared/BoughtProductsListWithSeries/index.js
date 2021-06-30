@@ -1,7 +1,7 @@
 import { Avatar, List, Select } from 'antd';
 const { Option } = Select;
 
-const BoughtProductsList = ({ products }) => {
+const BoughtProductsListWithSeries = ({ products }) => {
   return (
     <List
       dataSource={products}
@@ -35,4 +35,4 @@ const BoughtProductsList = ({ products }) => {
   );
 };
 
-export default BoughtProductsList;
+export default BoughtProductsListWithSeries;

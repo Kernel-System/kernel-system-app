@@ -7,7 +7,7 @@ const SignUp = () => (
       <>
         Si no tienes una cuenta para realizar tus pedidos ¡No te preocupes! solo
         contáctate con nosotros al correo{' '}
-        <a href='mailto:kernel-system@gmail.com'>kernel-system@gmail.com</a>
+        <a href='mailto:kernel-system@gmail.com'>kernel-system@gmail.com</a>{' '}
         para darte de alta.
       </>
     }

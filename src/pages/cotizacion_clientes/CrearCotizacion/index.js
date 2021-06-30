@@ -1,34 +1,34 @@
 import {
-  Button,
-  Form,
-  Select,
-  message,
-  Row,
-  Col,
-  Input,
-  DatePicker,
-  InputNumber,
-  Image,
-  Popconfirm,
-  Typography,
-  Table,
-} from 'antd';
-import {
-  EditOutlined,
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
-import { useHistory } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Image,
+  Input,
+  InputNumber,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Table,
+  Typography,
+} from 'antd';
+import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
-import { useEffect, useState } from 'react';
-import { useStoreState } from 'easy-peasy';
-import { http } from 'api';
+import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
+import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useHistory } from 'react-router';
 const { Search, TextArea } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -116,6 +116,7 @@ const Index = () => {
     http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
       onSetDato(result.data.data.empleado[0], setEmpleado);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetDato = (lista, setDato) => {
@@ -665,26 +666,29 @@ const Index = () => {
 
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
-    lista.push({
-      key: lista.length.toString(),
-      titulo: item.titulo,
-      codigo: item.codigo,
-      clave: item.clave,
-      precio_unitario: setPrecioTotalInicial(item, true),
-      clave_unidad: item.unidad_cfdi,
-      servicio: item.servicio,
-      iva: item.iva,
-      descuento: item.descuento,
-      precios_variables: item.precios_variables[0],
-      tipo_de_venta: item.tipo_de_venta,
-      precio_fijo: item.precio_fijo,
-      total: setPrecioTotalInicial(item),
-      productimage:
-        item.imagenes.length !== 0
-          ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
-          : '',
-      cantidad: 1,
-    });
+    const dato = lista.findIndex((producto) => producto.codigo === item.codigo);
+    if (dato === -1)
+      lista.push({
+        key: lista.length.toString(),
+        titulo: item.titulo,
+        codigo: item.codigo,
+        clave: item.clave,
+        precio_unitario: setPrecioTotalInicial(item, true),
+        clave_unidad: item.unidad_cfdi,
+        servicio: item.servicio,
+        iva: item.iva,
+        descuento: item.descuento,
+        precios_variables: item.precios_variables[0],
+        tipo_de_venta: item.tipo_de_venta,
+        precio_fijo: item.precio_fijo,
+        total: setPrecioTotalInicial(item),
+        productimage:
+          item.imagenes.length !== 0
+            ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
+            : '',
+        cantidad: 1,
+      });
+    else lista[dato] = { ...lista[dato], cantidad: lista[dato].cantidad + 1 };
     setListProducts(lista);
   };
   //#endregion

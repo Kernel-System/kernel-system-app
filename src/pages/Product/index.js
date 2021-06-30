@@ -29,7 +29,7 @@ const Product = () => {
       addCartItem({ id, quantity });
       message.success('Producto añadido a la lista');
     } catch (error) {
-      message.error(`Lo sentimos, ha ocurrido un error`);
+      message.error('Lo sentimos, ha ocurrido un error');
     }
   };
 
@@ -58,6 +58,7 @@ const Product = () => {
                 ieps: productData.ieps,
                 peso: productData.peso,
                 unidad_de_medida: productData.unidad_de_medida,
+                nombre_unidad_cfdi: productData.nombre_unidad_cfdi,
               }}
             />
           </Col>

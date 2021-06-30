@@ -54,6 +54,12 @@ export const formatPrice = (price) =>
 export const formatPhoneNumber = (phoneNumber) =>
   phoneNumber.toString().replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
 
+export const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
+
 export const csvToArray = (str, delimiter = ',') => {
   // slice from start of text to the first \n index
   // use split to create an array from string by delimiter

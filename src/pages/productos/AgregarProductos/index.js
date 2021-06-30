@@ -12,6 +12,7 @@ import {
   Switch,
   Tag,
 } from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { http, httpSAT } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
@@ -21,7 +22,6 @@ import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 const { TextArea, Search } = Input;
 const { Option } = Select;
 
@@ -36,7 +36,7 @@ const Index = ({ tipo }) => {
   const [precioFijo, setPrecioFijo] = useState(0);
   const [valor, setValor] = useState({
     codigo_producto: 0,
-    tipo_de_venta: 0,
+    tipo_de_venta: 'Fijo',
     valor_1: 1,
     precio_1: 1,
     valor_2: 1,
@@ -72,6 +72,7 @@ const Index = ({ tipo }) => {
       AgregarLista({});
       AgregarPrecioFijo(0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSearch = (value) => {
@@ -150,6 +151,7 @@ const Index = ({ tipo }) => {
         precio_3: valor.precio_3,
         precio_4: valor.precio_4,
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [precioFijo, agregar]);
 
   const changeValor = (value, tag) => {
@@ -248,7 +250,7 @@ const Index = ({ tipo }) => {
 
   const Mensaje = () => {
     message
-      .success('El producto ha sido registrados exitosamente', 3)
+      .success('El producto ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 
@@ -345,7 +347,7 @@ const Index = ({ tipo }) => {
         peso: dato.peso,
         costo: dato.costo,
         moneda: tipo !== 'agregar' ? dato.moneda : 'MXM',
-        tipo_de_venta: dato.tipo_de_venta,
+        tipo_de_venta: tipo !== 'agregar' ? dato.tipo_de_venta : 'Fijo',
         tipo_de_compra: dato.tipo_de_compra,
         costeo: dato.costeo,
         //ieps: dato.ieps,

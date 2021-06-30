@@ -1,11 +1,12 @@
-import { Avatar, List, Typography } from 'antd';
+import { Avatar, List } from 'antd';
 import { Link } from 'react-router-dom';
-import { formatPrice } from 'utils/functions';
-const { Paragraph } = Typography;
+import { formatPrice, toPercent } from 'utils/functions';
+import { calcPrecioVariable } from 'utils/productos';
 
-const BoughtProductsList = ({ products }) => {
+const BoughtProductsList = ({ products, nivel }) => {
   return (
     <List
+      style={{ marginRight: '1rem' }}
       dataSource={products}
       renderItem={(item) => (
         <List.Item>
@@ -21,9 +22,17 @@ const BoughtProductsList = ({ products }) => {
                 {item.codigo_producto.titulo}
               </Link>
             }
-            description={formatPrice(420)}
+            description={
+              <>
+                {item.cantidad} x
+                {formatPrice(
+                  calcPrecioVariable(item.codigo_producto, nivel) -
+                    calcPrecioVariable(item.codigo_producto, nivel) *
+                      toPercent(item.descuento_ofrecido)
+                )}
+              </>
+            }
           />
-          <Paragraph>x {item.cantidad}</Paragraph>
         </List.Item>
       )}
     />

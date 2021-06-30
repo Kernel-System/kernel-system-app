@@ -1,24 +1,24 @@
-import ShowProduct from 'components/ensamble/ShowProduct';
-import { useState, useEffect } from 'react';
-import { useHistory } from 'react-router';
+import { CheckOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import {
-  Typography,
-  Input,
-  Space,
   Button,
-  Form,
-  Row,
   Col,
-  Popconfirm,
+  Form,
+  Input,
   message,
+  Popconfirm,
+  Row,
+  Space,
+  Typography,
 } from 'antd';
-import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { http } from 'api';
+import { getUserRole } from 'api/auth';
+import ShowProduct from 'components/ensamble/ShowProduct';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
-import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
-import { getUserRole } from 'api/auth';
+import { useHistory } from 'react-router';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -51,6 +51,7 @@ const Index = ({ match }) => {
           ChangeEditable(false);
         ChangeList(result.data.data);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const ChangeVisible = () => {

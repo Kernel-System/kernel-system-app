@@ -1,10 +1,22 @@
-import AddProduct from 'components/ensamble/AddProduct';
-import { useState, useEffect } from 'react';
-import { Typography, Input, Space, Button, Form, Select, message } from 'antd';
-import { useHistory } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
+import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Row,
+  Select,
+  Space,
+  Typography,
+} from 'antd';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { http } from 'api';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -12,8 +24,13 @@ const { Option } = Select;
 const Index = () => {
   const history = useHistory();
   const [products, setProduct] = useState([]);
+  const [productsEns, setProductEns] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [creador, setCreador] = useState('');
+  const [almacenes, setAlmacenes] = useState([]);
+  const [almacen, setAlmacen] = useState(1);
+  const breakpoint = useBreakpoint();
+
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
     headers: {
@@ -35,10 +52,55 @@ const Index = () => {
           onChangeDato(result2.data.data, setEmpleados);
         });
     });
-    http.get(`/items/productos/`, putToken).then((result) => {
-      onChangeDato(result.data.data, setProduct);
+    http.get(`/items/almacenes/`, putToken).then((result) => {
+      onChangeDato(result.data.data, setAlmacenes);
     });
+    http.get(`/items/productos/`, putToken).then((result) => {
+      onChangeDato(result.data.data, setProductEns);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    http
+      .get(`/items/productos?fields=*,inventario.*`, putToken)
+      .then((result) => {
+        onSetProductos(result.data.data);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [almacen]);
+
+  const onSetProductos = (lista) => {
+    const newData = JSON.parse(JSON.stringify(lista));
+    const newProductos = [];
+    console.log({ almacen: almacen });
+    lista.forEach((producto, index) => {
+      let inventarios = [];
+      producto.inventario.forEach((inventario) => {
+        if (inventario.clave_almacen === almacen && inventario.cantidad !== 0)
+          inventarios.push(inventario);
+      });
+      if (inventarios.length !== 0) {
+        newData[index].inventario = inventarios;
+        newProductos.push(newData[index]);
+      }
+    });
+    console.log(newProductos);
+    setList({
+      ...list,
+      productos: [
+        {
+          id: 0,
+          codigo: '',
+          cantidad: 0,
+          descripcion: '',
+          clave: '',
+          clave_unidad: '',
+        },
+      ],
+    });
+    setProduct(newProductos);
+  };
 
   const onChangeDato = (lista, setDato) => {
     const newData = JSON.parse(JSON.stringify(lista));
@@ -51,20 +113,66 @@ const Index = () => {
     rfc_empleado_ensamble: '',
     codigo_ensamble: '',
     estado: 'Ordenado',
-    productos: [],
+    productos: [
+      {
+        id: 0,
+        codigo: '',
+        cantidad: 0,
+        descripcion: '',
+        clave: '',
+        clave_unidad: '',
+      },
+    ],
   });
-
-  const changeProducts = (element) => {
-    const lista = JSON.parse(JSON.stringify(list));
-    lista.productos = element;
-    console.log(lista);
-    setList(JSON.parse(JSON.stringify(lista)));
-  };
 
   const changeElements = (value, title) => {
     const lista = JSON.parse(JSON.stringify(list));
-    lista[title] = value;
+    lista.productos[title] = value;
     setList(JSON.parse(JSON.stringify(lista)));
+  };
+
+  const pushFila = () => {
+    const rows = JSON.parse(JSON.stringify(list));
+    rows.productos.push({
+      id: rows.productos.length,
+      codigo: '',
+      cantidad: 0,
+      descripcion: '',
+      clave: '',
+      clave_unidad: '',
+    });
+    setList(JSON.parse(JSON.stringify(rows)));
+  };
+
+  const popFila = () => {
+    const rows = JSON.parse(JSON.stringify(list));
+    rows.productos.pop();
+    setList(JSON.parse(JSON.stringify(rows)));
+  };
+
+  const onChangeNumber = (id, value) => {
+    const rows = JSON.parse(JSON.stringify(list));
+    rows.productos[id] = {
+      ...rows.productos[id],
+      cantidad: value,
+    };
+    setList(JSON.parse(JSON.stringify(rows)));
+  };
+
+  const changeProduct = (id, value, descripcion, key) => {
+    const rows = JSON.parse(JSON.stringify(list));
+    rows.productos[id] = {
+      id: id,
+      codigo: value,
+      cantidad: 1,
+      descripcion: descripcion,
+      clave: products[key].clave,
+      max: products[key].inventario
+        .map((inventario) => inventario.cantidad)
+        .reduce((cantidad, sum) => cantidad + sum, 0),
+      clave_unidad: products[key].unidad_cfdi,
+    };
+    setList(JSON.parse(JSON.stringify(rows)));
   };
 
   const onFinish = () => {
@@ -81,7 +189,7 @@ const Index = () => {
           codigo_ensamble: list.codigo_ensamble,
           rfc_empleado_ensamble: list.rfc_empleado_ensamble,
           rfc_empleado_orden: creador.rfc,
-          clave_almacen: creador.almacen,
+          clave_almacen: almacen,
         },
         putToken
       )
@@ -112,6 +220,10 @@ const Index = () => {
 
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
+  };
+
+  const onSetAlmacen = (value) => {
+    setAlmacen(value);
   };
 
   return (
@@ -147,7 +259,7 @@ const Index = () => {
             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
         >
-          {products.map((product) => (
+          {productsEns.map((product) => (
             <Option
               value={product.codigo}
               key={product.codigo}
@@ -188,12 +300,115 @@ const Index = () => {
           ))}
         </Select>
       </Form.Item>
-      <AddProduct
-        titulo='Componentes'
-        tag='componentes'
-        onChanged={changeProducts}
-        products={products}
-      />
+      <Title level={5}>Almacén</Title>
+      <Form.Item
+        name='almacen'
+        rules={[
+          {
+            required: true,
+            message: `Seleccione un almacen.`,
+          },
+        ]}
+      >
+        <Select
+          showSearch
+          style={{ width: '100%' }}
+          placeholder='Almacén'
+          onChange={(value) => {
+            onSetAlmacen(value);
+          }}
+        >
+          {almacenes.map((almacen) => (
+            <Option
+              value={almacen.clave}
+              key={almacen.clave}
+            >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Title level={5}>Componentes</Title>
+      {list.productos.map((fila) => (
+        <Row key={fila.id} gutter={[4]} style={{ marginBottom: '5px' }}>
+          <Col span={breakpoint.lg ? 12 : 24}>
+            <Row key={fila.id} gutter={[4]}>
+              <Col xs={16} lg={16}>
+                <Form.Item
+                  name={`$componente${fila.id}`}
+                  rules={[
+                    {
+                      required: true,
+                      message: `Asigna un componente`,
+                    },
+                  ]}
+                >
+                  <Select
+                    showSearch
+                    key={fila.id}
+                    style={{ width: '100%' }}
+                    placeholder='Buscar producto por código'
+                    optionFilterProp='children'
+                    onChange={(value, index) =>
+                      changeProduct(fila.id, value, index.children, index.key)
+                    }
+                    //onFocus={onFocus}
+                    //onBlur={onBlur}
+                    //onSearch={onSearch}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {products.map((product, index) => (
+                      <Option
+                        value={product.codigo}
+                        key={index}
+                      >{`${product.codigo} : ${product.titulo}`}</Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={8} lg={8}>
+                <InputNumber
+                  min={1}
+                  max={fila.max}
+                  defaultValue={1}
+                  onChange={(value) => onChangeNumber(fila.id, value)}
+                  disabled={
+                    list.productos[fila.id].codigo !== '' ? false : true
+                  }
+                  style={{ width: '100%' }}
+                />
+              </Col>
+            </Row>
+          </Col>
+          <Col span={breakpoint.lg ? 12 : 24}>
+            <Input
+              placeholder='Número de Serie'
+              style={{ width: '100%' }}
+              disabled={true}
+            />
+          </Col>
+        </Row>
+      ))}
+      <Space align='center'>
+        <Button
+          type='link'
+          icon={<PlusCircleOutlined />}
+          onClick={() => pushFila()}
+        >
+          Añadir
+        </Button>
+        <Button
+          type='link'
+          icon={<MinusCircleOutlined />}
+          danger
+          disabled={list.length === 1 ? true : false}
+          onClick={() => popFila()}
+        >
+          Remover
+        </Button>
+      </Space>
       <Title level={5}>Descripción</Title>
       <Space direction='vertical' style={{ width: '100%' }}>
         <Form.Item

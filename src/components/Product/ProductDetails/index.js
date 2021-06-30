@@ -1,8 +1,6 @@
-import { List, Typography } from 'antd';
+import { Col, List, Row } from 'antd';
 import Heading from 'components/UI/Heading';
 import { capitalize } from 'utils/functions';
-
-const { Paragraph } = Typography;
 
 const ProductDetails = ({ especificaciones }) => {
   const newEspecificaciones = Object.entries(especificaciones).filter(
@@ -12,24 +10,43 @@ const ProductDetails = ({ especificaciones }) => {
   return (
     <>
       <Heading title='Especificaciones' />
-      <List
-        size='small'
-        dataSource={newEspecificaciones}
-        renderItem={(especificacion) => {
-          if (especificacion !== null || especificacion !== undefined) {
-            return (
-              <List.Item key={especificacion[0]}>
-                <Paragraph>
-                  - {capitalize(especificacion[0].replaceAll('_', ' '))}:{' '}
-                  {capitalize(especificacion[1])}
-                </Paragraph>
-              </List.Item>
-            );
-          } else {
-            return;
-          }
-        }}
-      />
+      <Row>
+        <Col xs={24} sm={8}>
+          <List
+            dataSource={newEspecificaciones}
+            renderItem={(especificacion) => {
+              if (especificacion !== null || especificacion !== undefined) {
+                return (
+                  <List.Item>
+                    {especificacion[0] !== 'nombre_unidad_cfdi' && (
+                      <List.Item.Meta
+                        key={especificacion[0]}
+                        title={
+                          <>
+                            ·{' '}
+                            {capitalize(especificacion[0].replaceAll('_', ' '))}
+                          </>
+                        }
+                        description={
+                          <>
+                            {capitalize(especificacion[1])}{' '}
+                            {especificacion[0] === 'unidad_de_medida' &&
+                              newEspecificaciones.find(
+                                (esp) => esp[0] === 'nombre_unidad_cfdi'
+                              )[1]}
+                          </>
+                        }
+                      />
+                    )}{' '}
+                  </List.Item>
+                );
+              } else {
+                return;
+              }
+            }}
+          />
+        </Col>
+      </Row>
     </>
   );
 };

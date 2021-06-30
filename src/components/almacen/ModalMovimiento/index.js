@@ -1,9 +1,9 @@
-import { Modal, Divider } from 'antd';
-import TextLabel from 'components/UI/TextLabel';
-import { useEffect, useState } from 'react';
+import { Divider, Modal } from 'antd';
 import { http } from 'api';
-import { useStoreState } from 'easy-peasy';
 import BoughtProductsListWithSeries from 'components/shared/BoughtProductsListWithSeries';
+import TextLabel from 'components/UI/TextLabel';
+import { useStoreState } from 'easy-peasy';
+import { useEffect, useState } from 'react';
 
 const Index = ({ visible, movimiento, hideModal }) => {
   const [imagenes, setImagenes] = useState(movimiento.productos_movimiento);
@@ -29,6 +29,7 @@ const Index = ({ visible, movimiento, hideModal }) => {
       .then((result) => {
         onSetImagenes(result.data.data);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movimiento]);
 
   const onSetImagenes = (lista) => {

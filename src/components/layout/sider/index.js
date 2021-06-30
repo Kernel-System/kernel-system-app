@@ -1,8 +1,10 @@
 import {
   AppstoreOutlined,
+  ContainerOutlined,
   DollarOutlined,
   FileTextOutlined,
   ImportOutlined,
+  PictureOutlined,
   ShopOutlined,
   ShoppingOutlined,
   SwapOutlined,
@@ -98,26 +100,6 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
-  const ComprasMenuItem = (
-    <Menu.Item
-      key='compras'
-      icon={<ShoppingOutlined />}
-      onClick={!collapsed && ToggleCollapsed}
-    >
-      <Link to='/compras'>Compras</Link>
-    </Menu.Item>
-  );
-
-  const ProductosCompradosMenuItem = (
-    <Menu.Item
-      key='productos-comprados'
-      icon={<ShoppingOutlined />}
-      onClick={!collapsed && ToggleCollapsed}
-    >
-      <Link to='/productos-comprados'>Productos Comprados</Link>
-    </Menu.Item>
-  );
-
   const ProveedoresMenuItem = (
     <Menu.Item
       key='proveedores'
@@ -125,6 +107,46 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/proveedores'>Proveedores</Link>
+    </Menu.Item>
+  );
+
+  const AnunciosMenuItem = (
+    <Menu.Item
+      key='anuncios'
+      icon={<PictureOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/admin/anuncio'>Anuncios</Link>
+    </Menu.Item>
+  );
+
+  const SolicitudesCompraMenuItem = (
+    <Menu.Item
+      key='solicitudes-de-compra'
+      icon={<ContainerOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/empleado/solicitudes-de-compra'>Solicitudes de compra</Link>
+    </Menu.Item>
+  );
+
+  const ComprasMenuItem = (showIcon) => (
+    <Menu.Item
+      key='compras'
+      icon={!showIcon ?? <ShoppingOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/compras'>Compras</Link>
+    </Menu.Item>
+  );
+
+  const ProductosCompradosMenuItem = (showIcon) => (
+    <Menu.Item
+      key='productos-comprados'
+      icon={!showIcon ?? <ShoppingOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/productos-comprados'>Productos Comprados</Link>
     </Menu.Item>
   );
 
@@ -148,8 +170,19 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const ComprasSubMenu = (
+    <Menu.SubMenu key='subCompras' icon={<ShoppingOutlined />} title='Compras'>
+      {ComprasMenuItem()}
+      {ProductosCompradosMenuItem()}
+    </Menu.SubMenu>
+  );
+
   const FacturasSubMenu = (
-    <Menu.SubMenu key='sub1' icon={<FileTextOutlined />} title='Facturas'>
+    <Menu.SubMenu
+      key='subFacturas'
+      icon={<FileTextOutlined />}
+      title='Facturas'
+    >
       {FacturasExternasMenuItem()}
       {FacturasInternasMenuItem()}
     </Menu.SubMenu>
@@ -189,6 +222,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {VentaMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
+      {SolicitudesCompraMenuItem}
       {FacturasInternasMenuItem(true)}
     </>
   );
@@ -200,13 +234,13 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {EnsamblesMenuItem}
       {MovimientosAlmacenMenuItem}
       {TransferenciaMenuItem}
+      {ProductosCompradosMenuItem(true)}
     </>
   );
 
   const encargadoDeComprasMenuItems = (
     <>
-      {ComprasMenuItem}
-      {ProductosCompradosMenuItem}
+      {ComprasSubMenu}
       {ProveedoresMenuItem}
       {ProductosMenuItem}
       {FacturasExternasMenuItem(true)}
@@ -236,10 +270,11 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {CuentasMenuItem}
             {MovimientosAlmacenMenuItem}
             {TransferenciaMenuItem}
-            {ComprasMenuItem}
-            {ProductosCompradosMenuItem}
+            {ComprasSubMenu}
             {ProveedoresMenuItem}
             {FacturasSubMenu}
+            {AnunciosMenuItem}
+            {SolicitudesCompraMenuItem}
           </>
         )}
       </Menu>

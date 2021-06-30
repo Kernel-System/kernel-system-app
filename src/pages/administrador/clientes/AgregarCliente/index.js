@@ -1,22 +1,22 @@
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import {
-  Typography,
   Button,
+  Col,
   Form,
-  Select,
+  Input,
   message,
   Row,
-  Col,
-  Input,
+  Select,
+  Typography,
 } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { useHistory, useRouteMatch } from 'react-router';
-import HeadingBack from 'components/UI/HeadingBack';
+import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
-import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { useEffect, useState } from 'react';
+import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
-import { http } from 'api';
+import { useEffect, useState } from 'react';
+import { useHistory, useRouteMatch } from 'react-router';
 const { Title } = Typography;
 const { Option } = Select;
 
@@ -45,6 +45,7 @@ const Index = () => {
           onSetEmpleado(resul.data.data);
         });
     } else onSetEmpleado([{}]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSetEmpleado = (lista) => {
@@ -147,7 +148,7 @@ const Index = () => {
 
   const Mensaje = () => {
     message
-      .success('La cliente ha sido registrado exitosamente', 3)
+      .success('El cliente ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 

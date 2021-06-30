@@ -2,7 +2,7 @@ import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
 import { Popconfirm, List, Button, Input, Space } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 
@@ -56,6 +56,9 @@ const Index = ({ putToken, onConfirmDelete }) => {
           <List.Item
             key={item.codigo}
             actions={[
+              <Link to={`/productos/mostrar/${item.codigo}`}>
+                <Button icon={<EyeFilled />}></Button>
+              </Link>,
               <Space>
                 <Link to={`/productos/editar/${item.codigo}`}>
                   <Button icon={<EditFilled />} />
@@ -89,9 +92,17 @@ const Index = ({ putToken, onConfirmDelete }) => {
                 </Link>
               }
               description={item.titulo}
-            >
-              {item.description}
-            </List.Item.Meta>
+            />
+            {
+              <span
+                style={{
+                  display: 'inline',
+                  opacity: 0.8,
+                }}
+              >
+                <b>{item.descripcion}</b>
+              </span>
+            }
           </List.Item>
         )}
       />

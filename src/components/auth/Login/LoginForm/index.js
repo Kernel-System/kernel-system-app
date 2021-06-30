@@ -4,11 +4,10 @@ import { getToken, getUserNivel, getUserRole, getEmployeeId } from 'api/auth';
 import Heading from 'components/UI/Heading';
 import { useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { emailRules } from 'utils/validations/auth';
 
 const LoginForm = () => {
-  const history = useHistory();
   const login = useStoreActions((actions) => actions.user.login);
   const setUserRole = useStoreActions((actions) => actions.user.setUserRole);
   const setUserNivel = useStoreActions((actions) => actions.user.setUserNivel);
@@ -34,13 +33,13 @@ const LoginForm = () => {
             setEmployeeId(result[2].data.data?.empleado[0]?.rfc);
           })
           .catch(() => {
-            message.error(`Lo sentimos, ha ocurrido un error`);
+            message.error('Lo sentimos, ha ocurrido un error');
             setLoading(false);
             setHasError(true);
           });
       })
       .catch(() => {
-        message.error(`Lo sentimos, ha ocurrido un error`);
+        message.error('Lo sentimos, ha ocurrido un error');
         setLoading(false);
         setHasError(true);
       });

@@ -8,12 +8,12 @@ export const getProductTitleCodePairs = (token) =>
 
 export const getHomeProducts = () =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true`
+    '/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true'
   );
 
 export const getProduct = (id) =>
   http.get(
-    `/items/productos/${id}?fields=codigo,titulo,sku,costo,descripcion,descuento,tipo_de_venta,precio_fijo,precios_variables.*,ieps,peso,unidad_de_medida,imagenes.directus_files_id,inventario.cantidad,categorias.categorias_id.nombre`
+    `/items/productos/${id}?fields=codigo,titulo,sku,costo,descripcion,descuento,tipo_de_venta,precio_fijo,precios_variables.*,ieps,peso,unidad_de_medida,nombre_unidad_cfdi,imagenes.directus_files_id,inventario.cantidad,categorias.categorias_id.nombre`
   );
 
 export const getRelatedProducts = (fromProduct, categorias) => {

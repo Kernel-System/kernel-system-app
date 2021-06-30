@@ -10,6 +10,8 @@ import {
   Space,
   Typography,
 } from 'antd';
+import { insertSolicitudCompra } from 'api/cart';
+import { getUserData } from 'api/profile';
 import { getCartProducts } from 'api/shared/products';
 import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
@@ -22,13 +24,22 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
+import { useHistory } from 'react-router-dom';
+import { toPercent } from 'utils/functions';
+import { calcPrecioVariable } from 'utils/productos';
 const { Paragraph } = Typography;
 
 const Cart = () => {
+  const history = useHistory();
+  const queryClient = useQueryClient();
   const cartItems = useStoreState((state) => state.cart.cartItems);
   const nivel = useStoreState((state) => state.user.nivel);
+  const token = useStoreState((state) => state.user.token.access_token);
   const addOneToItem = useStoreActions((actions) => actions.cart.addOneToItem);
   const subOneToItem = useStoreActions((actions) => actions.cart.subOneToItem);
+  const setQuantityToItem = useStoreActions(
+    (actions) => actions.cart.setQuantityToItem
+  );
   const removeCartItem = useStoreActions(
     (actions) => actions.cart.removeCartItem
   );
@@ -62,12 +73,11 @@ const Cart = () => {
       message.error('Lo sentimos, ha ocurrido un error');
     },
   });
-  const queryClient = useQueryClient();
-
-  const [tipoEntrega, setTipoEntrega] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [tipoDeEntrega, setTipoDeEntrega] = useState(0);
   const [envio, setEnvio] = useState(0);
-  const [metodoPago, setMetodoPago] = useState(0);
-  const [formaPago, setFormaPago] = useState(0);
+  const [metodoDePago, setMetodoDePago] = useState(0);
+  const [formaDePago, setFormaDePago] = useState(0);
 
   let cartItemsData = undefined;
   cartItemsData = data?.data?.data.map((cartItemData) => {
@@ -76,6 +86,51 @@ const Cart = () => {
     );
     return { ...cartItemData, cantidad: cartItems[cartItemId]?.quantity };
   });
+
+  const handlePlaceOrder = async () => {
+    const {
+      cliente: { id },
+    } = await getUserData(token);
+    const solicitudCompra = {
+      estado: 'pendiente',
+      fecha_solicitud: new Date(),
+      total: cartItemsData.reduce(
+        (total, product) =>
+          total +
+          calcPrecioVariable(product, nivel) * product.cantidad -
+          calcPrecioVariable(product, nivel) *
+            product.cantidad *
+            toPercent(product.descuento),
+        0
+      ),
+      productos_solicitados: cartItemsData.map((cartItem) => ({
+        cantidad: cartItem.cantidad,
+        precio_ofrecido: calcPrecioVariable(cartItem, nivel),
+        descuento_ofrecido: cartItem.descuento,
+        iva: cartItem.iva,
+        codigo_producto: cartItem.codigo,
+      })),
+      id_cliente: id,
+      tipo_de_entrega: tipoDeEntrega,
+      metodo_de_pago: metodoDePago,
+      forma_de_pago: formaDePago,
+    };
+    setLoading(true);
+    insertSolicitudCompra(solicitudCompra, token)
+      .then(() =>
+        message.success(
+          'Se ha creado la solicitud de compra correctamente',
+          2,
+          () => {
+            setLoading(false);
+            history.push('/solicitudes-de-compra');
+          }
+        )
+      )
+      .catch(() => {
+        message.error('Lo sentimos, ha ocurrido un error');
+      });
+  };
 
   return (
     <>
@@ -104,6 +159,7 @@ const Cart = () => {
             nivel={nivel}
             addOneToItem={addOneToItem}
             subOneToItem={subOneToItem}
+            setQuantityToItem={setQuantityToItem}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>
@@ -112,18 +168,18 @@ const Cart = () => {
               <div>
                 <Paragraph type='secondary'>Elija una opción</Paragraph>
                 <Radio.Group
-                  defaultValue={tipoEntrega}
-                  onChange={(e) => setTipoEntrega(e.target.value)}
+                  defaultValue={tipoDeEntrega}
+                  onChange={(e) => setTipoDeEntrega(e.target.value)}
                 >
                   <Space direction='vertical'>
-                    <Radio value={0}>A domicilio</Radio>
-                    <Radio value={1}>
+                    <Radio value={0}>
                       Recoger en una sucursal Kernel System
                     </Radio>
+                    <Radio value={1}>A domicilio</Radio>
                   </Space>
                 </Radio.Group>
               </div>
-              {tipoEntrega === 0 && (
+              {tipoDeEntrega === 1 && (
                 <div>
                   <Paragraph type='secondary'>Envío</Paragraph>
                   <Radio.Group
@@ -143,12 +199,12 @@ const Cart = () => {
           <Card size='small' title='Método de pago'>
             <Paragraph type='secondary'>Elija una opción</Paragraph>
             <Radio.Group
-              defaultValue={metodoPago}
-              onChange={(e) => setMetodoPago(e.target.value)}
+              defaultValue={metodoDePago}
+              onChange={(e) => setMetodoDePago(e.target.value)}
             >
               <Space direction='vertical'>
-                <Radio value={0}>Pagar en linea</Radio>
-                <Radio value={1}>Pagar en sucursal</Radio>
+                <Radio value={0}>Pagar en sucursal</Radio>
+                <Radio value={1}>Pagar en linea</Radio>
               </Space>
             </Radio.Group>
           </Card>
@@ -157,8 +213,8 @@ const Cart = () => {
           <Card size='small' title='Forma de pago'>
             <Paragraph type='secondary'>Elija una opción</Paragraph>
             <Radio.Group
-              defaultValue={formaPago}
-              onChange={(e) => setFormaPago(e.target.value)}
+              defaultValue={formaDePago}
+              onChange={(e) => setFormaDePago(e.target.value)}
             >
               <Space direction='vertical'>
                 <Radio value={0}>Pago en una exhibición</Radio>
@@ -170,8 +226,9 @@ const Cart = () => {
         <Col xs={24} md={12} lg={6}>
           <Summary
             products={cartItemsData}
-            buttonLabel='Solicitar orden de compra'
-            buttonAction={() => console.log('Haciendo orden de compra')}
+            buttonLabel='Realizar solicitud de compra'
+            buttonAction={handlePlaceOrder}
+            buttonLoading={loading}
             nivel={nivel}
           />
         </Col>

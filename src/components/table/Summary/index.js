@@ -1,9 +1,16 @@
 import { Button, Card, Divider, Row, Space, Typography } from 'antd';
 import { formatPrice, toPercent } from 'utils/functions';
 import { calcPrecioVariable } from 'utils/productos';
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
-const Summary = ({ products, buttonLabel, buttonAction, nivel, type }) => {
+const Summary = ({
+  products,
+  buttonLabel,
+  buttonAction,
+  buttonLoading,
+  nivel,
+  type,
+}) => {
   return (
     <Card>
       <Space direction='vertical' style={{ width: '100%' }} size='middle'>
@@ -87,10 +94,10 @@ const Summary = ({ products, buttonLabel, buttonAction, nivel, type }) => {
                 products.reduce(
                   (total, product) =>
                     total +
-                    calcPrecioVariable(product, nivel) * product.cantidad -
-                    calcPrecioVariable(product, nivel) *
-                      product.cantidad *
-                      toPercent(product.descuento),
+                    (calcPrecioVariable(product, nivel) -
+                      calcPrecioVariable(product, nivel) *
+                        toPercent(product.descuento)) *
+                      product.cantidad,
                   0
                 )
               )
@@ -103,6 +110,7 @@ const Summary = ({ products, buttonLabel, buttonAction, nivel, type }) => {
         block
         onClick={buttonAction}
         disabled={!products?.length}
+        loading={buttonLoading ? buttonLoading : false}
       >
         {buttonLabel}
       </Button>
