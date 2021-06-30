@@ -10,18 +10,18 @@ const index = ({ width = '100%', recentText, oldestText, ...props }) => {
   );
 };
 
-const sortByRecent = (lista) =>
-  lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-const sortByOldest = (lista) =>
-  lista.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+const sortByRecent = (lista, field) =>
+  lista.sort((a, b) => new Date(b[field]) - new Date(a[field]));
+const sortByOldest = (lista, field) =>
+  lista.sort((a, b) => new Date(a[field]) - new Date(b[field]));
 
-export const sortData = (data, value) => {
+export const sortData = (data, value, field = 'fecha') => {
   if (!data) return data;
   switch (value) {
     case 'recent':
-      return sortByRecent(data);
+      return sortByRecent(data, field);
     case 'oldest':
-      return sortByOldest(data);
+      return sortByOldest(data, field);
     default:
       return data;
   }
