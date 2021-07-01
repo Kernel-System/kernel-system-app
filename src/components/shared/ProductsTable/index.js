@@ -188,6 +188,35 @@ const ProductsTable = ({
       dataIndex='subtotal'
       render={(_, record) => (
         <>
+          <Text strong>
+            {formatPrice(calcPrecioVariable(record, nivel) * record.cantidad)}
+          </Text>
+        </>
+      )}
+    />
+    <Table.Column
+      align='right'
+      title='Total'
+      dataIndex='Total'
+      render={(_, record) => (
+        <>
+          <Text
+            type='secondary'
+            style={{
+              fontSize: '12px',
+              position: 'absolute',
+              top: 1,
+              right: '1rem',
+            }}
+          >
+            +
+            {formatPrice(
+              calcPrecioVariable(record, nivel) *
+                toPercent(100 - record.descuento) *
+                toPercent(record.iva) *
+                record.cantidad
+            )}
+          </Text>
           <Text
             type='danger'
             style={{
@@ -206,10 +235,10 @@ const ProductsTable = ({
           </Text>
           <Text strong>
             {formatPrice(
-              calcPrecioVariable(record, nivel) * record.cantidad -
-                calcPrecioVariable(record, nivel) *
-                  record.cantidad *
-                  toPercent(record.descuento)
+              calcPrecioVariable(record, nivel) *
+                toPercent(100 - record.descuento) *
+                toPercent(100 + record.iva) *
+                record.cantidad
             )}
           </Text>
         </>
