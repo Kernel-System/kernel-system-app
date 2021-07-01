@@ -22,12 +22,7 @@ const Summary = ({
                   products.reduce((total, product) => {
                     return (
                       total +
-                      calcPrecioVariable(product, nivel) * product.cantidad -
-                      (calcPrecioVariable(product, nivel) * product.cantidad -
-                        calcPrecioVariable(product, nivel) *
-                          product.cantidad *
-                          toPercent(product.descuento)) *
-                        toPercent(product.iva)
+                      calcPrecioVariable(product, nivel) * product.cantidad
                     );
                   }, 0)
                 )
@@ -94,9 +89,9 @@ const Summary = ({
                 products.reduce(
                   (total, product) =>
                     total +
-                    (calcPrecioVariable(product, nivel) -
-                      calcPrecioVariable(product, nivel) *
-                        toPercent(product.descuento)) *
+                    calcPrecioVariable(product, nivel) *
+                      toPercent(100 - product.descuento) *
+                      toPercent(100 + product.iva) *
                       product.cantidad,
                   0
                 )
