@@ -13,6 +13,14 @@ export const userModel = {
     state.token = {};
   }),
 
+  setEmployeeId: action((state, payload) => {
+    state.rfc = payload;
+  }),
+
+  removeEmployeeId: action((state) => {
+    state.rfc = undefined;
+  }),
+
   expirationDate: 0,
 
   setExpirationDate: action(
@@ -24,6 +32,8 @@ export const userModel = {
   }),
 
   role: undefined,
+
+  rfc: undefined,
 
   setUserRole: action((state, payload) => {
     state.role = payload;
@@ -43,13 +53,17 @@ export const userModel = {
     state.nivel = undefined;
   }),
 
-  isAuth: computed((state) =>
-    state.role !== 'administrador'
-      ? !isEmptyObject(state.token) &&
-        state.role !== undefined &&
-        state.nivel !== undefined
-      : !isEmptyObject(state.token) && state.role !== undefined
-  ),
+  isAuth: computed((state) => {
+    if (isEmptyObject(state.token)) return false;
+    switch (state.role) {
+      case 'administrador':
+        return state.role !== undefined;
+      case 'cliente':
+        return state.nivel !== undefined;
+      default:
+        return state.rfc !== undefined;
+    }
+  }),
 
   login: thunk((actions, payload) => {
     actions.setUserToken(payload);
@@ -62,6 +76,7 @@ export const userModel = {
     actions.removeExpirationDate();
     actions.removeUserRole();
     actions.removeUserNivel();
+    actions.removeEmployeeId();
   }),
 
   refreshToken: thunk((actions, _, helpers) => {
