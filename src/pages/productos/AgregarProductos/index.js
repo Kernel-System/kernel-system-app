@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { InboxOutlined } from '@ant-design/icons';
 import {
   Button,
   Col,
@@ -11,6 +11,7 @@ import {
   Space,
   Switch,
   Tag,
+  Upload,
 } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import { http, httpSAT } from 'api';
@@ -24,6 +25,7 @@ import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
 const { TextArea, Search } = Input;
 const { Option } = Select;
+const { Dragger } = Upload;
 
 //https://ant.design/components/upload/
 
@@ -48,6 +50,7 @@ const Index = ({ tipo }) => {
   });
   const [listPS, setListPS] = useState([]);
   const [listUnidad, setListUnidad] = useState([]);
+  const [agregarIma, setAgregarIma] = useState(true);
 
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
@@ -73,7 +76,7 @@ const Index = ({ tipo }) => {
       AgregarPrecioFijo(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [agregarIma]);
 
   const onSearch = (value) => {
     httpSAT
@@ -330,6 +333,18 @@ const Index = ({ tipo }) => {
 
   const handleChange = (value, data) => {
     setNombreUnidad(data.nombre);
+  };
+
+  const beforeUpload = (file) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('Solo puede subir imágenes en formato JPG/PNG');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('La imagen debe pesar menos de 2MB');
+    }
+    return isJpgOrPng && isLt2M;
   };
 
   return list.map((dato) => (
@@ -965,13 +980,37 @@ const Index = ({ tipo }) => {
         <div>
           <TextLabel
             title='Imágenes'
-            subtitle='Seleccionar el boton de "Agregar Imagen", ir a la opción de "Imagenes" y seleccionar "Crear Nuevo", arrastrar o subir los archivos correspondientes, al finalizar confirmar en el boton de la esquina superior derecha'
+            subtitle='Da clic sobre la imágen para eliminarla.'
           />
           <Image.PreviewGroup style={{ width: '100%' }}>
             {dato.imagenes.map((imagen) => {
               return (
                 <Image
                   width={100}
+                  key={imagen.directus_files_id}
+                  style={{ marginRight: '5px' }}
+                  preview={false}
+                  onClick={() => {
+                    http
+                      .delete(
+                        `/items/productos_directus_files/${imagen.id}`,
+                        putToken
+                      )
+                      .then(() => {
+                        http
+                          .delete(
+                            `/files/${imagen.directus_files_id}`,
+                            putToken
+                          )
+                          .then(() => {
+                            setAgregarIma(!agregarIma);
+                            message.success('Imágen eliminada con exito');
+                          });
+                      })
+                      .catch(() => {
+                        message.error('Error al eliminar la imágen :c');
+                      });
+                  }}
                   src={`${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagen.directus_files_id}`}
                   //preview={false}
                 />
@@ -979,24 +1018,42 @@ const Index = ({ tipo }) => {
             })}
           </Image.PreviewGroup>
           {tipo !== 'mostrar' ? (
-            <div>
-              <br />
-              <br />
-              <Button
-                type='primary'
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  window
-                    .open(
-                      `${process.env.REACT_APP_DIRECTUS_API_URL}/admin/collections/productos/${dato.codigo}`,
-                      '_blank'
+            <Dragger
+              action={`${process.env.REACT_APP_DIRECTUS_API_URL}/files`}
+              headers={{
+                Authorization: `Bearer ${token}`,
+                'X-Requested-With': null,
+              }}
+              name='file'
+              listType='picture-card'
+              onChange={(info) => {
+                if (info?.file?.response?.data?.id !== undefined) {
+                  http
+                    .post(
+                      `/items/productos_directus_files`,
+                      {
+                        productos_codigo: dato.codigo,
+                        directus_files_id: info?.file?.response?.data?.id,
+                      },
+                      putToken
                     )
-                    .focus();
-                }}
-              >
-                Agregar Imagen
-              </Button>
-            </div>
+                    .then((result) => {
+                      setAgregarIma(!agregarIma);
+                      message.success('Imagen subida con exito');
+                    })
+                    .catch(() => {
+                      message.error('Error al subir la imagen :c');
+                    });
+                }
+              }}
+              maxCount={1}
+              beforeUpload={beforeUpload}
+            >
+              <p className='ant-upload-drag-icon'>
+                <InboxOutlined />
+              </p>
+              <p className='ant-upload-text'>Haz clic o arrastre el archivo</p>
+            </Dragger>
           ) : null}
           <br />
           <br />

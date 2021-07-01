@@ -3,13 +3,29 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import CompraForm from 'components/forms/CompraForm';
 import Header from 'components/UI/HeadingBack';
 import { message } from 'antd';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { insertItems as insertProveedor } from 'api/compras/proveedores';
 import { insertItems as insertFactura } from 'api/compras/facturas_externas';
 import { insertItems as insertCompra } from 'api/compras';
 import { filtrarPorUUID } from 'api/compras/facturas_externas';
+import { getProductCodes } from 'api/shared/products';
+
 import moment from 'moment';
+import { useStoreState } from 'easy-peasy';
 
 const Index = () => {
+  const queryClient = useQueryClient();
+  const rfc_empleado = useStoreState((state) => state.user.rfc);
+
+  const { data: productos_catalogo } = useQuery(
+    'productos_catalogo',
+    async () => {
+      const { data } = await getProductCodes();
+      const datos = data.data;
+      return datos;
+    }
+  );
+
   const onFacturaLeida = (factura) => {
     // console.log({ factura });
     const cfdi = factura['$'];
@@ -63,6 +79,9 @@ const Index = () => {
 
     conceptos.forEach((elemento, index) => {
       const objeto = elemento.$;
+      const codigo = objeto.NoIdentificacion;
+      const existe =
+        codigo && productos_catalogo.some((prod) => prod.codigo === codigo);
       const producto = {
         key: index,
         cantidad: objeto.Cantidad,
@@ -70,10 +89,11 @@ const Index = () => {
         clave_unidad: objeto.ClaveUnidad,
         descripcion: objeto.Descripcion,
         importe: objeto.Importe,
-        codigo: objeto.NoIdentificacion,
+        codigo: codigo,
         unidad: objeto.Unidad,
         descuento: objeto.Descuento ? objeto.Descuento : '',
         valor_unitario: objeto.ValorUnitario,
+        producto_catalogo: existe ? codigo : null,
       };
       productos.push(producto);
     });
@@ -173,19 +193,22 @@ const Index = () => {
     }
 
     const hide2 = message.loading('Registrando datos de compra', 0);
-    const noCompra = await insertarCompra({
+    const registroCompra = {
       ...compra,
-      fecha_compra: moment(compra.fecha_compra).format('YYYY-MM-DDThh:mm:ss'),
+      fecha_compra: moment(compra.fecha_compra).format('YYYY-MM-DDTHH:mm:ss'),
       fecha_entrega: compra.fecha_entrega
         ? moment(compra.fecha_entrega).format('YYYY-MM-DD')
         : null,
       productos_comprados: factura.datosCompra.productos_comprados,
       factura: idFactura,
       proveedor: factura.proveedor.rfc,
-    });
+      empleado: rfc_empleado,
+    };
+    const noCompra = await insertarCompra(registroCompra);
     hide2();
     if (noCompra > 0) {
       message.success('La compra ha sido registrada exitosamente', 2);
+      queryClient.invalidateQueries('productos_comprados');
       success = true;
     } else if (noCompra === 0) {
       message.warn('Esta compra ya ha sido registrada previamente', 2.5);

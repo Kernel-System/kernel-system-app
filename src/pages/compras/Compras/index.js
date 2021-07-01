@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { useMutation, useQueryClient } from 'react-query';
+import { focusManager, useMutation, useQueryClient } from 'react-query';
 import CompraForm from 'components/forms/CompraForm';
 import ListaCompras from 'components/list/ComprasList';
 import * as CRUD from 'api/compras';
@@ -27,7 +27,7 @@ const Index = (props) => {
     const newValues = {
       ...values,
       no_compra: listElement.no_compra,
-      fecha_compra: moment(values.fecha_compra).format('YYYY-MM-DDThh:mm:ss'),
+      fecha_compra: moment(values.fecha_compra).format('YYYY-MM-DDTHH:mm:ss'),
       fecha_entrega: moment(values.fecha_entrega).format('YYYY-MM-DD'),
     };
     updateMutation.mutate(newValues);
@@ -40,6 +40,7 @@ const Index = (props) => {
       queryClient
         .invalidateQueries('compras')
         .then(message.success('Cambios guardados exitosamente'));
+      queryClient.invalidateQueries('productos_comprados');
     },
   });
   const deleteMutation = useMutation(CRUD.deleteItem, {
@@ -47,6 +48,7 @@ const Index = (props) => {
       queryClient
         .invalidateQueries('compras')
         .then(message.success('Registro eliminado exitosamente'));
+      queryClient.invalidateQueries('productos_comprados');
     },
   });
 

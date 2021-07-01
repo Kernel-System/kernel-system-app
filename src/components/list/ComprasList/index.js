@@ -18,7 +18,7 @@ const { Text } = Typography;
 const { Option } = Select;
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
-  const [searchValue, setSearchValue] = useState(null);
+  const [searchValue, setSearchValue] = useState(undefined);
 
   function filtrarPorProveedor(compras, rfc) {
     if (compras && rfc) {

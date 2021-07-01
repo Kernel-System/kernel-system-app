@@ -1,34 +1,28 @@
 import {
-  CheckOutlined,
-  CloseOutlined,
-  DeleteOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  DatePicker,
-  Form,
-  Image,
   Input,
-  InputNumber,
-  message,
-  Popconfirm,
-  Row,
-  Select,
-  Table,
+  Button,
   Typography,
+  Row,
+  Col,
+  Form,
+  Select,
+  message,
+  DatePicker,
+  Table,
+  InputNumber,
+  Popconfirm,
+  Image,
 } from 'antd';
+
+import { DeleteOutlined } from '@ant-design/icons';
+import HeadingBack from 'components/UI/HeadingBack';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
-import HeadingBack from 'components/UI/HeadingBack';
-import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
-
+import { useStoreState } from 'easy-peasy';
+import { http } from 'api';
 const { Search } = Input;
 const { Option } = Select;
 
@@ -73,6 +67,10 @@ const Index = ({ tipo }) => {
   let match = useRouteMatch();
   const history = useHistory();
   const [tipoMuestra, setTipoMuestra] = useState(tipo);
+  const [almacen, setAlmacen] = useState('1');
+  const [almacenDestino, setAlmacenDestino] = useState('1');
+  const [almacenes, setAlmacenes] = useState([]);
+  const [empleado, setEmpleado] = useState('');
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
     headers: {
@@ -81,10 +79,21 @@ const Index = ({ tipo }) => {
   };
 
   useEffect(() => {
+    http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
+      onSetArreglo(result.data.data.empleado[0], setEmpleado);
+      if (
+        result.data.data.empleado[0].puesto ===
+        'd5432f92-7a74-4372-907c-9868507e0fd5'
+      ) {
+        onSetArreglo('Todo', setAlmacenDestino);
+      } else {
+        onSetArreglo(result.data.data.empleado[0].almacen, setAlmacenDestino);
+      }
+    });
     if (tipoMuestra !== 'agregar') {
       http
         .get(
-          `/items/solicitudes_transferencia/${match.params.id}?fields=*,productos_transferencia.id,productos_transferencia.codigo,productos_transferencia.clave,productos_transferencia.cantidad,productos_transferencia.clave_unidad,productos_transferencia.estado,productos_transferencia.transferencia,productos_transferencia.titulo`,
+          `/items/solicitudes_transferencia/${match.params.id}?fields=*,productos_transferencia.*`,
           putToken
         )
         .then((result) => {
@@ -99,9 +108,46 @@ const Index = ({ tipo }) => {
           onAddTransferencia(result.data.data);
           onAddProductos(result.data.data.productos_transferencia);
         });
+    } else {
+      http.get(`/items/almacenes/`, putToken).then((result) => {
+        onSetArreglo(result.data.data, setAlmacenes);
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onSetArreglo = (lista, asignar) => {
+    const newLista = JSON.parse(JSON.stringify(lista));
+    asignar(newLista);
+  };
+
+  useEffect(() => {
+    http
+      .get(
+        `/items/productos?fields=*,imagenes.directus_files_id,categorias.*,inventario.*`,
+        putToken
+      )
+      .then((result) => {
+        if (tipoMuestra === 'agregar') onSetProductos(result.data.data);
+      });
+  }, [almacen]);
+
+  const onSetProductos = (lista) => {
+    const newData = JSON.parse(JSON.stringify(lista));
+    const newProductos = [];
+    lista.forEach((producto, index) => {
+      let inventarios = [];
+      producto.inventario.forEach((inventario) => {
+        if (inventario.clave_almacen === almacen && inventario.cantidad !== 0)
+          inventarios.push(inventario);
+      });
+      if (inventarios.length !== 0) {
+        newData[index].inventario = inventarios;
+        newProductos.push(newData[index]);
+      }
+    });
+    setListProducts([]);
+    setListProductsToShow(newProductos);
+  };
 
   const breakpoint = useBreakpoint();
 
@@ -115,6 +161,7 @@ const Index = ({ tipo }) => {
 
   const onAddProductos = (lista) => {
     const arreglo = [];
+    console.log(lista);
     lista.forEach((producto) => {
       arreglo.push({
         key: arreglo.length.toString(),
@@ -148,6 +195,9 @@ const Index = ({ tipo }) => {
         clave: item.clave,
         clave_unidad: item.unidad_cfdi,
         estado: 'Por transferir',
+        max: item.inventario
+          .map((inventario) => inventario.cantidad)
+          .reduce((cantidad, sum) => cantidad + sum, 0),
         productimage:
           item.imagenes.length !== 0
             ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
@@ -158,87 +208,62 @@ const Index = ({ tipo }) => {
     setListProducts(lista);
   };
 
-  const fetchProducts = async () => {
-    const { data } = await http.get(
-      `/items/productos?fields=*,imagenes.directus_files_id,categorias.*`,
-      putToken
-    );
-    return data.data;
-  };
-
-  const onSearchChange = (value) => {
-    setSearchValue(value);
-    filtrarProductosPorTitulo(data, value);
-  };
-
-  const filtrarProductosPorTitulo = async (productos, value) => {
-    if (productos) {
-      setListProductsToShow(
-        productos.filter((item) => item.titulo.includes(value))
-      );
-    }
-  };
-
-  const [searchValue, setSearchValue] = useState('');
-
-  const { data } = useQuery('productos', async () => {
-    const result = await fetchProducts();
-    setListProductsToShow(result);
-    filtrarProductosPorTitulo(result, searchValue);
-    return result;
-  });
-
   const [listToShow, setListProductsToShow] = useState([]);
 
   const onFinish = (datos) => {
     console.log(datos);
-
-    if (listProducts.length !== 0) {
-      http
-        .post(
-          '/items/solicitudes_transferencia/',
-          {
-            estado: datos.estado,
-            almacen_origen: datos.almacen_origen,
-            almacen_destino: datos.almacen_destino,
-            factura: datos.factura,
-            rfc_empleado: 'Empleado Actual',
-          },
-          putToken
-        )
-        .then((resul) => {
-          console.log(resul);
-          let productos = [];
-          listProducts.map((item) => {
-            return productos.push({
-              titulo: item.titulo,
-              codigo: item.codigo,
-              clave: item.clave,
-              clave_unidad: item.clave_unidad,
-              estado: 'Por transferir',
-              //productimage:'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-              cantidad: item.cantidad,
-              transferencia: resul.data.data.id,
+    if (datos.almacen_origen !== datos.almacen_destino) {
+      if (listProducts.length !== 0) {
+        http
+          .post(
+            '/items/solicitudes_transferencia/',
+            {
+              estado: datos.estado,
+              almacen_origen: datos.almacen_origen,
+              almacen_destino: datos.almacen_destino,
+              factura: datos.factura,
+              rfc_empleado: empleado.rfc,
+            },
+            putToken
+          )
+          .then((resul) => {
+            console.log(resul);
+            let productos = [];
+            listProducts.map((item) => {
+              return productos.push({
+                titulo: item.titulo,
+                codigo: item.codigo,
+                clave: item.clave,
+                clave_unidad: item.clave_unidad,
+                estado: 'Por transferir',
+                //productimage:'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                cantidad: item.cantidad,
+                transferencia: resul.data.data.id,
+              });
             });
+            console.log(productos);
+            http
+              .post(`/items/productos_transferencia`, productos, putToken)
+              .then((resul2) => {
+                console.log(resul2);
+                Mensaje();
+              });
+          })
+          .catch((error) => {
+            if (
+              error.response.data.errors[0].extensions.code ===
+              'RECORD_NOT_UNIQUE'
+            ) {
+              message.error('Codigo ya existente');
+            } else message.error('Un error ha ocurrido');
           });
-          console.log(productos);
-          http
-            .post(`/items/productos_transferencia`, productos, putToken)
-            .then((resul2) => {
-              console.log(resul2);
-              Mensaje();
-            });
-        })
-        .catch((error) => {
-          if (
-            error.response.data.errors[0].extensions.code ===
-            'RECORD_NOT_UNIQUE'
-          ) {
-            message.error('Codigo ya existente');
-          } else message.error('Un error ha ocurrido');
-        });
+      } else {
+        message.warning('Ingresa los productos a transferir');
+      }
     } else {
-      message.warning('Ingresa los productos a transferir');
+      message.warn(
+        'El almacen origen y el almacen destino deben ser distintos.'
+      );
     }
   };
 
@@ -315,39 +340,6 @@ const Index = ({ tipo }) => {
 
   const isEditing = (record) => record.key === editingKey;
 
-  const edit = (record) => {
-    form.setFieldsValue({
-      titulo: '',
-      cantidad: '',
-      ...record,
-    });
-    setEditingKey(record.key);
-  };
-
-  const cancel = () => {
-    setEditingKey('');
-  };
-
-  const save = async (key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...listProducts];
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
-        setListProducts(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setListProducts(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-  };
-
   const typeColumn = (type) => {
     switch (type) {
       case 'cantidad':
@@ -364,6 +356,16 @@ const Index = ({ tipo }) => {
   const handleDelete = (key) => {
     const dataSource = [...listProducts];
     setListProducts(dataSource.filter((item) => item.key !== key));
+  };
+
+  const onChangeCantidad = (value, index) => {
+    if (value !== 0) {
+      const newData = JSON.parse(JSON.stringify(listProducts));
+      newData[index].cantidad = value;
+      setListProducts(newData);
+      setEditingKey('');
+      setListProducts(newData);
+    }
   };
 
   const columns = [
@@ -387,48 +389,34 @@ const Index = ({ tipo }) => {
       title: 'CANTIDAD',
       dataIndex: 'cantidad',
       width: '30px',
-      editable: true,
+      render: (_, record) => {
+        return tipoMuestra === 'agregar' ? (
+          <InputNumber
+            max={record.max}
+            min={1}
+            defaultValue={record.cantidad}
+            onChange={(value) => {
+              onChangeCantidad(value, record.key);
+            }}
+          />
+        ) : (
+          <p>{record.cantidad}</p>
+        );
+      },
     },
     {
       title: '',
       dataIndex: 'operation',
       //fixed: breakpoint.lg ? "left": false,
-      width: '50px',
+      width: '20px',
       render: (_, record) => {
-        const editable = isEditing(record);
         return tipoMuestra === 'agregar' ? (
-          editable ? (
-            <span>
-              <Button
-                type='link'
-                onClick={() => save(record.key)}
-                icon={<CheckOutlined />}
-                style={{
-                  marginRight: 8,
-                }}
-              />
-              <Popconfirm title='¿Estas seguro de cancelar?' onConfirm={cancel}>
-                <CloseOutlined />
-              </Popconfirm>
-            </span>
-          ) : (
-            <span>
-              <Button
-                icon={<EditOutlined />}
-                type='link'
-                disabled={editingKey !== ''}
-                onClick={() => edit(record)}
-              >
-                Editar
-              </Button>
-              <Popconfirm
-                title='¿Estas seguro de querer eliminar?'
-                onConfirm={() => handleDelete(record.key)}
-              >
-                <DeleteOutlined />
-              </Popconfirm>
-            </span>
-          )
+          <Popconfirm
+            title='¿Estas seguro de querer eliminar?'
+            onConfirm={() => handleDelete(record.key)}
+          >
+            <DeleteOutlined />
+          </Popconfirm>
         ) : null;
       },
     },
@@ -469,9 +457,7 @@ const Index = ({ tipo }) => {
           remember: true,
           almacen_origen: datosTransferencia.almacen_origen,
           almacen_destino:
-            tipoMuestra !== 'agregar'
-              ? datosTransferencia.almacen_destino
-              : '1',
+            tipoMuestra !== 'agregar' ? datosTransferencia.almacen_destino : '',
           //estado: tipoMuestra !== 'agregar' ? datosTransferencia.estado : 'Pendiente',
           factura: datosTransferencia.factura,
           fecha_estimada: datosTransferencia.fecha_estimada,
@@ -535,11 +521,14 @@ const Index = ({ tipo }) => {
                   //defaultValue='Almacen 1'
                   placeholder='Selecciona un almacen.'
                   style={{ width: '100%' }}
-                  //onChange={handleChange}
+                  onChange={(value) => setAlmacen(value)}
                 >
-                  <Option value='1'>Almacen 1</Option>
-                  <Option value='2'>Almacen 2</Option>
-                  <Option value='3'>Almacen 3</Option>
+                  {almacenes.map((almacen) => (
+                    <Option
+                      value={almacen.clave}
+                      key={almacen.clave}
+                    >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             ) : (
@@ -551,47 +540,69 @@ const Index = ({ tipo }) => {
             span={breakpoint.lg ? 12 : 24}
             style={{ marginBottom: '10px' }}
           >
-            <Title level={5}>Fecha Estimada</Title>
             {datosTransferencia.estado !== 'Confirmado' ? (
-              <Typography>{datosTransferencia.fecha_estimada}</Typography>
+              datosTransferencia.fecha_estimada !== undefined ? (
+                <div>
+                  <Title level={5}>Fecha Estimada</Title>
+                  <Typography>{datosTransferencia.fecha_estimada}</Typography>
+                </div>
+              ) : null
             ) : (
-              <Form.Item
-                key='fecha_estimada'
-                name='fecha estimada'
-                rules={[
-                  datosTransferencia.estado === 'Confirmado'
-                    ? {
-                        required: true,
-                        message: `Selecciona una fecha estimada`,
-                      }
-                    : { required: false },
-                ]}
-              >
-                <DatePicker
-                  style={{ width: '100%' }}
-                  onChange={onChangeTime}
-                  disabled={
-                    datosTransferencia.estado !== 'Confirmado' ? true : false
-                  }
-                  placeholder='Selecciona la fecha de entrega estimada'
-                />
-              </Form.Item>
+              <div>
+                <Title level={5}>Fecha Estimada</Title>
+                <Form.Item
+                  key='fecha_estimada'
+                  name='fecha estimada'
+                  rules={[
+                    datosTransferencia.estado === 'Confirmado'
+                      ? {
+                          required: true,
+                          message: `Selecciona una fecha estimada`,
+                        }
+                      : { required: false },
+                  ]}
+                >
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    onChange={onChangeTime}
+                    disabled={
+                      datosTransferencia.estado !== 'Confirmado' ? true : false
+                    }
+                    placeholder='Selecciona la fecha de entrega estimada'
+                  />
+                </Form.Item>
+              </div>
             )}
-
             <Title level={5}>Almacen Destino</Title>
             {tipoMuestra === 'agregar' ? (
-              <InputForm
-                titulo='almacen_destino'
-                mensaje='Asignar un almacen de destino.'
-                //placeholder='Almacen de origen'
-                required={true}
-                valueDef={
-                  tipoMuestra === 'agregar'
-                    ? '1'
-                    : datosTransferencia.almacen_destino
-                }
-                enable={true}
-              />
+              almacenDestino === 'Todo' ? (
+                <Form.Item
+                  key='almacen_destino'
+                  name='almacen_destino'
+                  rules={[
+                    {
+                      required: true,
+                      message: `Selecciona un almacen de origen.`,
+                    },
+                  ]}
+                >
+                  <Select
+                    key='almacen_destino'
+                    //defaultValue='Almacen 1'
+                    placeholder='Selecciona un almacen destino.'
+                    style={{ width: '100%' }}
+                  >
+                    {almacenes.map((almacen) => (
+                      <Option
+                        value={almacen.clave}
+                        key={almacen.clave}
+                      >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              ) : (
+                <Typography>{setAlmacenDestino}</Typography>
+              )
             ) : (
               <Typography>{datosTransferencia.almacen_destino}</Typography>
             )}
@@ -611,6 +622,7 @@ const Index = ({ tipo }) => {
             titulo='comentario'
             enable={datosTransferencia.estado !== 'Tranferido'}
             required={datosTransferencia.estado === 'Tranferido'}
+            max={100}
             mensaje='Agregar comentario.'
             placeholder='Comentario.'
           />
@@ -625,7 +637,6 @@ const Index = ({ tipo }) => {
           allowClear
           enterButton='Buscar'
           onSearch={(value) => {
-            onSearchChange(value);
             setVisible(!visible);
           }}
         />

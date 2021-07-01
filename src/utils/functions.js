@@ -1,3 +1,22 @@
+export const arraysMatch = function (arr1, arr2) {
+  // Check if the arrays are the same length
+  if (arr1.length !== arr2.length) return false;
+
+  for (let i = 0; i < arr1.length; i++) {
+    for (const prop in arr1[i]) {
+      if (!arr2[i].hasOwnProperty(prop)) return false;
+      const valArr1 = arr1[i][prop];
+      const valArr2 = arr2[i][prop];
+
+      if (valArr1 !== valArr2) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
 export const updateObject = (oldObject, updatedValues) => ({
   ...oldObject,
   ...updatedValues,

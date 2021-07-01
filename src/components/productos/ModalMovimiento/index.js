@@ -1,4 +1,4 @@
-import { Modal, Button, Form, InputNumber, Input } from 'antd';
+import { Modal, Button, Form } from 'antd';
 import TextLabel from 'components/UI/TextLabel';
 
 import React, { useEffect, useCallback } from 'react';

@@ -88,7 +88,7 @@ const Index = (props) => {
         visible={isModalVisible}
         footer={null}
         onCancel={handleCancel}
-        width='50%'
+        width='70%'
       >
         <ProveedorForm
           onSubmit={onSaveChanges}
