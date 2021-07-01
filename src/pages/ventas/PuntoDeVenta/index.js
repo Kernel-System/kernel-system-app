@@ -20,11 +20,12 @@ import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';
 import MetodoPagoModal from 'components/ventas/MetodoPagoModal';
+import { http, httpSAT } from 'api';
 import { useStoreState } from 'easy-peasy';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { Link } from 'react-router-dom';
-import { calcCantidad } from 'utils/productos';
+import { calcCantidad, calcPrecioVariable } from 'utils/productos';
 const { Paragraph } = Typography;
 
 const PuntoDeVenta = () => {
@@ -35,16 +36,63 @@ const PuntoDeVenta = () => {
   const [productQuery, setProductQuery] = useState(undefined);
   const [serviceQuery, setServiceQuery] = useState(undefined);
   const [tipoComprobante, setTipoComprobante] = useState('ticket');
-  const [formaPago, setFormaPago] = useState('exhibicion');
+  const [formaPago, setFormaPago] = useState('PUE');
+  const [metodoPago, setMetodoPago] = useState('01');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [empleado, setEmpleado] = useState({});
+  const [almacenes, setAlmacenes] = useState([]);
+
+  const putToken = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const onSetDato = (lista, setDato) => {
+    console.log(lista);
+    setDato(lista);
+  };
+
+  useEffect(() => {
+    http.get(`/users/me?fields=empleado.*`, putToken).then((result) => {
+      onSetDato(result.data.data.empleado[0], setEmpleado);
+      return http
+        .get(
+          `/items/almacenes?fields=clave&filter[clave_sucursal][_in]=${result.data.data.empleado[0].sucursal}`,
+          putToken
+        )
+        .then((result) => {
+          onSetDato(
+            result.data.data.map((almacen) => almacen.clave),
+            setAlmacenes
+          );
+        });
+    });
+  }, []);
 
   const products = useQuery(['punto-de-venta-products', productQuery], () =>
-    getPuntoDeVentaProducts(productQuery, token)
+    getPuntoDeVentaProducts(productQuery, token, empleado.sucursal)
   );
 
-  const productsData = products.data?.data?.data;
+  const setProductData = () => {
+    let productos = [];
+    products.data?.data?.data.forEach((producto) => {
+      let inventario = producto.inventario
+        .filter((inven) => almacenes.includes(inven.clave_almacen))
+        .map((inven) => {
+          return { cantidad: inven.cantidad };
+        });
+      if (inventario.length > 0) {
+        productos.push({ ...producto, inventario: inventario });
+      }
+    });
+    return productos;
+  };
+
+  const productsData = setProductData(products.data?.data?.data);
+
   const services = useQuery(['punto-de-venta-services', serviceQuery], () =>
-    getPuntoDeVentaServices(serviceQuery, token)
+    getPuntoDeVentaServices(serviceQuery, token, empleado.sucursal)
   );
 
   const servicesData = services.data?.data?.data;
@@ -53,8 +101,72 @@ const PuntoDeVenta = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const handleOk = (datos) => {
+    console.log(datos);
     setIsModalVisible(false);
+    //if (tipoComprobante === 'factura') {
+    let items = [];
+    console.log(puntoDeVentaProducts);
+    puntoDeVentaProducts.forEach((producto) => {
+      console.log(producto);
+      items.push({
+        ProductCode: producto.clave,
+        IdentificationNumber: producto.codigo,
+        Description: producto.titulo,
+        Unit: 'NO APLICA',
+        UnitCode: producto.unidad_cfdi,
+        UnitPrice: calcPrecioVariable(producto, 1),
+        Quantity: producto.cantidad,
+        Subtotal: calcPrecioVariable(producto, 1) * producto.cantidad,
+        Discount:
+          calcPrecioVariable(producto, 1) *
+          producto.cantidad *
+          (producto.descuento / 100),
+        Taxes: [
+          {
+            Total:
+              calcPrecioVariable(producto, 1) *
+              producto.cantidad *
+              (1 - producto.descuento / 100) *
+              (producto.iva / 100),
+            Name: 'IVA',
+            Rate: producto.iva / 100,
+            Base:
+              calcPrecioVariable(producto, 1) *
+              producto.cantidad *
+              (1 - producto.descuento / 100),
+            IsRetention: false,
+          },
+        ],
+        Total:
+          calcPrecioVariable(producto, 1) *
+          producto.cantidad *
+          (1 - producto.descuento / 100) *
+          (1 + producto.iva / 100),
+      });
+    });
+    console.log({
+      Serie: 'F',
+      ExpeditionPlace: '06100',
+      PaymentConditions: 'CREDITO A SIETE DIAS',
+      CfdiType: datos.cfdi,
+      PaymentForm: metodoPago,
+      PaymentMethod: formaPago,
+      Issuer: {
+        //emisor
+        FiscalRegime: '601',
+        Rfc: 'ESO1202108R2',
+        Name: 'SinDelantal Mexico',
+      },
+      Receiver: {
+        Rfc: 'SME111110NY1',
+        Name: 'SinDelantal Mexico',
+        CfdiUse: 'P01',
+      },
+      Items: items,
+    });
+
+    //}
   };
 
   const handleCancel = () => {
@@ -242,6 +354,7 @@ const PuntoDeVenta = () => {
       <ProductsTable
         products={puntoDeVentaProducts}
         type='venta'
+        nivel={1}
         removeItem={handleRemoveItem}
         addOneToItem={handleAddOneToItem}
         subOneToItem={handleSubOneToItem}
@@ -252,7 +365,7 @@ const PuntoDeVenta = () => {
         setQuantityToItem={handleSetQuantityToItem}
       />
       <Row gutter={[16, 16]}>
-        <Col xs={24} md={12} lg={6}>
+        <Col span={breakpoint.lg ? 6 : 24}>
           <Card size='small' title='Factura'>
             <Space direction='vertical'>
               <div>
@@ -270,22 +383,38 @@ const PuntoDeVenta = () => {
             </Space>
           </Card>
         </Col>
-        <Col xs={24} md={12} lg={6}>
-          <Card size='small' title='Forma de pago'>
+        <Col span={breakpoint.lg ? 6 : 24}>
+          <Card size='small' title='Método de Pago'>
             <Paragraph type='secondary'>Elija una opción</Paragraph>
             <Radio.Group
-              defaultValue={formaPago}
-              onChange={(e) => setFormaPago(e.target.value)}
+              defaultValue={metodoPago}
+              onChange={(e) => setMetodoPago(e.target.value)}
             >
               <Space direction='vertical'>
-                <Radio value={'exhibicion'}>Pago en una exhibición</Radio>
-                <Radio value={'parcialidades'}>Pago en parcialidades</Radio>
+                <Radio value={'01'}>Pago en efectivo</Radio>
+                <Radio value={'04'}>Pago con tarjeta de débito o crédito</Radio>
               </Space>
             </Radio.Group>
           </Card>
         </Col>
-        <Col xs={24} lg={{ span: 7, offset: 5 }}>
+        <Col span={breakpoint.lg ? 6 : 24}>
+          <Card size='small' title='Forma de pago'>
+            <Paragraph type='secondary'>Elija una opción</Paragraph>
+            <Radio.Group
+              defaultValue={formaPago}
+              disabled={tipoComprobante !== 'factura'}
+              onChange={(e) => setFormaPago(e.target.value)}
+            >
+              <Space direction='vertical'>
+                <Radio value={'PUE'}>Pago en una exhibición</Radio>
+                <Radio value={'PPD'}>Pago en parcialidades</Radio>
+              </Space>
+            </Radio.Group>
+          </Card>
+        </Col>
+        <Col span={breakpoint.lg ? 6 : 24}>
           <Summary
+            nivel={1}
             buttonLabel='Proceder a pagar'
             buttonAction={showModal}
             products={puntoDeVentaProducts}
@@ -304,6 +433,8 @@ const PuntoDeVenta = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        tipoComprobante={tipoComprobante}
+        metodoPago={metodoPago}
       />
     </>
   );

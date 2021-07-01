@@ -1,10 +1,12 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Modal, Row, Space, Table } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
+import { Button, Col, Modal, Row, Space, Table, message, Upload } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import TextLabel from 'components/UI/TextLabel';
 import { FormasDePago, tiposDeMoneda } from 'utils/facturas/catalogo';
+import { http } from 'api';
+const { Dragger } = Upload;
 
-const Index = ({ visible, pago, setVis }) => {
+const Index = ({ visible, pago, setVis, putToken, token, actualizar }) => {
   const breakpoint = useBreakpoint();
   console.log(pago);
   const columns = [
@@ -102,10 +104,23 @@ const Index = ({ visible, pago, setVis }) => {
     };
   });
 
+  const beforeUpload = (file) => {
+    const isJpgOrPng =
+      file.type === 'image/jpeg' ||
+      file.type === 'image/png' ||
+      file.type === 'application/pdf';
+    if (!isJpgOrPng) {
+      message.error(
+        'Solo puede subir imágenes en formato JPG/PNG o archivos PDF'
+      );
+    }
+    return isJpgOrPng;
+  };
+
   return Object.keys(pago).length !== 0 ? (
     <>
       <Modal
-        title={`Pago No. ${pago.pagos_id.id}`}
+        title={`Pago No. ${pago?.id}`}
         centered
         visible={visible}
         onOk={() => {
@@ -127,7 +142,7 @@ const Index = ({ visible, pago, setVis }) => {
           </Button>,
         ]}
       >
-        <TextLabel title='Tipo de Factura' subtitle={pago.pagos_id.tipo} />
+        <TextLabel title='Tipo de Factura' subtitle={pago?.tipo} />
         <Row key='columnas' gutter={[16, 8]} style={{ marginBottom: '10px' }}>
           <Col
             className='gutter-row'
@@ -137,58 +152,46 @@ const Index = ({ visible, pago, setVis }) => {
             <TextLabel title='Id de Factura' subtitle={pago.item} />
             <TextLabel
               title='Forma de Pago'
-              subtitle={FormasDePago[pago.pagos_id.forma_de_pago_p]}
+              subtitle={FormasDePago[pago?.forma_de_pago_p]}
             />
-            <TextLabel
-              title='Tipo de Cambio'
-              subtitle={pago.pagos_id.tipo_cambio_p}
-            />
+            <TextLabel title='Tipo de Cambio' subtitle={pago?.tipo_cambio_p} />
           </Col>
           <Col
             className='gutter-row'
             span={breakpoint.lg ? 12 : 24}
             style={{ marginBottom: '10px' }}
           >
-            <TextLabel
-              title='Fecha de Pago'
-              subtitle={pago.pagos_id.fecha_pago}
-            />
+            <TextLabel title='Fecha de Pago' subtitle={pago?.fecha_pago} />
             <TextLabel
               title='Moneda'
-              subtitle={tiposDeMoneda[pago.pagos_id.moneda_p]}
+              subtitle={tiposDeMoneda[pago?.moneda_p]}
             />
-            <TextLabel title='Monto' subtitle={pago.pagos_id.monto} />
+            <TextLabel title='Monto' subtitle={pago?.monto} />
           </Col>
         </Row>
-        <TextLabel
-          title='Número de Operación'
-          subtitle={pago.pagos_id.num_operacion}
-        />
+        <TextLabel title='Número de Operación' subtitle={pago?.num_operacion} />
         <TextLabel
           title='Nombre del banco'
-          subtitle={pago.pagos_id.nom_banco_ord_ext}
+          subtitle={pago?.nom_banco_ord_ext}
         />
         <TextLabel
           title='RFC Emisor Cuenta Ordenante'
-          subtitle={pago.pagos_id.rfc_emisor_cta_ord}
+          subtitle={pago?.rfc_emisor_cta_ord}
         />
-        <TextLabel
-          title='Cuenta Ordenante'
-          subtitle={pago.pagos_id.cta_ordenante}
-        />
+        <TextLabel title='Cuenta Ordenante' subtitle={pago?.cta_ordenante} />
         <TextLabel
           title='RFC Emisor Cuenta Beneficiario'
-          subtitle={pago.pagos_id.rfc_emisor_cta_ben}
+          subtitle={pago?.rfc_emisor_cta_ben}
         />
         <TextLabel
           title='Cuenta Beneficiario'
-          subtitle={pago.pagos_id.cta_beneficiario}
+          subtitle={pago?.cta_beneficiario}
         />
         <TextLabel title='Relacionar pago con documento (Opcional)' />
         <Table
           bordered
           scroll={{ x: 1500, y: 600 }}
-          dataSource={pago.pagos_id.doctos_relacionados}
+          dataSource={pago?.doctos_relacionados}
           columns={mergedColumns}
           rowClassName='editable-row'
         />
@@ -197,9 +200,10 @@ const Index = ({ visible, pago, setVis }) => {
           subtitle='Seleccionar el boton de agregar archivo, ir a la opción de "Archivos Comprobante" y seleccionar "Crear Nuevo", arrastrar o subir los archivos correspondientes, al finalizar confirmar en el boton de la esquina superior derecha'
         />
         <Space direction='vertical'>
-          {pago.pagos_id.archivos_comprobante.map((documento) => (
+          {pago?.archivos_comprobante.map((documento, index) => (
             <Button
               type='link'
+              key={index}
               onClick={() => {
                 window
                   .open(
@@ -215,20 +219,42 @@ const Index = ({ visible, pago, setVis }) => {
         </Space>
         <br />
         <br />
-        <Button
-          type='primary'
-          icon={<PlusOutlined />}
-          onClick={() => {
-            window
-              .open(
-                `${process.env.REACT_APP_DIRECTUS_API_URL}/admin/collections/pagos/${pago.pagos_id.id}`,
-                '_blank'
-              )
-              .focus();
+        <Dragger
+          action={`${process.env.REACT_APP_DIRECTUS_API_URL}/files`}
+          headers={{
+            Authorization: `Bearer ${token}`,
+            'X-Requested-With': null,
           }}
+          name='file'
+          listType='picture-card'
+          onChange={(info) => {
+            if (info?.file?.response?.data?.id !== undefined) {
+              http
+                .post(
+                  `/items/pagos_directus_files`,
+                  {
+                    pagos_id: pago?.id,
+                    directus_files_id: info?.file?.response?.data?.id,
+                  },
+                  putToken
+                )
+                .then((result) => {
+                  message.success('Archivo subido con exito');
+                  actualizar();
+                })
+                .catch(() => {
+                  message.error('Error al subir el Archivo :c');
+                });
+            }
+          }}
+          maxCount={1}
+          beforeUpload={beforeUpload}
         >
-          Agregar Archivo
-        </Button>
+          <p className='ant-upload-drag-icon'>
+            <InboxOutlined />
+          </p>
+          <p className='ant-upload-text'>Haz clic o arrastre el archivo</p>
+        </Dragger>
       </Modal>
     </>
   ) : null;
