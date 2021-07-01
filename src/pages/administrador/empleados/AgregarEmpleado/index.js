@@ -21,6 +21,8 @@ const Index = () => {
   const [empleado, setEmpleado] = useState([]);
   const [mail, setMail] = useState('');
   const [almacenes, setAlmacenes] = useState([]);
+  const [sucursal, setSucursal] = useState([]);
+  const [sucursales, setSucursales] = useState([]);
   const history = useHistory();
   let match = useRouteMatch();
   const token = useStoreState((state) => state.user.token.access_token);
@@ -42,12 +44,22 @@ const Index = () => {
           onSetEmpleado(resul.data.data);
         });
     } else onSetEmpleado([{}]);
-    http.get(`/items/almacenes/`, putToken).then((result) => {
-      console.log(result.data.data);
-      onSetAlmacenes(result.data.data);
+    http.get(`/items/sucursales/`, putToken).then((result) => {
+      onSetSucursales(result.data.data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    http
+      .get(
+        `/items/almacenes/?filter[clave_sucursal][_in]=${sucursal}`,
+        putToken
+      )
+      .then((result) => {
+        onSetAlmacenes(result.data.data);
+      });
+  }, [sucursal]);
 
   const onSetEmpleado = (lista) => {
     const newLista = JSON.parse(JSON.stringify(lista));
@@ -57,6 +69,11 @@ const Index = () => {
   const onSetAlmacenes = (lista) => {
     const newLista = JSON.parse(JSON.stringify(lista));
     setAlmacenes(newLista);
+  };
+
+  const onSetSucursales = (lista) => {
+    const newLista = JSON.parse(JSON.stringify(lista));
+    setSucursales(newLista);
   };
 
   const onSetCorreo = (correo) => {
@@ -98,6 +115,8 @@ const Index = () => {
               cp: dato.cp,
               entre_calle_1: dato.entre_calle_1,
               entre_calle_2: dato.entre_calle_2,
+              sucursal: dato.sucursal,
+              almacen: dato.almacen,
             },
             putToken
           )
@@ -133,7 +152,7 @@ const Index = () => {
       .patch(
         `/users/${empleado[0].cuenta.id}`,
         {
-          //email: dato.correo,
+          email: dato.correo,
           password: dato.password,
           role: dato.puesto,
         },
@@ -160,6 +179,7 @@ const Index = () => {
               cp: dato.cp,
               entre_calle_1: dato.entre_calle_1,
               entre_calle_2: dato.entre_calle_2,
+              sucursal: dato.sucursal,
               almacen: dato.almacen,
             },
             putToken
@@ -325,14 +345,54 @@ const Index = () => {
             </Option>
           </Select>
         </Form.Item>
-        <Title level={5}>Almacén</Title>
-        <Form.Item name='almacen'>
+        <Title level={5}>Sucursal</Title>
+        <Form.Item
+          name='sucursal'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna una sucursal',
+            },
+          ]}
+        >
           <Select
             showSearch
             style={{ width: '100%' }}
             placeholder='Buscar un almacén'
             optionFilterProp='children'
-            //onChange={onChange}
+            onChange={(value) => {
+              setSucursal(value);
+            }}
+            //onFocus={onFocus}
+            //onSearch={onSearch}
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+          >
+            {sucursales.map((sucursal) => (
+              <Option
+                value={sucursal.clave}
+                key={sucursal.clave}
+              >{`${sucursal.clave} : ${sucursal.nombre} `}</Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Title level={5}>Almacén</Title>
+        <Form.Item
+          name='almacen'
+          rules={[
+            {
+              required: true,
+              message: 'Asigna un almacen',
+            },
+          ]}
+        >
+          <Select
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Buscar un almacén'
+            optionFilterProp='children'
             //onFocus={onFocus}
             //onSearch={onSearch}
             filterOption={(input, option) =>
@@ -347,6 +407,7 @@ const Index = () => {
             ))}
           </Select>
         </Form.Item>
+
         <Row key='Row1' gutter={[16, 24]} style={{ marginBottom: '10px' }}>
           <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Title level={5}>Teléfono</Title>
