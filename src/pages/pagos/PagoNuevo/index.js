@@ -41,6 +41,10 @@ const Index = () => {
     }
     if (!errorDocument) {
       console.log(value);
+      let dato =
+        tipo === 'facturas_externas'
+          ? { facturas_externas: value.folio_factura }
+          : { facturas_internas: value.folio_factura };
       http
         .post(
           '/items/pagos/',
@@ -57,48 +61,36 @@ const Index = () => {
             rfc_emisor_cta_ben: value.rfc_emisor_cta_ben,
             cta_beneficiario: value.cta_beneficiario,
             tipo: value.tipo,
+            ...dato,
           },
           putToken
         )
         .then((resul_pago) => {
           console.log(resul_pago);
-          http
-            .post(
-              '/items/pagos_factura/',
-              {
-                pagos_id: resul_pago.data.data.id,
-                collection: value.tipo,
-                item: value.folio_factura,
-              },
-              putToken
-            )
-            .then((resul_pfactura) => {
-              console.log(resul_pfactura);
-              if (documentos.length !== 0) {
-                let newDocumento = [];
-                documentos.forEach((documento) => {
-                  newDocumento.push({
-                    id_pago: resul_pago.data.data.id,
-                    id_documento: documento.id_documento, //25
-                    folio: documento.folio, //25
-                    serie: documento.serie, //40
-                    moneda_dr: documento.moneda_dr, //char 3
-                    tipo_cambio_dr: documento.tipo_cambio_dr, //decimal 10
-                    metodo_de_pago_dr: documento.metodo_de_pago_dr, //char 3
-                    numparcialidad: documento.numparcialidad, //36
-                    imp_saldo_ant: documento.imp_saldo_ant,
-                    imp_saldo_insoluto: documento.imp_saldo_insoluto,
-                    imp_pagado: documento.imp_pagado,
-                  });
-                });
-                http
-                  .post('/items/doctos_relacionados/', newDocumento, putToken)
-                  .then((resul) => {
-                    console.log(resul);
-                    Mensaje();
-                  });
-              } else Mensaje();
+          if (documentos.length !== 0) {
+            let newDocumento = [];
+            documentos.forEach((documento) => {
+              newDocumento.push({
+                id_pago: resul_pago.data.data.id,
+                id_documento: documento.id_documento, //25
+                folio: documento.folio, //25
+                serie: documento.serie, //40
+                moneda_dr: documento.moneda_dr, //char 3
+                tipo_cambio_dr: documento.tipo_cambio_dr, //decimal 10
+                metodo_de_pago_dr: documento.metodo_de_pago_dr, //char 3
+                numparcialidad: documento.numparcialidad, //36
+                imp_saldo_ant: documento.imp_saldo_ant,
+                imp_saldo_insoluto: documento.imp_saldo_insoluto,
+                imp_pagado: documento.imp_pagado,
+              });
             });
+            http
+              .post('/items/doctos_relacionados/', newDocumento, putToken)
+              .then((resul) => {
+                console.log(resul);
+                Mensaje();
+              });
+          } else Mensaje();
         });
     } else message.warning('Falta llenar datos de documentos');
   };

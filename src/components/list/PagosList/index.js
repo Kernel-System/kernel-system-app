@@ -1,28 +1,24 @@
 import { EditFilled } from '@ant-design/icons';
 import { Button, List } from 'antd';
 import { http } from 'api';
-import { useStoreState } from 'easy-peasy';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import './styles.css';
 
-const Index = ({ onClickItem, id_fac, tipo }) => {
-  const token = useStoreState((state) => state.user.token.access_token);
-  const putToken = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
+const Index = ({ onClickItem, id_fac, tipo, putToken }) => {
+  const [total, setTotal] = useState(0);
+
   const fetchItems = async () => {
     const { data } = await http.get(
-      `/items/pagos_factura?filter[item][_eq]=${id_fac}&filter[collection][_eq]=${tipo}&fields=*,pagos_id.*,pagos_id.archivos_comprobante.*,pagos_id.doctos_relacionados.*,pagos_id.archivos_comprobante.directus_files_id.*`,
+      `/items/pagos?filter[${tipo}][_eq]=${id_fac}&fields=*,archivos_comprobante.*,doctos_relacionados.*,archivos_comprobante.directus_files_id.*,facturas_internas.*,facturas_internas.*`,
       putToken
     );
+    setTotal(data.data.map((dato) => dato.monto).reduce((a, b) => a + b, 0));
     return data.data;
   };
 
-  useQuery('clientes', async () => {
+  useQuery('pagos', async () => {
     const result = await fetchItems();
     setListToShow(result);
     return result;
@@ -71,12 +67,12 @@ const Index = ({ onClickItem, id_fac, tipo }) => {
                       margin: 0,
                     }}
                   >
-                    {`Id: ${item.pagos_id.id}`}
+                    {`Id: ${item.id}`}
                   </p>
                 }
-                description={`Fecha: ${item.pagos_id.fecha_pago}`}
+                description={`Fecha: ${item.fecha_pago}`}
               />
-              {`No. Operación: ${item.pagos_id.num_operacion}`}
+              {`No. Operación: ${item.num_operacion}`}
             </List.Item>
           );
         }}

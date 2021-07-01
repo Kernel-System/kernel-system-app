@@ -18,7 +18,11 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
 
   useEffect(() => {
     http.get(`/items/${tipo}?fields=*`, putToken).then((resul) => {
-      onSetFactura(resul.data.data);
+      const resultado = resul.data.data.filter((factura) => {
+        return factura?.pagos?.length !== 0;
+      });
+      console.log(resultado);
+      onSetFactura(resultado);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo]);
