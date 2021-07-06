@@ -158,7 +158,7 @@ const PuntoDeVenta = () => {
       });
       httpSAT
         .post('/2/cfdis', {
-          Serie: 'KS',
+          Serie: empleado.sucursal.clave,
           Currency: 'MXN',
           ExpeditionPlace: empleado.sucursal.cp,
           CfdiType: 'I',
@@ -212,6 +212,7 @@ const PuntoDeVenta = () => {
               console.log(result2.data.data);
               ingresarVenta(datos, {
                 folio: result.data.Folio,
+                id_int: result2.data.data.id,
                 fecha: result.data.Date,
                 id: result.data.Id,
               });
@@ -267,7 +268,7 @@ const PuntoDeVenta = () => {
           metodo_pago: metodoPago,
           forma_pago: formaPago,
           comentarios: 'Venta en Tienda',
-          factura: factura?.folio,
+          factura: factura?.id_int,
           rfc_vendedor: empleado.rfc,
           cantidad_recibida: datos.cantidad,
           cantidad_salida: datos.cambio,

@@ -6,7 +6,15 @@ import { FormasDePago, tiposDeMoneda } from 'utils/facturas/catalogo';
 import { http } from 'api';
 const { Dragger } = Upload;
 
-const Index = ({ visible, pago, setVis, putToken, token, actualizar }) => {
+const Index = ({
+  visible,
+  pago,
+  setVis,
+  putToken,
+  token,
+  actualizar,
+  tipo,
+}) => {
   const breakpoint = useBreakpoint();
   console.log(pago);
   const columns = [
@@ -149,7 +157,14 @@ const Index = ({ visible, pago, setVis, putToken, token, actualizar }) => {
             span={breakpoint.lg ? 12 : 24}
             style={{ marginBottom: '10px' }}
           >
-            <TextLabel title='Id de Factura' subtitle={pago.item} />
+            <TextLabel
+              title='Id de Factura'
+              subtitle={
+                tipo === 'facturas_externas'
+                  ? pago?.facturas_externas?.id
+                  : pago?.facturas_internas?.id
+              }
+            />
             <TextLabel
               title='Forma de Pago'
               subtitle={FormasDePago[pago?.forma_de_pago_p]}

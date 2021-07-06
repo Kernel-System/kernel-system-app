@@ -1,5 +1,5 @@
 import SucursalesList from 'components/list/SucursalesList';
-import { http } from 'api';
+import { http, httpSAT } from 'api';
 import { Button, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
@@ -35,7 +35,11 @@ const Index = () => {
   };
 
   const onConfirmDelete = (item) => {
-    deleteMutation.mutate(item);
+    httpSAT.delete(`/serie/${item.id_api}/${item.clave}`).then(() => {
+      httpSAT.delete(`/BranchOffice/${item.id_api}`).then(() => {
+        deleteMutation.mutate(item);
+      });
+    });
   };
 
   const deleteMutation = useMutation(deleteItem, {
