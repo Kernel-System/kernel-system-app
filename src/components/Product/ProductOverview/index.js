@@ -29,8 +29,8 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
       <Space align='end'>
         <Title level={2} style={{ display: 'inline-block', marginBottom: 0 }}>
           {formatPrice(
-            calcPrecioVariable(product, nivel) -
-              calcPrecioVariable(product, nivel) * toPercent(product.descuento)
+            calcPrecioVariable(product, nivel) *
+              toPercent(100 - product.descuento)
           )}
         </Title>
         {product.descuento > 0 && (
@@ -38,6 +38,7 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
             {formatPrice(calcPrecioVariable(product, nivel))}
           </Paragraph>
         )}
+        <Text strong>IVA NO INCLUIDO</Text>
       </Space>
       <Paragraph type='secondary'>
         Precios y disponibilidad válidos en tienda en línea La Paz, Baja

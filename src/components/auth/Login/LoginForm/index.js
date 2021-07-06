@@ -1,6 +1,6 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Space, Typography } from 'antd';
-import { getToken, getUserNivel, getUserRole, getEmployeeId } from 'api/auth';
+import { getEmployeeId, getToken, getUserNivel, getUserRole } from 'api/auth';
 import Heading from 'components/UI/Heading';
 import { useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
@@ -29,17 +29,20 @@ const LoginForm = () => {
         ])
           .then((result) => {
             setUserRole(result[0].data.data.role.name);
-            setUserNivel(result[1].data.data?.cliente[0]?.nivel);
-            setEmployeeId(result[2].data.data?.empleado[0]?.rfc);
+            if (result[0].data.data.role.name === 'cliente') {
+              setUserNivel(result[1].data.data?.cliente[0]?.nivel);
+            } else {
+              setEmployeeId(result[2].data.data?.empleado[0]?.rfc);
+            }
           })
           .catch(() => {
-            message.error('Lo sentimos, ha ocurrido un error');
+            message.error('Lo sentimos, ha ocurrido un error 1');
             setLoading(false);
             setHasError(true);
           });
       })
       .catch(() => {
-        message.error('Lo sentimos, ha ocurrido un error');
+        message.error('Lo sentimos, ha ocurrido un error 2');
         setLoading(false);
         setHasError(true);
       });

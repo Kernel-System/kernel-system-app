@@ -5,39 +5,44 @@ import {
   Col,
   Divider,
   Form,
+  Input,
   message,
   Radio,
   Row,
   Space,
-  Typography,
   Spin,
+  Typography,
 } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import { http, httpSAT } from 'api';
 import {
+  getClienteNivel,
   getPuntoDeVentaProducts,
   getPuntoDeVentaServices,
 } from 'api/ventas/punto_de_venta';
+import { getSolicitudCompra } from 'api/ventas/solicitudes_compra';
 import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
 import Heading from 'components/UI/Heading';
 import MetodoPagoModal from 'components/ventas/MetodoPagoModal';
-import { http, httpSAT } from 'api';
 import { useStoreState } from 'easy-peasy';
-import { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from 'react-query';
-import { Link } from 'react-router-dom';
-import { calcCantidad, calcPrecioVariable } from 'utils/productos';
-import { toPercent } from 'utils/functions';
+import { useQueryParams } from 'hooks/useQueryParams';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import logo from 'utils/Cotizacion.png';
+import { toPercent } from 'utils/functions';
+import { calcCantidad, calcPrecioVariable } from 'utils/productos';
 const { Paragraph } = Typography;
 
 const PuntoDeVenta = () => {
   const history = useHistory();
   const queryClient = useQueryClient();
   const breakpoint = useBreakpoint();
+  const query = useQueryParams();
   const token = useStoreState((state) => state.user.token.access_token);
   const [puntoDeVentaProducts, setPuntoDeVentaProducts] = useState([]);
   const [nivel, setNivel] = useState(1);
@@ -50,6 +55,8 @@ const PuntoDeVenta = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [empleado, setEmpleado] = useState({});
   const [almacenes, setAlmacenes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [disableCliente, setDisableCliente] = useState(false);
 
   const putToken = {
     headers: {
@@ -62,6 +69,26 @@ const PuntoDeVenta = () => {
   };
 
   useEffect(() => {
+    if (query.get('solicitud') !== null) {
+      getSolicitudCompra(query.get('solicitud'), token).then(
+        ({ data: { data } }) => {
+          data.productos_solicitados.forEach((producto) => {
+            const newProducto = {
+              ...producto.codigo_producto,
+              descuento: producto.descuento_ofrecido,
+              iva: producto.iva,
+              precio_fijo: producto.precio_ofrecido,
+              cantidad: producto.cantidad,
+            };
+            setPuntoDeVentaProducts((prevPuntoDeVentaProducts) => [
+              ...prevPuntoDeVentaProducts,
+              newProducto,
+            ]);
+          });
+        }
+      );
+    }
+
     http
       .get(`/users/me?fields=empleado.*,empleado.sucursal.*`, putToken)
       .then((result) => {
@@ -79,6 +106,8 @@ const PuntoDeVenta = () => {
             );
           });
       });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const products = useQuery(['punto-de-venta-products', productQuery], () =>
@@ -854,6 +883,21 @@ const PuntoDeVenta = () => {
       )
     );
 
+  const handleGetClienteNivel = (rfc) => {
+    if (rfc) {
+      setIsLoading(true);
+      getClienteNivel(rfc.toUpperCase(), token).then(({ data: { data } }) => {
+        if (!data.length) {
+          message.error('Cliente no encontrado en el sistema');
+        } else {
+          setDisableCliente(true);
+          setNivel(data[0].nivel);
+        }
+        setIsLoading(false);
+      });
+    }
+  };
+
   const handleSetProductQuery = (query) => {
     setProductQuery(query);
     queryClient.invalidateQueries('punto-de-venta-products');
@@ -867,8 +911,29 @@ const PuntoDeVenta = () => {
   return (
     <>
       <Spin size='large' spinning={spin}>
-        <Heading title='Punto de venta' />
+        <Heading
+          title='Punto de venta'
+          extra={
+            query.get('solicitud')
+              ? `ID Solicitud de compra: ${query.get('solicitud')}`
+              : `Le atiende: ${empleado.nombre}`
+          }
+        />
         <Form layout='vertical'>
+          <Form.Item
+            label='Cliente'
+            normalize={(value) => (value || '').toUpperCase()}
+          >
+            <Input.Search
+              enterButton='Buscar cliente'
+              onSearch={handleGetClienteNivel}
+              placeholder='Buscar cliente por RFC'
+              disabled={disableCliente}
+              maxLength={13}
+              loading={isLoading}
+            />
+          </Form.Item>
+          {!breakpoint.sm && <Divider style={{ marginTop: 0 }} />}
           <Form.Item label='Buscar producto'>
             <AutoComplete
               style={{ width: '100%' }}
@@ -887,7 +952,6 @@ const PuntoDeVenta = () => {
               ))}
             </AutoComplete>
           </Form.Item>
-          {!breakpoint.sm && <Divider style={{ marginTop: 0 }} />}
           <Form.Item label='Buscar servicio'>
             <AutoComplete
               style={{ width: '100%' }}
@@ -907,7 +971,7 @@ const PuntoDeVenta = () => {
         <ProductsTable
           products={puntoDeVentaProducts}
           type='venta'
-          nivel={1}
+          nivel={query.get('solicitud') === null && nivel}
           removeItem={handleRemoveItem}
           addOneToItem={handleAddOneToItem}
           subOneToItem={handleSubOneToItem}
@@ -969,7 +1033,7 @@ const PuntoDeVenta = () => {
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
             <Summary
-              nivel={nivel}
+              nivel={query.get('solicitud') === null && nivel}
               buttonLabel='Proceder a pagar'
               buttonAction={showModal}
               products={puntoDeVentaProducts}
@@ -990,7 +1054,7 @@ const PuntoDeVenta = () => {
           onCancel={handleCancel}
           tipoComprobante={tipoComprobante}
           metodoPago={metodoPago}
-          nivel={nivel}
+          nivel={query.get('solicitud') === null && nivel}
         />
       </Spin>
     </>

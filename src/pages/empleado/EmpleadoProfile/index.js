@@ -11,7 +11,7 @@ import { capitalize } from 'utils/functions';
 
 const EmpleadoProfile = () => {
   const token = useStoreState((state) => state.user.token.access_token);
-  const user = useQuery('user', () => getUserData(token));
+  const user = useQuery('employee', () => getUserData(token));
   const role = useStoreState((state) => state.user.role);
   return (
     <>
