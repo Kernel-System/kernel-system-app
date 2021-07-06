@@ -1,5 +1,10 @@
 import { http } from 'api';
 
+export const getClienteNivel = (rfc, token) =>
+  http.get(`/items/clientes?fields=nivel&filter[rfc][_eq]=${rfc}&limit=1`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
 export const getPuntoDeVentaProducts = (product, token) =>
   http.get(
     `/items/productos?fields=clave,nombre_unidad_cfdi,unidad_cfdi,codigo,titulo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,iva,imagenes.directus_files_id,inventario.clave_almacen,inventario.cantidad&filter={"_and":[{"tipo_de_venta":{"_neq":"Servicio"}}${

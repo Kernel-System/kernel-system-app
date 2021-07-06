@@ -102,10 +102,10 @@ const Cart = () => {
       total: cartItemsData.reduce(
         (total, product) =>
           total +
-          calcPrecioVariable(product, nivel) * product.cantidad -
           calcPrecioVariable(product, nivel) *
-            product.cantidad *
-            toPercent(product.descuento),
+            toPercent(100 - product.descuento) *
+            toPercent(100 + product.iva) *
+            product.cantidad,
         0
       ),
       productos_solicitados: cartItemsData.map((cartItem) => ({

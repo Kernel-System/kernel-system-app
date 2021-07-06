@@ -28,7 +28,9 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const role = useStoreState((state) => state.user.role);
 
   const onSearch = (value) => {
-    history.push(`/b/${value}`);
+    if (value !== '') {
+      history.push(`/b/${value}`);
+    }
   };
 
   const menu = (

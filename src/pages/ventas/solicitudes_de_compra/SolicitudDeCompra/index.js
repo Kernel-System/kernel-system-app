@@ -28,7 +28,7 @@ import { useStoreState } from 'easy-peasy';
 import moment from 'moment';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
-import { useHistory, useParams } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import {
   capitalize,
   formatDateTime,
@@ -96,7 +96,7 @@ const SolicitudDeCompra = () => {
               ...product,
               [campo]:
                 campo === 'precio_ofrecido'
-                  ? parseFloat(valor.replace(/[MX$]|,*/g, ''))
+                  ? parseFloat(valor.replace(/[$]|,*/g, ''))
                   : parseInt(valor),
             }
           : product
@@ -154,8 +154,9 @@ const SolicitudDeCompra = () => {
       total: newProducts.reduce(
         (total, product) =>
           total +
-          (product.precio_ofrecido -
-            product.precio_ofrecido * toPercent(product.descuento_ofrecido)) *
+          product.precio_ofrecido *
+            toPercent(100 - product.descuento_ofrecido) *
+            toPercent(100 + product.iva) *
             product.cantidad,
         0
       ),
@@ -339,7 +340,7 @@ const SolicitudDeCompra = () => {
                 disabled={solicitudData.estado !== 'pendiente' ? true : false}
                 style={{ marginBottom: '1rem' }}
               />
-              {solicitudData.estado === 'pendiente' && (
+              {solicitudData.estado === 'pendiente' ? (
                 <Space>
                   <Button
                     type='primary'
@@ -361,6 +362,12 @@ const SolicitudDeCompra = () => {
                     </Button>
                   </Popconfirm>
                 </Space>
+              ) : (
+                solicitudData.estado === 'aprobada' && (
+                  <Link to={`/venta?solicitud=${id}`}>
+                    <Button type='primary'>Proceder a pagar</Button>
+                  </Link>
+                )
               )}
             </Col>
             <Col xs={24} md={12}>

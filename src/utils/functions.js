@@ -49,6 +49,7 @@ export const formatPrice = (price) =>
   new Intl.NumberFormat('en', {
     style: 'currency',
     currency: 'MXN',
+    currencyDisplay: 'narrowSymbol',
   }).format(price);
 
 export const formatPhoneNumber = (phoneNumber) =>

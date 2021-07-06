@@ -6,7 +6,6 @@ import { formatPrice, toPercent } from 'utils/functions';
 const OrderProductsList = ({ products }) => {
   return (
     <List
-      style={{ marginRight: '1rem' }}
       dataSource={products}
       renderItem={(item) => (
         <List.Item>
@@ -33,15 +32,21 @@ const OrderProductsList = ({ products }) => {
                 <Text type='secondary'>
                   {item.cantidad} x{' '}
                   {formatPrice(
-                    (item.precio_ofrecido -
-                      item.precio_ofrecido *
-                        toPercent(item.descuento_ofrecido)) *
+                    item.precio_ofrecido *
+                      toPercent(100 - item.descuento_ofrecido) *
+                      toPercent(100 + item.iva) *
                       item.cantidad
                   )}
                 </Text>
-                <Text type='danger' delete>
-                  {formatPrice(item.precio_ofrecido * item.cantidad)}
-                </Text>
+                {item.descuento_ofrecido > 0 && (
+                  <Text type='secondary' delete>
+                    {formatPrice(
+                      item.precio_ofrecido *
+                        toPercent(100 + item.iva) *
+                        item.cantidad
+                    )}
+                  </Text>
+                )}
               </Space>
             }
           />
