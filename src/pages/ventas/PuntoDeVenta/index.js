@@ -66,6 +66,7 @@ const PuntoDeVenta = () => {
       .get(`/users/me?fields=empleado.*,empleado.sucursal.*`, putToken)
       .then((result) => {
         onSetDato(result.data.data.empleado[0], setEmpleado);
+        console.log(result.data.data.empleado[0].sucursal);
         http
           .get(
             `/items/almacenes?fields=clave&filter[clave_sucursal][_in]=${result.data.data.empleado[0].sucursal.clave}`,
@@ -156,6 +157,7 @@ const PuntoDeVenta = () => {
             (1 + producto.iva / 100),
         });
       });
+      console.log(empleado.sucursal.clave);
       httpSAT
         .post('/2/cfdis', {
           Serie: empleado.sucursal.clave,
@@ -697,7 +699,16 @@ const PuntoDeVenta = () => {
         downloadLink.href = linkSource;
         downloadLink.download = fileName;
         downloadLink.click();
-        okMessage('Creación de Ticket y Factura exitosa');
+        console.log('aqui lel');
+        httpSAT
+          .post(
+            `/cfdi?cfdiType=${'issued'}&cfdiId=${factura.id}&email=${
+              datos.correo
+            }`
+          )
+          .then((result) => {
+            okMessage('Creación de Ticket y Factura exitosa');
+          });
       });
     } else {
       okMessage('Creación de Ticket exitosa');
@@ -958,11 +969,10 @@ const PuntoDeVenta = () => {
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
             <Summary
-              nivel={1}
+              nivel={nivel}
               buttonLabel='Proceder a pagar'
               buttonAction={showModal}
               products={puntoDeVentaProducts}
-              nivel={nivel}
               type='pdv'
             />
             <br />

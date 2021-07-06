@@ -179,6 +179,13 @@ const MetodoPagoModal = ({
               >
                 <Input maxLength={13} />
               </Form.Item>
+              <Form.Item
+                name='correo'
+                label='Correo Electrónico'
+                rules={[{ type: 'email', required: true }]}
+              >
+                <Input maxLength={100} />
+              </Form.Item>
               <Row gutter={16}>
                 <Col xs={24}>
                   <Form.Item name='calle' label='Calle' rules={calleRules}>
