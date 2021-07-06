@@ -113,7 +113,7 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
                   <Link
                     to={
                       tipo === 'facturas_internas'
-                        ? `/cuentas/pagos_int/${item.folio}`
+                        ? `/cuentas/pagos_int/${item.id}`
                         : `/cuentas/pagos_ext/${item.id}`
                     }
                   >

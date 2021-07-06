@@ -1060,13 +1060,9 @@ const Index = () => {
                   Ninguna
                 </Option>
                 {facturas.map((factura) => {
-                  return tipo === 'facturas_internas' ? (
-                    <Option key={factura.folio} value={factura.folio}>
-                      {factura.folio}
-                    </Option>
-                  ) : (
+                  return (
                     <Option key={factura.id} value={factura.id}>
-                      {`${factura.id} : ${factura.folio}`}
+                      {factura.id}
                     </Option>
                   );
                 })}
@@ -1079,7 +1075,7 @@ const Index = () => {
           title={`${
             tipo === 'facturas_externas'
               ? 'Factura Externa ID : ' + factura
-              : 'Factura Interna folio : ' + factura
+              : 'Factura Interna ID : ' + factura
           }`}
         />
       ) : null}

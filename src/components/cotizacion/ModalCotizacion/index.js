@@ -301,7 +301,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
       },
     });
     doc.autoTable({
-      //styles: { fillColor: [255, 0, 0] },
+      styles: { halign: 'right', fillColor: [255, 0, 0] },
       //columnStyles: { 0: { halign: 'center', fillColor: [0, 255, 0] } }, // Cells in first column centered and green
       headStyles: {
         fillColor: [167, 168, 167],
@@ -316,7 +316,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
       },
       columnStyles: {
         0: { cellWidth: 15 },
-        1: { cellWidth: 60 },
+        1: { cellWidth: 60, halign: 'left' },
         // etc
       },
       pageBreak: 'auto',
