@@ -38,9 +38,10 @@ const MetodoPagoModal = ({
   onCancel,
   tipoComprobante,
   metodoPago,
+  nivel,
 }) => {
   const [form] = Form.useForm();
-  const nivel = useStoreState((state) => state.user.nivel);
+  //const nivel = 1;//useStoreState((state) => state.user.nivel);
   const [years, setYears] = useState([]);
   const [cantidadRecibida, setCantidadRecibida] = useState(0);
   const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -83,7 +84,20 @@ const MetodoPagoModal = ({
         0
       )
     ) {
-      onOk(values);
+      onOk({
+        ...values,
+        cambio:
+          cantidadRecibida -
+          products.reduce(
+            (total, product) =>
+              total +
+              calcPrecioVariable(product, nivel) *
+                product.cantidad *
+                toPercent(100 - product.descuento) *
+                toPercent(100 + product.iva),
+            0
+          ),
+      });
     } else {
       message.warning('Cantidad recibida incorrecta.');
     }
@@ -247,8 +261,8 @@ const MetodoPagoModal = ({
           {metodoPago === '01' ? (
             <Collapse.Panel header='Pago en efectivo' key='2'>
               <Form.Item
-                label='Cantidad recibida'
                 name='cantidad'
+                label='Cantidad recibida'
                 rules={[
                   {
                     required: true,
