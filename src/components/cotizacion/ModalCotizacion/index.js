@@ -355,8 +355,9 @@ const Index = ({ visible, cotizacion, setVis }) => {
       ],
       didParseCell: (data) => {
         //console.log(data);
+        if (data.row.index !== 0) data.cell.styles.fillColor = [255, 255, 255];
         if (data.row.index === cotizacion?.productos_cotizados.length + 5) {
-          data.cell.styles.fillColor = [255, 255, 128];
+          data.cell.styles.fillColor = [255, 255, 128]; //128
         }
       },
     });
@@ -380,6 +381,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
         if (data.column.dataKey === 2 && data.cell.section === 'body') {
           console.log(data);
           doc.autoTable({
+            styles: { halign: 'right' },
             columnStyles: {
               0: { fillColor: [0, 0, 0] },
               1: { fillColor: [0, 0, 0] },
@@ -389,6 +391,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
             bodyStyles: {
               fillColor: [0, 0, 0],
               textColor: [255, 255, 255],
+              halign: 'right',
             },
             body: [
               ['SUBTOTAL', `$ ${cotizacion.total - cotizacion.iva}`],
