@@ -81,15 +81,15 @@ const Index = ({ visible, inventario, alm, hideModal }) => {
       dataIndex: 'series',
       width: 250,
       render: (_, record) => {
-        if (record.series.length !== 0) {
+        if (record?.series?.length !== 0) {
           return (
             <Select
               showSearch
               style={{ width: '100%' }}
-              placeholder='Concepto'
+              placeholder='Series'
               optionFilterProp='children'
             >
-              {record.series.map((serie, indx) => (
+              {record?.series?.map((serie, indx) => (
                 <Option key={indx} value={serie.id}>
                   {serie.serie}
                 </Option>
