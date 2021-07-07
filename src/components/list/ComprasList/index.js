@@ -11,7 +11,7 @@ import moment from 'moment';
 import 'moment/locale/es-mx';
 import locale from 'antd/es/date-picker/locale/es_ES';
 
-const formatoCompra = 'DD MMMM YYYY, h:mm:ss a';
+const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
 const formatoEntrega = 'DD/MM/YYYY';
 
 const { Text } = Typography;
