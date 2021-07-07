@@ -29,6 +29,7 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
+import Ventas from 'pages/ventas/Ventas';
 import SolicitudDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudDeCompra';
 import SolicitudesDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudesDeCompra';
 import { Route, Switch } from 'react-router';
@@ -170,6 +171,12 @@ const Rutas = () => {
         path='/venta'
         exact
         component={PuntoDeVenta}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/ventas'
+        exact
+        component={Ventas}
       />
       {/* Cotizacion a clientes */}
       <PrivateRoute
@@ -380,7 +387,7 @@ const Rutas = () => {
       </PrivateRoute>
       {/* Inventario */}
       <PrivateRoute
-        allowedRoles={['administrador']}
+        allowedRoles={['administrador', 'encargado de almacen']}
         path='/inventario'
         exact
         component={Inventario}

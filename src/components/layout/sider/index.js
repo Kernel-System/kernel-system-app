@@ -10,6 +10,9 @@ import {
   SwapOutlined,
   TeamOutlined,
   ToolOutlined,
+  SnippetsOutlined,
+  ReconciliationOutlined,
+  StockOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -47,6 +50,36 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/venta'>Punto de Venta</Link>
+    </Menu.Item>
+  );
+
+  const VentasMenuItem = (
+    <Menu.Item
+      key='ventas'
+      icon={<StockOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/ventas'>Ventas</Link>
+    </Menu.Item>
+  );
+
+  const CotizacionMenuItem = (
+    <Menu.Item
+      key='cotizacion'
+      icon={<SnippetsOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/cotizacion-cliente'>Cotizaciones</Link>
+    </Menu.Item>
+  );
+
+  const InventarioMenuItem = (
+    <Menu.Item
+      key='inventario'
+      icon={<ReconciliationOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/inventario'>Inventario</Link>
     </Menu.Item>
   );
 
@@ -220,6 +253,8 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const encargadoDeVentasMenuItems = (
     <>
       {VentaMenuItem}
+      {CotizacionMenuItem}
+      {VentasMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
       {SolicitudesCompraMenuItem}
@@ -231,6 +266,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const encargadoDeAlmacenMenuItems = (
     <>
+      {InventarioMenuItem}
       {EnsamblesMenuItem}
       {MovimientosAlmacenMenuItem}
       {TransferenciaMenuItem}
@@ -265,6 +301,9 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
         {role === 'administrador' && (
           <>
             {VentaMenuItem}
+            {CotizacionMenuItem}
+            {VentasMenuItem}
+            {InventarioMenuItem}
             {EnsamblesMenuItem}
             {ProductosMenuItem}
             {CuentasMenuItem}
