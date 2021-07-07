@@ -93,7 +93,6 @@ const PuntoDeVenta = () => {
       .get(`/users/me?fields=empleado.*,empleado.sucursal.*`, putToken)
       .then((result) => {
         onSetDato(result.data.data.empleado[0], setEmpleado);
-        console.log(result.data.data.empleado[0].sucursal);
         http
           .get(
             `/items/almacenes?fields=clave&filter[clave_sucursal][_in]=${result.data.data.empleado[0].sucursal.clave}`,
@@ -143,18 +142,15 @@ const PuntoDeVenta = () => {
 
   const handleOk = (datos) => {
     setSpin(true);
-    console.log(datos);
     setIsModalVisible(false);
-    console.log(puntoDeVentaProducts);
     if (tipoComprobante === 'factura') {
       let items = [];
       puntoDeVentaProducts.forEach((producto) => {
-        console.log(producto);
         items.push({
           ProductCode: producto.clave,
           IdentificationNumber: producto.codigo,
           Description: producto.titulo,
-          Unit: producto.unidad_cfdi,
+          Unit: producto.nombre_unidad_cfdi.substring(0, 20),
           UnitCode: producto.unidad_cfdi,
           UnitPrice: calcPrecioVariable(producto, nivel),
           Quantity: producto.cantidad,
@@ -186,7 +182,6 @@ const PuntoDeVenta = () => {
             (1 + producto.iva / 100),
         });
       });
-      console.log(empleado.sucursal.clave);
       httpSAT
         .post('/2/cfdis', {
           Serie: empleado.sucursal.clave,
@@ -203,7 +198,6 @@ const PuntoDeVenta = () => {
           Items: items,
         })
         .then((result) => {
-          console.log(result.data);
           http
             .post(
               `/items/facturas_internas`,
@@ -215,7 +209,7 @@ const PuntoDeVenta = () => {
                 condiciones_de_pago: result.data.PaymentTerms,
                 lugar_expedicion: result.data.ExpeditionPlace,
                 rfc_emisor: result.data.Issuer.Rfc,
-                nombre_emisor: result.data.Issuer.Name,
+                nombre_emisor: empleado.sucursal.nombre,
                 no_certificado: result.data.CertNumber,
                 regimen_fiscal: result.data.Issuer.FiscalRegime,
                 rfc_receptor: result.data.Receiver.Rfc,
@@ -227,8 +221,8 @@ const PuntoDeVenta = () => {
                 uuid: result.data.Complement.TaxStamp.Uuid,
                 fecha_timbrado: result.data.Complement.TaxStamp.Date,
                 no_certificado_sat: result.data.Complement.TaxStamp.SatSign,
-                forma_pago: formaPago,
-                metodo_pago: metodoPago,
+                forma_pago: metodoPago,
+                metodo_pago: formaPago,
                 moneda: result.data.Currency,
                 descuento: result.data.Discount,
                 subtotal: result.data.Total,
@@ -240,7 +234,6 @@ const PuntoDeVenta = () => {
               putToken
             )
             .then((result2) => {
-              console.log(result2.data.data);
               ingresarVenta(datos, {
                 folio: result.data.Folio,
                 id_int: result2.data.data.id,
@@ -721,14 +714,12 @@ const PuntoDeVenta = () => {
     if (tipoComprobante === 'factura') {
       //generar factura
       httpSAT.get(`/cfdi/pdf/issued/${factura.id}`).then((result) => {
-        console.log(result.data);
         const linkSource = 'data:application/pdf;base64,' + result.data.Content;
         const downloadLink = document.createElement('a');
         const fileName = 'Y-cBTZ-NI21-sO98EVHYQQ2.pdf';
         downloadLink.href = linkSource;
         downloadLink.download = fileName;
         downloadLink.click();
-        console.log('aqui lel');
         httpSAT
           .post(
             `/cfdi?cfdiType=${'issued'}&cfdiId=${factura.id}&email=${
@@ -1001,7 +992,7 @@ const PuntoDeVenta = () => {
             </Card>
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
-            <Card size='small' title='Método de Pago'>
+            <Card size='small' title='Forma de pago'>
               <Paragraph type='secondary'>Elija una opción</Paragraph>
               <Radio.Group
                 defaultValue={metodoPago}
@@ -1017,7 +1008,7 @@ const PuntoDeVenta = () => {
             </Card>
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
-            <Card size='small' title='Forma de pago'>
+            <Card size='small' title='Método de Pago'>
               <Paragraph type='secondary'>Elija una opción</Paragraph>
               <Radio.Group
                 defaultValue={formaPago}
