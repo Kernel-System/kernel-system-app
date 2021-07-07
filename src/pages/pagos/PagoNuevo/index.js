@@ -117,8 +117,8 @@ const Index = () => {
     setEnabled(false);
     const dir =
       value === 'facturas_internas'
-        ? `/items/facturas_internas/`
-        : `/items/facturas_externas/`;
+        ? `/items/facturas_internas?filter[metodo_pago][_eq]=PPD`
+        : `/items/facturas_externas?filter[metodo_pago][_eq]=PPD`;
     http.get(dir, putToken).then((resul) => {
       setFacturas(resul.data.data);
     });

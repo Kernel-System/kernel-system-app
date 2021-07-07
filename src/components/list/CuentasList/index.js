@@ -17,9 +17,9 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
   };
 
   useEffect(() => {
-    http.get(`/items/${tipo}?fields=*`, putToken).then((resul) => {
+    http.get(`/items/${tipo}?fields=*,pagos.*`, putToken).then((resul) => {
       const resultado = resul.data.data.filter((factura) => {
-        return factura?.pagos?.length !== 0;
+        return factura?.metodo_pago === 'PPD';
       });
       console.log(resultado);
       onSetFactura(resultado);
@@ -110,13 +110,27 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
             <List.Item key={item.rfc} actions={[]}>
               <List.Item.Meta
                 title={
-                  <Link
-                    to={
-                      tipo === 'facturas_internas'
-                        ? `/cuentas/pagos_int/${item.id}`
-                        : `/cuentas/pagos_ext/${item.id}`
-                    }
-                  >
+                  item?.pagos?.length !== 0 ? (
+                    <Link
+                      to={
+                        tipo === 'facturas_internas'
+                          ? `/cuentas/pagos_int/${item.id}`
+                          : `/cuentas/pagos_ext/${item.id}`
+                      }
+                    >
+                      <p
+                        onClick={() => {
+                          console.log(item);
+                        }}
+                        style={{
+                          cursor: 'pointer',
+                          margin: 0,
+                        }}
+                      >
+                        {`Folio: ${item.folio}`}
+                      </p>
+                    </Link>
+                  ) : (
                     <p
                       onClick={() => {
                         console.log(item);
@@ -128,11 +142,22 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
                     >
                       {`Folio: ${item.folio}`}
                     </p>
-                  </Link>
+                  )
                 }
-                description={`Emisor: ${item.rfc_emisor}`}
+                description={`Emisor: ${item.rfc_emisor}\r\nReceptor: ${item.rfc_receptor}`}
               />
-              {`Receptor: ${item.rfc_receptor}`}
+              {
+                <span
+                  style={{
+                    display: 'inline',
+                    opacity: 0.8,
+                  }}
+                >
+                  <b>{`$${item.pagos
+                    .map((dato) => dato.monto)
+                    .reduce((a, b) => a + b, 0)}/$${item.total}`}</b>
+                </span>
+              }
             </List.Item>
           );
         }}
