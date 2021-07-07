@@ -8,18 +8,24 @@ import * as CRUD from 'api/compras/productos_comprados';
 import ProductoCompradoForm from 'components/forms/ProductoCompradoForm';
 
 const ProductosComprados = () => {
-  const showModal = (element, list) => {
+  const [isModalVisible, setIsModalVisible] = useState();
+  const [listElement, setListElement] = useState();
+  const [elementId, setElementId] = useState();
+
+  const onClickItem = (element) => {
+    const newId = element?.id;
     setIsModalVisible(true);
-    if (element === undefined && list.length) {
+    setListElement(element);
+    setElementId(newId);
+  };
+
+  function refreshItem(list) {
+    if (isModalVisible && list.length) {
       const newElement =
         list.find((elem) => elem.id === elementId) ?? listElement;
       setListElement(newElement);
-    } else {
-      const newElement = element ?? listElement;
-      setListElement(newElement);
-      setElementId(newElement.id);
     }
-  };
+  }
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -43,16 +49,12 @@ const ProductosComprados = () => {
     },
   });
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [listElement, setListElement] = useState({});
-  const [elementId, setElementId] = useState();
-
   return (
     <>
       <ListaProductos
-        onClickItem={showModal}
-        editItem={showModal}
-        itemOpened={isModalVisible}
+        onClickItem={onClickItem}
+        editItem={onClickItem}
+        refreshItem={refreshItem}
       ></ListaProductos>
       <br />
 
@@ -61,19 +63,21 @@ const ProductosComprados = () => {
           Registrar Compra
         </Button>
       </Link>
-      <Modal
-        title={listElement.descripcion}
-        visible={isModalVisible}
-        footer={null}
-        onCancel={handleCancel}
-        width='70%'
-      >
-        <ProductoCompradoForm
-          datosProducto={listElement}
-          onSubmit={onSaveChanges}
-          submitText='Guardar cambios'
-        />
-      </Modal>
+      {listElement ? (
+        <Modal
+          title={listElement.descripcion}
+          visible={isModalVisible}
+          footer={null}
+          onCancel={handleCancel}
+          width='70%'
+        >
+          <ProductoCompradoForm
+            datosProducto={listElement}
+            onSubmit={onSaveChanges}
+            submitText='Guardar cambios'
+          />
+        </Modal>
+      ) : null}
     </>
   );
 };
