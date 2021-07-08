@@ -716,7 +716,7 @@ const PuntoDeVenta = () => {
       httpSAT.get(`/cfdi/pdf/issued/${factura.id}`).then((result) => {
         const linkSource = 'data:application/pdf;base64,' + result.data.Content;
         const downloadLink = document.createElement('a');
-        const fileName = 'Y-cBTZ-NI21-sO98EVHYQQ2.pdf';
+        const fileName = `${factura.id}.pdf`;
         downloadLink.href = linkSource;
         downloadLink.download = fileName;
         downloadLink.click();
