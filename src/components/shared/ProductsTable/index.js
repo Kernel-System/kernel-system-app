@@ -4,7 +4,6 @@ import {
   Image,
   InputNumber,
   Popconfirm,
-  Space,
   Table,
   Typography,
 } from 'antd';
@@ -16,16 +15,12 @@ const { Text } = Typography;
 const ProductsTable = ({
   products,
   loading,
+  nivel,
   type = 'carrito',
   removeItem,
-  nivel,
   addOneToItem,
   subOneToItem,
-  addOneDiscountToItem,
-  subOneDiscountToItem,
-  addOnePriceToItem,
-  subOnePriceToItem,
-  setQuantityToItem,
+  setValueToItem,
 }) => (
   <Table
     loading={loading}
@@ -94,21 +89,32 @@ const ProductsTable = ({
       dataIndex='descuento'
       render={(descuento, record) =>
         type === 'venta' ? (
-          <InputNumber
-            formatter={(value) => `${value}%`}
-            parser={(value) => value.replace('%', '')}
-            min={0}
-            max={100}
-            value={descuento}
-            disabled={record.tipo_de_venta === 'Servicio'}
-            onStep={(_, { type }) => {
-              if (type === 'up') {
-                addOneDiscountToItem(record.codigo);
-              } else {
-                subOneDiscountToItem(record.codigo);
+          record.tipo_de_venta === 'Servicio' ? (
+            `${descuento.toFixed(2)}%`
+          ) : (
+            <InputNumber
+              formatter={(value) => `${value}%`}
+              parser={(value) => value.replace('%', '')}
+              min={0}
+              max={100}
+              disabled={record.tipo_de_venta === 'Servicio'}
+              value={descuento}
+              onStep={(_, { type }) => {
+                if (type === 'up') {
+                  addOneToItem('descuento', record.codigo);
+                } else {
+                  subOneToItem('descuento', record.codigo);
+                }
+              }}
+              onBlur={({ target: { value } }) =>
+                setValueToItem({
+                  campo: 'descuento',
+                  codigo: record.codigo,
+                  valor: value,
+                })
               }
-            }}
-          />
+            />
+          )
         ) : (
           `${descuento.toFixed(2)}%`
         )
@@ -120,20 +126,27 @@ const ProductsTable = ({
       dataIndex='precios_variables'
       render={(_, record) =>
         record.tipo_de_venta === 'Servicio' ? (
-          <Space>
-            <Text>MX$</Text>
-            <InputNumber
-              min={0}
-              value={calcPrecioVariable(record, nivel)}
-              onStep={(_, { type }) => {
-                if (type === 'up') {
-                  addOnePriceToItem(record.codigo);
-                } else {
-                  subOnePriceToItem(record.codigo);
-                }
-              }}
-            />
-          </Space>
+          <InputNumber
+            style={{ width: '150px' }}
+            formatter={(value) => formatPrice(value)}
+            min={0}
+            precision={2}
+            value={calcPrecioVariable(record, nivel)}
+            onStep={(_, { type }) => {
+              if (type === 'up') {
+                addOneToItem('precio_fijo', record.codigo);
+              } else {
+                subOneToItem('precio_fijo', record.codigo);
+              }
+            }}
+            onBlur={({ target: { value } }) =>
+              setValueToItem({
+                campo: 'precio_fijo',
+                codigo: record.codigo,
+                valor: value,
+              })
+            }
+          />
         ) : (
           formatPrice(calcPrecioVariable(record, nivel))
         )
@@ -163,18 +176,26 @@ const ProductsTable = ({
               record.tipo_de_venta === 'Servicio' ? 999 : calcCantidad(record)
             }
             value={cantidad}
-            onStep={(_, { type }) => {
-              if (type === 'up') {
-                addOneToItem(record.codigo);
+            onStep={(_, info) => {
+              if (type === 'venta') {
+                if (info.type === 'up') {
+                  addOneToItem('cantidad', record.codigo);
+                } else {
+                  subOneToItem('cantidad', record.codigo);
+                }
               } else {
-                subOneToItem(record.codigo);
+                if (info.type === 'up') {
+                  addOneToItem(record.codigo);
+                } else {
+                  subOneToItem(record.codigo);
+                }
               }
             }}
             onBlur={({ target: { value } }) =>
-              setQuantityToItem(
-                type === 'carrito'
-                  ? { id: record.codigo, cantidad: value }
-                  : record.codigo,
+              setValueToItem(
+                type === 'venta'
+                  ? { campo: 'cantidad', codigo: record.codigo, valor: value }
+                  : { id: record.codigo, cantidad: value },
                 value
               )
             }
@@ -200,12 +221,31 @@ const ProductsTable = ({
       dataIndex='Total'
       render={(_, record) => (
         <>
+          {record.descuento > 0 && (
+            <Text
+              type='danger'
+              style={{
+                fontSize: '12px',
+                position: 'absolute',
+                top: 3,
+                right: '1rem',
+              }}
+            >
+              -
+              {formatPrice(
+                calcPrecioVariable(record, nivel) *
+                  toPercent(record.descuento) *
+                  record.cantidad
+              )}{' '}
+              DTO
+            </Text>
+          )}
           <Text
             type='secondary'
             style={{
               fontSize: '12px',
               position: 'absolute',
-              top: 1,
+              top: 18,
               right: '1rem',
             }}
           >
@@ -215,23 +255,8 @@ const ProductsTable = ({
                 toPercent(100 - record.descuento) *
                 toPercent(record.iva) *
                 record.cantidad
-            )}
-          </Text>
-          <Text
-            type='danger'
-            style={{
-              fontSize: '12px',
-              position: 'absolute',
-              top: 16,
-              right: '1rem',
-            }}
-          >
-            -
-            {formatPrice(
-              calcPrecioVariable(record, nivel) *
-                toPercent(record.descuento) *
-                record.cantidad
-            )}
+            )}{' '}
+            IVA
           </Text>
           <Text strong>
             {formatPrice(
@@ -239,7 +264,7 @@ const ProductsTable = ({
                 toPercent(100 - record.descuento) *
                 toPercent(100 + record.iva) *
                 record.cantidad
-            )}
+            )}{' '}
           </Text>
         </>
       )}

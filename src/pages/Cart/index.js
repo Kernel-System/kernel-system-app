@@ -21,12 +21,7 @@ import Heading from 'components/UI/Heading';
 import { useStoreActions, useStoreState } from 'easy-peasy';
 import moment from 'moment';
 import { useState } from 'react';
-import {
-  focusManager,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { toPercent } from 'utils/functions';
 import { calcPrecioVariable } from 'utils/productos';
@@ -49,15 +44,14 @@ const Cart = () => {
   const clearCartItems = useStoreActions(
     (actions) => actions.cart.clearCartItems
   );
-  const cartItemsQuery = useQuery('cart-items', () =>
-    getCartProducts(cartItems)
+  const cartItemsQuery = useQuery(
+    ['cart-items', cartItems.map((cartItem) => cartItem.id)],
+    () => getCartProducts(cartItems)
   );
   const sucursales = useQuery('sucursales', getSucursales);
   const handleRemoveCartItem = useMutation((codigo) => removeCartItem(codigo), {
     onSuccess: () => {
-      focusManager.setFocused(true);
       queryClient.invalidateQueries('cart-items').then(() => {
-        focusManager.setFocused(false);
         message.success('Se ha eliminado el producto correctamente');
       });
     },
@@ -67,9 +61,7 @@ const Cart = () => {
   });
   const handleClearCartItems = useMutation(() => clearCartItems(), {
     onSuccess: () => {
-      focusManager.setFocused(true);
       queryClient.invalidateQueries('cart-items').then(() => {
-        focusManager.setFocused(false);
         message.success('Se ha vaciado la lista de compra correctamente');
       });
     },
@@ -89,7 +81,7 @@ const Cart = () => {
     const cartItemId = cartItems.findIndex(
       (cartItem) => cartItemData.codigo === cartItem.id
     );
-    return { ...cartItemData, cantidad: cartItems[cartItemId]?.quantity };
+    return { ...cartItemData, cantidad: cartItems[cartItemId]?.cantidad };
   });
 
   const handlePlaceOrder = async () => {
@@ -164,12 +156,12 @@ const Cart = () => {
           <ProductsTable
             products={cartItemsData}
             loading={cartItemsQuery.isLoading || cartItemsQuery.isFetching}
+            nivel={nivel}
             type='carrito'
             removeItem={handleRemoveCartItem}
-            nivel={nivel}
             addOneToItem={addOneToItem}
             subOneToItem={subOneToItem}
-            setQuantityToItem={setQuantityToItem}
+            setValueToItem={setQuantityToItem}
           />
         </Col>
         <Col xs={24} md={12} lg={6}>

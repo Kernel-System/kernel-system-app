@@ -13,7 +13,7 @@ export const cartModel = {
     );
 
     if (existingItem) {
-      state.cartItems[existingItemId].quantity += payload.quantity;
+      state.cartItems[existingItemId].cantidad += payload.cantidad;
     } else {
       state.cartItems.push(payload);
     }
@@ -23,21 +23,21 @@ export const cartModel = {
     const existingItemId = state.cartItems.findIndex(
       (item) => item.id === payload
     );
-    state.cartItems[existingItemId].quantity += 1;
+    state.cartItems[existingItemId].cantidad += 1;
   }),
 
   subOneToItem: action((state, payload) => {
     const existingItemId = state.cartItems.findIndex(
       (item) => item.id === payload
     );
-    state.cartItems[existingItemId].quantity -= 1;
+    state.cartItems[existingItemId].cantidad -= 1;
   }),
 
   setQuantityToItem: action((state, payload) => {
     const existingItemId = state.cartItems.findIndex(
       (item) => item.id === payload.id
     );
-    state.cartItems[existingItemId].quantity = parseInt(payload.cantidad);
+    state.cartItems[existingItemId].cantidad = parseInt(payload.cantidad);
   }),
 
   removeCartItem: action((state, payload) => {
