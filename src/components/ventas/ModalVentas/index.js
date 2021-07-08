@@ -101,7 +101,7 @@ const Index = ({ visible, venta, hideModal }) => {
             <TextLabel title='Descuento' subtitle={`$ ${venta.descuento}`} />
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
-            <TextLabel title='IVA' subtitle={`$ ${venta.descuento}`} />
+            <TextLabel title='IVA' subtitle={`$ ${venta.iva}`} />
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
             <TextLabel title='Total' subtitle={`$ ${venta.total}`} />
