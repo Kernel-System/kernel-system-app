@@ -16,9 +16,10 @@ import EmpleadoProfile from 'pages/empleado/EmpleadoProfile';
 import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
 import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
-import FacturarTicket from 'pages/FacturarTicket';
+import FacturarTicket from 'pages/facturas/FacturarTicket';
 import FacturasExternas from 'pages/facturas/FacturasExternas';
 import FacturasInternas from 'pages/facturas/FacturasInternas';
+import FacturasGlobales from 'pages/facturas/GenerarFacturasGlobal';
 import Home from 'pages/Home';
 import Order from 'pages/orders/Order';
 import Orders from 'pages/orders/Orders';
@@ -223,6 +224,13 @@ const Rutas = () => {
         path='/facturas-externas'
         exact
         component={FacturasExternas}
+      />
+      FacturasGlobales
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/facturas-globales'
+        exact
+        component={FacturasGlobales}
       />
       {/* Facturas Internas */}
       <PrivateRoute

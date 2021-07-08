@@ -18,6 +18,7 @@ const Index = (props) => {
       factura['cfdi:Complemento'][0]['tfd:TimbreFiscalDigital'][0].$;
 
     const datosFactura = {
+      id: cfdi.id,
       folio: cfdi.Folio,
       serie: cfdi.Serie,
       tipo_de_comprobante: cfdi.TipoDeComprobante,
@@ -25,6 +26,7 @@ const Index = (props) => {
       condiciones_de_pago: cfdi.CondicionesDePago,
       lugar_expedicion: cfdi.LugarExpedicion,
       no_certificado: cfdi.NoCertificado,
+      cancelada: cfdi.cancelada === 'false' ? 'Si' : 'No',
 
       moneda: cfdi.Moneda,
       tipo_cambio: cfdi.TipoCambio,
