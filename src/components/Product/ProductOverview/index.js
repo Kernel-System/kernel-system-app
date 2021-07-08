@@ -29,13 +29,13 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
       <Space align='end'>
         <Title level={2} style={{ display: 'inline-block', marginBottom: 0 }}>
           {formatPrice(
-            calcPrecioVariable(product, nivel) *
+            calcPrecioVariable(product, nivel ? nivel : 1) *
               toPercent(100 - product.descuento)
           )}
         </Title>
         {product.descuento > 0 && (
           <Paragraph type={'secondary'} delete>
-            {formatPrice(calcPrecioVariable(product, nivel))}
+            {formatPrice(calcPrecioVariable(product, nivel ? nivel : 1))}
           </Paragraph>
         )}
         <Text strong>IVA NO INCLUIDO</Text>
@@ -69,10 +69,10 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
           <Form
             name='addToCartForm'
             layout='inline'
-            initialValues={{ quantity: 1 }}
+            initialValues={{ cantidad: 1 }}
             onFinish={addToCart}
           >
-            <Form.Item name='quantity'>
+            <Form.Item name='cantidad'>
               <InputNumber min={1} max={calcCantidad(product)} keyboard />
             </Form.Item>
             <Form.Item>
@@ -81,7 +81,7 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
                 htmlType='submit'
                 disabled={
                   cartItems.find((item) => item.id === product.codigo)
-                    ?.quantity >= calcCantidad(product)
+                    ?.cantidad >= calcCantidad(product)
                     ? true
                     : false
                 }

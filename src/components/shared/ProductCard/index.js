@@ -58,14 +58,13 @@ const ProductCard = ({ product }) => {
         <Space>
           <Title level={3} style={{ display: 'inline-block', marginBottom: 0 }}>
             {formatPrice(
-              calcPrecioVariable(product, nivel) -
-                calcPrecioVariable(product, nivel) *
-                  toPercent(product.descuento)
+              calcPrecioVariable(product, nivel ? nivel : 1) *
+                toPercent(100 - product.descuento)
             )}
           </Title>
           {product.descuento > 0 && (
             <Text type={'secondary'} delete>
-              {formatPrice(calcPrecioVariable(product, nivel))}
+              {formatPrice(calcPrecioVariable(product, nivel ? nivel : 1))}
             </Text>
           )}
         </Space>
