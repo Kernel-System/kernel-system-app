@@ -7,6 +7,7 @@ import {
   Form,
   Input,
   message,
+  Popconfirm,
   Radio,
   Row,
   Space,
@@ -20,9 +21,13 @@ import {
   getPuntoDeVentaProducts,
   getPuntoDeVentaServices,
 } from 'api/ventas/punto_de_venta';
-import { getSolicitudCompra } from 'api/ventas/solicitudes_compra';
+import {
+  getClienteData,
+  getSolicitudCompra,
+} from 'api/ventas/solicitudes_compra';
 import ProductsTable from 'components/shared/ProductsTable';
 import Summary from 'components/table/Summary';
+import CenteredSpinner from 'components/UI/CenteredSpinner';
 import Heading from 'components/UI/Heading';
 import MetodoPagoModal from 'components/ventas/MetodoPagoModal';
 import { useStoreState } from 'easy-peasy';
@@ -57,6 +62,7 @@ const PuntoDeVenta = () => {
   const [almacenes, setAlmacenes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [disableCliente, setDisableCliente] = useState(false);
+  const [cliente, setCliente] = useState({});
 
   const putToken = {
     headers: {
@@ -72,6 +78,8 @@ const PuntoDeVenta = () => {
     if (query.get('solicitud') !== null) {
       getSolicitudCompra(query.get('solicitud'), token).then(
         ({ data: { data } }) => {
+          setCliente(data.id_cliente);
+          handleGetClienteNivel(data.id_cliente.rfc);
           data.productos_solicitados.forEach((producto) => {
             const newProducto = {
               ...producto.codigo_producto,
@@ -300,7 +308,8 @@ const PuntoDeVenta = () => {
           factura: factura?.id_int,
           rfc_vendedor: empleado.rfc,
           cantidad_recibida: datos.cantidad,
-          cantidad_salida: datos.cambio,
+          ucantidad_salida: datos.cambio,
+          solicitud_compra: query.get('solicitd') && query.get('solicitud'),
         },
         putToken
       )
@@ -788,89 +797,41 @@ const PuntoDeVenta = () => {
     );
   };
 
-  const handleAddOneDiscountToItem = (codigo) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
+  const addOneToItem = (campo, codigo) => {
+    setPuntoDeVentaProducts(
+      puntoDeVentaProducts.map((product) =>
         product.codigo === codigo
-          ? {
-              ...product,
-              descuento: product.descuento + 1,
-            }
+          ? { ...product, [campo]: (product[campo] += 1) }
           : product
       )
     );
+  };
 
-  const handleSubOneDiscountToItem = (codigo) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
+  const subOneToItem = (campo, codigo) => {
+    setPuntoDeVentaProducts(
+      puntoDeVentaProducts.map((product) =>
         product.codigo === codigo
-          ? {
-              ...product,
-              descuento: product.descuento - 1,
-            }
+          ? { ...product, [campo]: (product[campo] -= 1) }
           : product
       )
     );
+  };
 
-  const handleAddOnePriceToItem = (codigo) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
+  const setValueToItem = ({ campo, codigo, valor }) => {
+    setPuntoDeVentaProducts(
+      puntoDeVentaProducts.map((product) =>
         product.codigo === codigo
           ? {
               ...product,
-              precio_fijo: product.precio_fijo + 1,
+              [campo]:
+                campo === 'precios_variables' || campo === 'precio_fijo'
+                  ? parseFloat(valor.replace(/[$]|,*/g, ''))
+                  : parseInt(valor),
             }
           : product
       )
     );
-
-  const handleSubOnePriceToItem = (codigo) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
-        product.codigo === codigo
-          ? {
-              ...product,
-              precio_fijo: product.precio_fijo - 1,
-            }
-          : product
-      )
-    );
-
-  const handleAddOneToItem = (codigo) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
-        product.codigo === codigo
-          ? {
-              ...product,
-              cantidad: product.cantidad + 1,
-            }
-          : product
-      )
-    );
-
-  const handleSubOneToItem = (codigo) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
-        product.codigo === codigo
-          ? {
-              ...product,
-              cantidad: product.cantidad - 1,
-            }
-          : product
-      )
-    );
-
-  const handleSetQuantityToItem = (codigo, cantidad) =>
-    setPuntoDeVentaProducts((prevPuntoDeVentaProducts) =>
-      prevPuntoDeVentaProducts.map((product) =>
-        product.codigo === codigo
-          ? {
-              ...product,
-              cantidad: parseInt(cantidad),
-            }
-          : product
-      )
-    );
+  };
 
   const handleGetClienteNivel = (rfc) => {
     if (rfc) {
@@ -902,141 +863,163 @@ const PuntoDeVenta = () => {
       <Spin size='large' spinning={spin}>
         <Heading
           title='Punto de venta'
+          subtitle={
+            <Popconfirm
+              title='¿Está seguro que quiere comenzar una nueva venta?'
+              okText='Nueva venta'
+              okType='danger'
+              cancelText='Cancelar'
+              onConfirm={() => (window.location = '/venta')}
+            >
+              <Button type='primary'>Nueva venta</Button>
+            </Popconfirm>
+          }
           extra={
             query.get('solicitud')
-              ? `ID Solicitud de compra: ${query.get('solicitud')}`
-              : `Le atiende: ${empleado.nombre}`
+              ? `Solicitud: #${query.get('solicitud')}`
+              : empleado.nombre && `Le atiende: ${empleado.nombre}`
           }
         />
-        <Form layout='vertical'>
-          <Form.Item
-            label='Cliente'
-            normalize={(value) => (value || '').toUpperCase()}
-          >
-            <Input.Search
-              enterButton='Buscar cliente'
-              onSearch={handleGetClienteNivel}
-              placeholder='Buscar cliente por RFC'
-              disabled={disableCliente}
-              maxLength={13}
-              loading={isLoading}
-            />
-          </Form.Item>
-          {!breakpoint.sm && <Divider style={{ marginTop: 0 }} />}
-          <Form.Item label='Buscar producto'>
-            <AutoComplete
-              style={{ width: '100%' }}
-              placeholder='Buscar producto por nombre o código'
-              onSelect={handleAddToOrder}
-              onChange={handleSetProductQuery}
-              allowClear
-            >
-              {productsData?.map((productData) => (
-                <AutoComplete.Option
-                  key={productData.codigo}
-                  disabled={calcCantidad(productData) === 0}
+        {!cliente && query.get('solicitud') ? (
+          <CenteredSpinner />
+        ) : (
+          <>
+            <Form layout='vertical'>
+              <Form.Item
+                label='Cliente'
+                normalize={(value) => (value || '').toUpperCase()}
+              >
+                <Input.Search
+                  onSearch={(rfc) => {
+                    handleGetClienteNivel(rfc);
+                    getClienteData(rfc, token).then(({ data: { data } }) => {
+                      if (data.length) {
+                        setCliente(data[0]);
+                      }
+                    });
+                  }}
+                  placeholder='Buscar cliente por RFC'
+                  disabled={disableCliente}
+                  maxLength={13}
+                  loading={isLoading}
+                  value={cliente.rfc}
+                />
+              </Form.Item>
+              {!breakpoint.sm && <Divider style={{ marginTop: 0 }} />}
+              <Form.Item label='Buscar producto'>
+                <AutoComplete
+                  style={{ width: '100%' }}
+                  placeholder='Buscar producto por nombre o código'
+                  onSelect={handleAddToOrder}
+                  onChange={handleSetProductQuery}
+                  allowClear
                 >
-                  <strong>{productData.codigo}</strong> | {productData.titulo}
-                </AutoComplete.Option>
-              ))}
-            </AutoComplete>
-          </Form.Item>
-          <Form.Item label='Buscar servicio'>
-            <AutoComplete
-              style={{ width: '100%' }}
-              placeholder='Buscar servicio por nombre'
-              onSelect={handleAddToOrder}
-              onChange={handleSetServiceQuery}
-              allowClear
-            >
-              {servicesData?.map((serviceData) => (
-                <AutoComplete.Option key={serviceData.codigo}>
-                  <strong>{serviceData.codigo}</strong> | {serviceData.titulo}
-                </AutoComplete.Option>
-              ))}
-            </AutoComplete>
-          </Form.Item>
-        </Form>
-        <ProductsTable
-          products={puntoDeVentaProducts}
-          type='venta'
-          nivel={query.get('solicitud') === null && nivel}
-          removeItem={handleRemoveItem}
-          addOneToItem={handleAddOneToItem}
-          subOneToItem={handleSubOneToItem}
-          addOneDiscountToItem={handleAddOneDiscountToItem}
-          subOneDiscountToItem={handleSubOneDiscountToItem}
-          addOnePriceToItem={handleAddOnePriceToItem}
-          subOnePriceToItem={handleSubOnePriceToItem}
-          setQuantityToItem={handleSetQuantityToItem}
-        />
-        <Row gutter={[16, 16]}>
-          <Col span={breakpoint.lg ? 6 : 24}>
-            <Card size='small' title='Factura'>
-              <Space direction='vertical'>
-                <div>
+                  {productsData?.map((productData) => (
+                    <AutoComplete.Option
+                      key={productData.codigo}
+                      disabled={calcCantidad(productData) === 0}
+                    >
+                      <strong>{productData.codigo}</strong> |{' '}
+                      {productData.titulo}
+                    </AutoComplete.Option>
+                  ))}
+                </AutoComplete>
+              </Form.Item>
+              <Form.Item label='Buscar servicio'>
+                <AutoComplete
+                  style={{ width: '100%' }}
+                  placeholder='Buscar servicio por nombre'
+                  onSelect={handleAddToOrder}
+                  onChange={handleSetServiceQuery}
+                  allowClear
+                >
+                  {servicesData?.map((serviceData) => (
+                    <AutoComplete.Option key={serviceData.codigo}>
+                      <strong>{serviceData.codigo}</strong> |{' '}
+                      {serviceData.titulo}
+                    </AutoComplete.Option>
+                  ))}
+                </AutoComplete>
+              </Form.Item>
+            </Form>
+            <ProductsTable
+              products={puntoDeVentaProducts}
+              nivel={query.get('solicitud') === null && nivel}
+              type='venta'
+              removeItem={handleRemoveItem}
+              addOneToItem={addOneToItem}
+              subOneToItem={subOneToItem}
+              setValueToItem={setValueToItem}
+            />
+            <Row gutter={[16, 16]}>
+              <Col span={breakpoint.lg ? 6 : 24}>
+                <Card size='small' title='Factura'>
+                  <Space direction='vertical'>
+                    <div>
+                      <Paragraph type='secondary'>Elija una opción</Paragraph>
+                      <Radio.Group
+                        defaultValue={tipoComprobante}
+                        onChange={(e) => setTipoComprobante(e.target.value)}
+                      >
+                        <Space direction='vertical'>
+                          <Radio value={'ticket'}>Ticket</Radio>
+                          <Radio value={'factura'}>Factura </Radio>
+                        </Space>
+                      </Radio.Group>
+                    </div>
+                  </Space>
+                </Card>
+              </Col>
+              <Col span={breakpoint.lg ? 6 : 24}>
+                <Card size='small' title='Método de Pago'>
                   <Paragraph type='secondary'>Elija una opción</Paragraph>
                   <Radio.Group
-                    defaultValue={tipoComprobante}
-                    onChange={(e) => setTipoComprobante(e.target.value)}
+                    defaultValue={metodoPago}
+                    onChange={(e) => setMetodoPago(e.target.value)}
                   >
                     <Space direction='vertical'>
-                      <Radio value={'ticket'}>Ticket</Radio>
-                      <Radio value={'factura'}>Factura </Radio>
+                      <Radio value={'01'}>Pago en efectivo</Radio>
+                      <Radio value={'04'}>
+                        Pago con tarjeta de débito o crédito
+                      </Radio>
                     </Space>
                   </Radio.Group>
-                </div>
-              </Space>
-            </Card>
-          </Col>
-          <Col span={breakpoint.lg ? 6 : 24}>
-            <Card size='small' title='Método de Pago'>
-              <Paragraph type='secondary'>Elija una opción</Paragraph>
-              <Radio.Group
-                defaultValue={metodoPago}
-                onChange={(e) => setMetodoPago(e.target.value)}
-              >
-                <Space direction='vertical'>
-                  <Radio value={'01'}>Pago en efectivo</Radio>
-                  <Radio value={'04'}>
-                    Pago con tarjeta de débito o crédito
-                  </Radio>
-                </Space>
-              </Radio.Group>
-            </Card>
-          </Col>
-          <Col span={breakpoint.lg ? 6 : 24}>
-            <Card size='small' title='Forma de pago'>
-              <Paragraph type='secondary'>Elija una opción</Paragraph>
-              <Radio.Group
-                defaultValue={formaPago}
-                disabled={tipoComprobante !== 'factura'}
-                onChange={(e) => setFormaPago(e.target.value)}
-              >
-                <Space direction='vertical'>
-                  <Radio value={'PUE'}>Pago en una exhibición</Radio>
-                  <Radio value={'PPD'}>Pago en parcialidades</Radio>
-                </Space>
-              </Radio.Group>
-            </Card>
-          </Col>
-          <Col span={breakpoint.lg ? 6 : 24}>
-            <Summary
-              nivel={query.get('solicitud') === null && nivel}
-              buttonLabel='Proceder a pagar'
-              buttonAction={showModal}
-              products={puntoDeVentaProducts}
-              type='pdv'
-            />
-            <br />
-            <Link to='/cotizacion-cliente/nuevo'>
-              <Button type='link' block>
-                Generar cotización
-              </Button>
-            </Link>
-          </Col>
-        </Row>
+                </Card>
+              </Col>
+              <Col span={breakpoint.lg ? 6 : 24}>
+                <Card size='small' title='Forma de pago'>
+                  <Paragraph type='secondary'>Elija una opción</Paragraph>
+                  <Radio.Group
+                    defaultValue={formaPago}
+                    disabled={tipoComprobante !== 'factura'}
+                    onChange={(e) => setFormaPago(e.target.value)}
+                  >
+                    <Space direction='vertical'>
+                      <Radio value={'PUE'}>Pago en una exhibición</Radio>
+                      <Radio value={'PPD'}>Pago en parcialidades</Radio>
+                    </Space>
+                  </Radio.Group>
+                </Card>
+              </Col>
+              <Col span={breakpoint.lg ? 6 : 24}>
+                <Summary
+                  nivel={query.get('solicitud') === null && nivel}
+                  buttonLabel='Proceder a pagar'
+                  buttonAction={showModal}
+                  products={puntoDeVentaProducts}
+                  type='pdv'
+                />
+                <Link to='/cotizacion-cliente/nuevo'>
+                  <Button type='link' block style={{ marginTop: '1rem' }}>
+                    Generar cotización
+                  </Button>
+                </Link>
+              </Col>
+            </Row>
+          </>
+        )}
         <MetodoPagoModal
+          cliente={cliente}
           products={puntoDeVentaProducts}
           visible={isModalVisible}
           onOk={handleOk}
