@@ -81,8 +81,8 @@ const SolicitudCompraProductsTable = ({
         render={(_, record) => record.codigo_producto.titulo}
       />
       <Table.Column
-        title='Descuento(%)'
         align='right'
+        title='Descuento(%)'
         dataIndex='descuento_ofrecido'
         render={(descuento_ofrecido, record) => (
           <InputNumber
@@ -116,8 +116,8 @@ const SolicitudCompraProductsTable = ({
         )}
       />
       <Table.Column
-        title='Precio Unitario'
         align='right'
+        title='Precio Unitario'
         dataIndex='precio_ofrecido'
         render={(precio_ofrecido, record) => (
           <InputNumber
@@ -207,12 +207,31 @@ const SolicitudCompraProductsTable = ({
         dataIndex='Total'
         render={(_, record) => (
           <>
+            {record.descuento_ofrecido > 0 && (
+              <Text
+                type='danger'
+                style={{
+                  fontSize: '12px',
+                  position: 'absolute',
+                  top: 3,
+                  right: '1rem',
+                }}
+              >
+                -
+                {formatPrice(
+                  record.precio_ofrecido *
+                    toPercent(record.descuento_ofrecido) *
+                    record.cantidad
+                )}{' '}
+                DTO
+              </Text>
+            )}
             <Text
               type='secondary'
               style={{
                 fontSize: '12px',
                 position: 'absolute',
-                top: 2,
+                top: 18,
                 right: '1rem',
               }}
             >
@@ -224,23 +243,6 @@ const SolicitudCompraProductsTable = ({
                   record.cantidad
               )}{' '}
               IVA
-            </Text>
-            <Text
-              type='danger'
-              style={{
-                fontSize: '12px',
-                position: 'absolute',
-                top: 16,
-                right: '1rem',
-              }}
-            >
-              -
-              {formatPrice(
-                record.precio_ofrecido *
-                  toPercent(record.descuento_ofrecido) *
-                  record.cantidad
-              )}{' '}
-              DTO
             </Text>
             <Text strong>
               {formatPrice(
