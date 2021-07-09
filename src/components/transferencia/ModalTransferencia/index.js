@@ -1,5 +1,4 @@
-import { Modal, Button, List } from 'antd';
-import TextLabel from 'components/UI/TextLabel';
+import { Modal, List } from 'antd';
 import { useEffect } from 'react';
 
 const Index = ({ lista, onSelection, visible, clave, setVis }) => {
@@ -10,7 +9,7 @@ const Index = ({ lista, onSelection, visible, clave, setVis }) => {
   return (
     <>
       <Modal
-        //title={`Ensamble No. ${clave}`}
+        title={`Seleccione un producto`}
         centered
         visible={visible}
         onOk={() => {
@@ -19,42 +18,58 @@ const Index = ({ lista, onSelection, visible, clave, setVis }) => {
         onCancel={() => {
           setVis();
         }}
-        width={'85%'}
-        footer={[
-          <Button
-            key='submit'
-            type='primary'
-            onClick={() => {
-              setVis();
-            }}
-          >
-            Confirmar
-          </Button>,
-        ]}
+        width={'50%'}
+        footer={null}
       >
-        <TextLabel title='Selecciona un producto.' />
         <List
-          itemLayout='vertical'
+          itemLayout='horizontal'
           size='default'
           pagination={{
             onChange: (page) => {
               //changePag(page);
             },
-            pageSize: 5,
+            pageSize: 8,
           }}
           dataSource={lista}
-          renderItem={(item) => (
-            <List.Item key={item.codigo}>
+          renderItem={(item, index) => (
+            <List.Item key={index}>
               <List.Item.Meta
                 //avatar={<Avatar src={item.avatar} />}
+                title={
+                  <p
+                    onClick={() => {
+                      onSelection(item);
+                      setVis();
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    {item.titulo}
+                  </p>
+                }
+                description={item.descripcion}
+              />
+              <span
                 onClick={() => {
                   onSelection(item);
                   setVis();
                 }}
-                title={`Codigo ${item.codigo}`}
-                description={item.descripcion}
-              />
-              {item.titulo}
+                style={{
+                  display: 'inline',
+                  cursor: 'pointer',
+                }}
+              >
+                Código:{' '}
+                <b
+                  style={{
+                    opacity: 1,
+                  }}
+                >
+                  {item.codigo}
+                </b>
+              </span>
             </List.Item>
           )}
         />

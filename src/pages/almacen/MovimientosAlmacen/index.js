@@ -23,7 +23,7 @@ const Index = () => {
   };
 
   const showModal = (element) => {
-    console.log({ element });
+    // console.log({ element });
     setMovimiento(element);
     setVisible(true);
   };

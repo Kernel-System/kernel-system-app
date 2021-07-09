@@ -1,0 +1,8 @@
+.imagen-col-hidden {
+  display: none;
+  width: 140px;
+}
+
+.imagen-col-visible {
+  width: 100px;
+}
