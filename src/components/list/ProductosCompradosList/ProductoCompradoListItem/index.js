@@ -53,7 +53,7 @@ const ProductoCompradoListItem = ({ item, index, onClickItem, editItem }) => {
                   fontWeight: 'normal',
                 }}
               >
-                {item.nombre_emisor + ' - '}
+                {item.rfc_emisor + ' - '}
               </span>
               {item.descripcion}
             </p>
@@ -74,12 +74,10 @@ const ProductoCompradoListItem = ({ item, index, onClickItem, editItem }) => {
             display: 'inline',
             opacity: 0.8,
             color:
-              item.cantidad - item.cantidad_ingresada > 0
-                ? '#e53935'
-                : 'inherit',
+              item.cantidad > item.cantidad_ingresada ? '#e53935' : 'inherit',
           }}
         >
-          {item.cantidad - item.cantidad_ingresada > 0
+          {item.cantidad > item.cantidad_ingresada
             ? `Pendiente de ingresar: ${
                 item.cantidad - item.cantidad_ingresada
               } ${item.unidad}`
