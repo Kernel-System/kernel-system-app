@@ -1276,7 +1276,7 @@ const Index = () => {
       </Form>
       <ModalProducto
         lista={listToShow}
-        visible={true}
+        visible={visible}
         setVis={changeVisible}
         onSelection={addListItem}
       />
