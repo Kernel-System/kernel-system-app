@@ -4,9 +4,11 @@ import { http } from 'api';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import TextLabel from '../../UI/TextLabel';
 import './styles.css';
 
 const Index = ({ onClickItem, id_fac, tipo, putToken }) => {
+  const [totalSuma, setTotalSuma] = useState(0);
   const [total, setTotal] = useState(0);
 
   const fetchItems = async () => {
@@ -14,7 +16,15 @@ const Index = ({ onClickItem, id_fac, tipo, putToken }) => {
       `/items/pagos?filter[${tipo}][_eq]=${id_fac}&fields=*,archivos_comprobante.*,doctos_relacionados.*,archivos_comprobante.directus_files_id.*,facturas_internas.*,facturas_internas.*`,
       putToken
     );
-    setTotal(data.data.map((dato) => dato.monto).reduce((a, b) => a + b, 0));
+    console.log(data.data);
+    if (tipo === 'facturas_internas') {
+      setTotal(data.data[0].facturas_internas.total);
+    } else {
+      setTotal(data.data[0].facturas_externas.total);
+    }
+    setTotalSuma(
+      data.data.map((dato) => dato.monto).reduce((a, b) => a + b, 0)
+    );
     return data.data;
   };
 
@@ -36,6 +46,10 @@ const Index = ({ onClickItem, id_fac, tipo, putToken }) => {
   return (
     <>
       <br />
+      <TextLabel
+        title={`Progreso de Pago`}
+        subtitle={`$${totalSuma}/$${total}`}
+      />
       <List
         itemLayout='horizontal'
         size='default'

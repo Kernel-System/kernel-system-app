@@ -4,16 +4,16 @@ import {
   Form,
   Input,
   InputNumber,
+  message,
   Modal,
   Row,
   Select,
   Space,
   Typography,
-  message,
 } from 'antd';
-import { useStoreState } from 'easy-peasy';
 import { useCallback, useEffect, useState } from 'react';
-import { formatPrice, toPercent } from 'utils/functions';
+import { usosCfdi } from 'utils/facturas/catalogo';
+import { formatPrice, isEmptyObject, toPercent } from 'utils/functions';
 import { calcPrecioVariable } from 'utils/productos';
 import {
   calleRules,
@@ -27,7 +27,6 @@ import {
   noIntRules,
   paisRules,
 } from 'utils/validations/address';
-import { usosCfdi } from 'utils/facturas/catalogo';
 const { Text } = Typography;
 const { Option } = Select;
 
@@ -38,9 +37,10 @@ const MetodoPagoModal = ({
   onCancel,
   tipoComprobante,
   metodoPago,
+  nivel,
+  cliente,
 }) => {
   const [form] = Form.useForm();
-  const nivel = useStoreState((state) => state.user.nivel);
   const [years, setYears] = useState([]);
   const [cantidadRecibida, setCantidadRecibida] = useState(0);
   const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -54,8 +54,15 @@ const MetodoPagoModal = ({
 
   useEffect(() => {
     getYears();
+    if (!isEmptyObject(cliente)) {
+      form.setFieldsValue({
+        razon_social: cliente?.razon_social,
+        rfc: cliente?.rfc,
+        ...cliente?.domicilios_cliente[0],
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cliente]);
 
   const onFinish = (values) => {
     console.log(values.cantidad);
@@ -83,7 +90,20 @@ const MetodoPagoModal = ({
         0
       )
     ) {
-      onOk(values);
+      onOk({
+        ...values,
+        cambio:
+          cantidadRecibida -
+          products.reduce(
+            (total, product) =>
+              total +
+              calcPrecioVariable(product, nivel) *
+                product.cantidad *
+                toPercent(100 - product.descuento) *
+                toPercent(100 + product.iva),
+            0
+          ),
+      });
     } else {
       message.warning('Cantidad recibida incorrecta.');
     }
@@ -101,6 +121,7 @@ const MetodoPagoModal = ({
       okText='Pagar'
       cancelText='Regresar'
       okButtonProps={{ disabled: buttonDisabled }}
+      forceRender
     >
       <Form
         name='punto_venta'
@@ -164,6 +185,13 @@ const MetodoPagoModal = ({
                 ]}
               >
                 <Input maxLength={13} />
+              </Form.Item>
+              <Form.Item
+                name='correo'
+                label='Correo Electrónico'
+                rules={[{ type: 'email', required: true }]}
+              >
+                <Input maxLength={100} />
               </Form.Item>
               <Row gutter={16}>
                 <Col xs={24}>
@@ -247,8 +275,8 @@ const MetodoPagoModal = ({
           {metodoPago === '01' ? (
             <Collapse.Panel header='Pago en efectivo' key='2'>
               <Form.Item
-                label='Cantidad recibida'
                 name='cantidad'
+                label='Cantidad recibida'
                 rules={[
                   {
                     required: true,

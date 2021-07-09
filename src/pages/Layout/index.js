@@ -3,9 +3,11 @@ import Content from 'components/layout/Content';
 import Footer from 'components/layout/Footer';
 import Header from 'components/layout/Header';
 import Sider from 'components/layout/Sider';
+import { useStoreState } from 'easy-peasy';
 import React, { useState } from 'react';
 
 const Index = ({ children }) => {
+  const role = useStoreState((state) => state.user.role);
   const [collapsed, setCollapsed] = useState(true);
 
   const ToggleCollapsed = () => {
@@ -19,7 +21,7 @@ const Index = ({ children }) => {
         <Sider collapsed={collapsed} ToggleCollapsed={ToggleCollapsed} />
         <Content>{children}</Content>
       </Layout>
-      <Footer />
+      {(role === 'cliente' || role === undefined) && <Footer />}
     </Layout>
   );
 };

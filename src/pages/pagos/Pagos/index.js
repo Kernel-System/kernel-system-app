@@ -57,6 +57,7 @@ const Index = ({ tipo }) => {
       <Modal
         visible={visible}
         pago={pago}
+        tipo={tipo}
         setVis={changeModal}
         putToken={putToken}
         token={token}

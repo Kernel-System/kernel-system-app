@@ -24,7 +24,7 @@ const App = () => {
     <>
       {rehydrated && (
         <Layout>
-          <BackTop visibilityHeight={0} />
+          <BackTop visibilityHeight={300} />
           <Rutas />
         </Layout>
       )}

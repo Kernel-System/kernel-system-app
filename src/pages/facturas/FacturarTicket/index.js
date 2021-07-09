@@ -32,6 +32,16 @@ const Index = () => {
         onFinishFailed={onFinishFailed}
       >
         <Heading title='Facturar Ticket de Compra' />
+        <Alert
+          message='La Factura será timbrada 24hrs hábiles después de realizar el pedido.'
+          type='info'
+        />
+        <br />
+        <Alert
+          message='La venta debe ser registrada antes de la 10 p.m. del día viernes de la semana correspondiente.'
+          type='info'
+        />
+        <br />
         <Title level={5}>Número de ticket</Title>
         <InputForm
           titulo='no_ticket'
@@ -208,11 +218,6 @@ const Index = () => {
             />
           </Col>
         </Row>
-
-        <Alert
-          message='La Factura será timbrada 24hrs hábiles después de realizar el pedido'
-          type='info'
-        />
         <br />
         <Form.Item name='boton'>
           <Button

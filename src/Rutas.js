@@ -16,9 +16,10 @@ import EmpleadoProfile from 'pages/empleado/EmpleadoProfile';
 import AgregarEnsambles from 'pages/ensamble/AgregarEnsambles';
 import Ensambles from 'pages/ensamble/Ensambles';
 import ModificarEnsambles from 'pages/ensamble/ModificarEnsamble';
-import FacturarTicket from 'pages/FacturarTicket';
+import FacturarTicket from 'pages/facturas/FacturarTicket';
 import FacturasExternas from 'pages/facturas/FacturasExternas';
 import FacturasInternas from 'pages/facturas/FacturasInternas';
+import FacturasGlobales from 'pages/facturas/GenerarFacturasGlobal';
 import Home from 'pages/Home';
 import Order from 'pages/orders/Order';
 import Orders from 'pages/orders/Orders';
@@ -29,6 +30,7 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
+import Ventas from 'pages/ventas/Ventas';
 import SolicitudDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudDeCompra';
 import SolicitudesDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudesDeCompra';
 import { Route, Switch } from 'react-router';
@@ -171,6 +173,12 @@ const Rutas = () => {
         exact
         component={PuntoDeVenta}
       />
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/ventas'
+        exact
+        component={Ventas}
+      />
       {/* Cotizacion a clientes */}
       <PrivateRoute
         allowedRoles={['encargado de ventas']}
@@ -216,6 +224,13 @@ const Rutas = () => {
         path='/facturas-externas'
         exact
         component={FacturasExternas}
+      />
+      FacturasGlobales
+      <PrivateRoute
+        allowedRoles={['administrador']}
+        path='/facturas-globales'
+        exact
+        component={FacturasGlobales}
       />
       {/* Facturas Internas */}
       <PrivateRoute
@@ -380,7 +395,7 @@ const Rutas = () => {
       </PrivateRoute>
       {/* Inventario */}
       <PrivateRoute
-        allowedRoles={['administrador']}
+        allowedRoles={['administrador', 'encargado de almacen']}
         path='/inventario'
         exact
         component={Inventario}

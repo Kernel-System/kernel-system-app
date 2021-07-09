@@ -1,24 +1,17 @@
 import {
-  Avatar,
   Button,
   Card,
   Col,
   Collapse,
-  List,
   Row,
   Space,
   Statistic,
   Typography,
 } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import Text from 'antd/lib/typography/Text';
 import { Link } from 'react-router-dom';
-import {
-  capitalize,
-  formatDate,
-  formatPrice,
-  toPercent,
-} from 'utils/functions';
+import { capitalize, formatDate, formatPrice } from 'utils/functions';
+import OrderProductsList from '../OrderProductsList';
 const { Title } = Typography;
 
 const OrderCard = ({ details }) => {
@@ -76,53 +69,7 @@ const OrderCard = ({ details }) => {
               }`}
               key='1'
             >
-              <List
-                size='small'
-                dataSource={details.productos_solicitados}
-                renderItem={(item) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          shape='square'
-                          src={
-                            item.codigo_producto.imagenes.length
-                              ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.codigo_producto.imagenes[0].directus_files_id}`
-                              : undefined
-                          }
-                        >
-                          {item.codigo_producto.titulo[0]}
-                        </Avatar>
-                      }
-                      title={
-                        <Link to={`/producto/${item.codigo_producto.codigo}`}>
-                          {item.codigo_producto.titulo}
-                        </Link>
-                      }
-                      description={
-                        <>
-                          <Space>
-                            <Text type='secondary'>
-                              {item.cantidad} x{' '}
-                              {formatPrice(
-                                (item.precio_ofrecido -
-                                  item.precio_ofrecido *
-                                    toPercent(item.descuento_ofrecido)) *
-                                  item.cantidad
-                              )}
-                            </Text>
-                            <Text type='danger' delete>
-                              {formatPrice(
-                                item.precio_ofrecido * item.cantidad
-                              )}
-                            </Text>
-                          </Space>
-                        </>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
+              <OrderProductsList products={details.productos_solicitados} />
             </Collapse.Panel>
           </Collapse>
         </Col>

@@ -27,7 +27,7 @@ const Index = () => {
     },
   };
 
-  const onFinish = (value: any) => {
+  const onFinish = (value) => {
     let errorDocument = false;
     for (let i = 0; i < documentos.length; i++) {
       if (
@@ -117,8 +117,8 @@ const Index = () => {
     setEnabled(false);
     const dir =
       value === 'facturas_internas'
-        ? `/items/facturas_internas/`
-        : `/items/facturas_externas/`;
+        ? `/items/facturas_internas?filter[metodo_pago][_eq]=PPD`
+        : `/items/facturas_externas?filter[metodo_pago][_eq]=PPD`;
     http.get(dir, putToken).then((resul) => {
       setFacturas(resul.data.data);
     });
@@ -193,11 +193,7 @@ const Index = () => {
               disabled={enabled}
             >
               {facturas.map((factura) => {
-                return tipo === 'facturas_internas' ? (
-                  <Option key={factura.folio} value={factura.folio}>
-                    {factura.folio}
-                  </Option>
-                ) : (
+                return (
                   <Option key={factura.id} value={factura.id}>
                     {factura.folio}
                   </Option>

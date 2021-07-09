@@ -1,6 +1,6 @@
 import { Button, Col, Form, message, Row, Typography } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
-import { http } from 'api';
+import { http, httpSAT } from 'api';
 import InputForm from 'components/shared/InputForm';
 import NumericInputForm from 'components/shared/NumericInputForm';
 import HeadingBack from 'components/UI/HeadingBack';
@@ -69,9 +69,42 @@ const Index = () => {
         },
         putToken
       )
-      .then((resul) => {
-        console.log(resul);
-        Mensaje();
+      .then((result_suc) => {
+        console.log(result_suc);
+        httpSAT
+          .post('/BranchOffice', {
+            Name: datos.nombre,
+            Description: `Sucursal clave ${result_suc.data.data.clave}`,
+            Address: {
+              Street: datos.calle,
+              ExteriorNumber: datos.no_ext,
+              InteriorNumber: datos.no_int,
+              Neighborhood: datos.colonia,
+              ZipCode: datos.cp,
+              Locality: datos.localidad,
+              Municipality: datos.municipio,
+              State: datos.municipio,
+              Country: 'México',
+            },
+          })
+          .then((result_suc_api) => {
+            httpSAT
+              .post(`/serie/`, {
+                IdBranchOffice: result_suc_api.data.Id,
+                Name: datos.clave,
+                Description: `Serie de la sucursal ${datos.nombre}`,
+                Folio: 0,
+              })
+              .then((result_ser) => {
+                http
+                  .patch(`/items/sucursales/${datos.clave}`, {
+                    id_api: result_suc_api.data.Id,
+                  })
+                  .then(() => {
+                    Mensaje();
+                  });
+              });
+          });
       })
       .catch((error) => {
         if (

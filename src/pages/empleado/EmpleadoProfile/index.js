@@ -11,13 +11,15 @@ import { capitalize } from 'utils/functions';
 
 const EmpleadoProfile = () => {
   const token = useStoreState((state) => state.user.token.access_token);
-  const user = useQuery('user', () => getUserData(token));
+  const user = useQuery('employee', () => getUserData(token));
   const role = useStoreState((state) => state.user.role);
+  const date = new Date();
   return (
     <>
       {role === 'administrador' ? (
         <HeadingBack
           title='Mi perfil'
+          subtitle={`${date.getDay() === 5 ? 'FACTURACIÓN GLOBAL HOY' : ''}`}
           extra={capitalize(role)}
           actions={[
             <Link to='/empleado/perfil' key='1'>
