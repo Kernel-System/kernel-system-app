@@ -1,4 +1,5 @@
 import React from 'react';
+import './styles.css';
 import { Descriptions } from 'antd';
 import {
   tiposDeComprobante,
@@ -10,12 +11,12 @@ import {
 } from 'utils/facturas/catalogo';
 import moment from 'moment';
 
-const formatoFecha = 'DD/MM/YYYY, h:mm:ss a';
+const formatoFecha = 'DD/MM/YYYY, hh:mm:ss a';
 const Item = Descriptions.Item;
 
 const index = ({ factura }) => {
   return (
-    <Descriptions layout='vertical' bordered>
+    <Descriptions layout='vertical' bordered className='boldTitles'>
       <Item label='Folio'>{factura.folio}</Item>
       <Item label='Serie'>{factura.serie}</Item>
       <Item label='Tipo de comprobante'>
