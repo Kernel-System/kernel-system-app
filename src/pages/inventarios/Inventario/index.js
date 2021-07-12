@@ -6,12 +6,10 @@ import { useState } from 'react';
 const Index = () => {
   const [visible, setVisible] = useState(false);
   const [movimiento, setMovimiento] = useState({});
-  const [almacen, setAlmacen] = useState({});
 
-  const showModal = (element, tipo) => {
-    console.log({ element });
+  const showModal = (element) => {
+    // console.log({ element });
     setMovimiento(element);
-    setAlmacen(tipo);
     setVisible(true);
   };
 
@@ -27,7 +25,6 @@ const Index = () => {
       <ModalMovimiento
         visible={visible}
         inventario={movimiento}
-        alm={almacen}
         hideModal={hideModal}
       />
     </>
