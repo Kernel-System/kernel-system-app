@@ -1,8 +1,10 @@
 import { EyeFilled } from '@ant-design/icons';
 import { Button, Col, List, Row, Select, Typography } from 'antd';
-import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
+import { getItems } from 'api/almacen/inventario';
+
 import './styles.css';
 const { Option } = Select;
 const { Text } = Typography;
@@ -11,94 +13,75 @@ const Index = ({ onClickItem }) => {
   const [almacenes, setAlmacenes] = useState([]);
   const [productos, setProductos] = useState([]);
   const [inventario, setInventario] = useState([]);
+  const [searchValue, setSearchValue] = useState('Todo');
+  const [listToShow, setListToShow] = useState([]);
   const token = useStoreState((state) => state.user.token.access_token);
-  const putToken = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-  useEffect(() => {
-    http.get('/items/almacenes', putToken).then((result) => {
-      onSetAlmacenes(result.data.data);
+
+  const { data: list } = useQuery('inventario', async () => {
+    const { data } = await getItems(token);
+    const datos = data.data;
+    const newAlmacenes = [];
+    datos.forEach(({ clave_almacen }) => {
+      if (!newAlmacenes.some((alm) => alm.clave === clave_almacen.clave))
+        newAlmacenes.push({ ...clave_almacen });
     });
-    http
-      .get(
-        '/items/inventario?fields=*,codigo_producto.*,series_inventario.*',
-        putToken
-      )
-      .then((result) => {
-        onSetInventarios(result.data.data);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const filteredresult = filtrarPorAlmacen(datos, searchValue);
+    onSetInventarios(filteredresult);
+    setAlmacenes(newAlmacenes);
+    return datos;
+  });
 
-  const onSetInventarios = (lista) => {
-    const newLista = JSON.parse(JSON.stringify(lista));
-    setInventario(newLista);
-    onSetProductos(newLista);
-  };
-
-  const onSetAlmacenes = (lista) => {
-    setAlmacenes(lista);
+  const onSetInventarios = (inventarios) => {
+    setInventario(inventarios);
+    onSetProductos(inventarios);
   };
 
   const onSearchChange = (value) => {
     setSearchValue(value);
-    filtrarAlmacenesPorClaveConProducto(inventario, productos, value);
+    const filteredresult = filtrarPorAlmacen(list, value);
+    onSetInventarios(filteredresult);
   };
 
-  const filtrarAlmacenesPorClaveConProducto = async (
-    almacenes,
-    producto,
-    value
-  ) => {
-    if (value === 'Todo') {
-      if (producto.length === 0) setProductos(producto);
-      setListToShow(producto);
-    } else if (almacenes)
-      setListToShow(almacenes.filter((item) => item.clave_almacen === value));
+  const filtrarPorAlmacen = (inventario, clave) => {
+    if (clave === 'Todo') return inventario?.slice();
+    else
+      return inventario?.filter((item) => item.clave_almacen.clave === clave);
   };
 
-  const [searchValue, setSearchValue] = useState('Todo');
-
-  const onSetProductos = (result) => {
-    let juntarProductos = {};
-    let arrayProductos = [];
-    const newData = JSON.parse(JSON.stringify(result));
-    newData.forEach((dato) => {
+  const onSetProductos = (inventario) => {
+    const productosJuntados = {};
+    const newProductos = [];
+    inventario?.forEach((dato) => {
       const objName = `${dato.codigo_producto.codigo}`;
-      if (juntarProductos[objName] === undefined) {
-        juntarProductos[objName] = [dato];
+      if (productosJuntados[objName] === undefined) {
+        productosJuntados[objName] = [dato];
       } else {
-        juntarProductos[objName] = [...juntarProductos[objName], dato];
+        productosJuntados[objName] = [...productosJuntados[objName], dato];
       }
     });
-    Object.keys(juntarProductos).map((key) => {
-      return arrayProductos.push(juntarProductos[key]);
+    Object.keys(productosJuntados).map((key) => {
+      return newProductos.push(productosJuntados[key]);
     });
-    setProductos(arrayProductos);
-    filtrarAlmacenesPorClaveConProducto(newData, arrayProductos, searchValue);
+    setProductos(newProductos);
+    setListToShow(newProductos);
   };
 
-  const [listToShow, setListToShow] = useState([]);
-
-  //
   return (
     <>
       <Row gutter={[16, 12]}>
-        <Col>
+        <Col xs={24} lg={4}>
           <Text
             style={{
               verticalAlign: 'sub',
             }}
           >
-            Filtrar por Concepto:
+            Filtrar por Almacén:
           </Text>
         </Col>
-        <Col xs={24} lg={12}>
+        <Col xs={24} lg={20}>
           <Select
             style={{ width: '100%' }}
-            placeholder='Seleccionar un Puesto'
+            placeholder='Filtrar por Almacén'
             optionFilterProp='children'
             defaultValue='Todo'
             onChange={onSearchChange}
@@ -108,10 +91,24 @@ const Index = ({ onClickItem }) => {
                 .includes(input.toLowerCase());
             }}
           >
-            <Option value='Todo'>Todo</Option>
-            {almacenes.map((almacen, indx) => (
-              <Option key={indx} value={almacen.clave}>
-                {`${almacen.clave} : ${almacen.clave_sucursal}`}
+            <Option value='Todo'>Todos</Option>
+            {almacenes.map((almacen) => (
+              <Option value={almacen.clave} key={almacen.clave}>
+                <b
+                  style={{
+                    opacity: 0.6,
+                  }}
+                >
+                  {almacen.clave}
+                </b>
+                : de sucursal{' '}
+                <b
+                  style={{
+                    opacity: 0.6,
+                  }}
+                >
+                  {almacen.clave_sucursal}
+                </b>
               </Option>
             ))}
           </Select>
@@ -135,7 +132,7 @@ const Index = ({ onClickItem }) => {
               actions={[
                 <Button
                   icon={<EyeFilled />}
-                  onClick={() => onClickItem(item, searchValue)}
+                  onClick={() => onClickItem(item)}
                 ></Button>,
               ]}
             >
@@ -143,23 +140,21 @@ const Index = ({ onClickItem }) => {
                 title={
                   <p
                     onClick={() => {
-                      onClickItem(item, searchValue);
+                      onClickItem(item);
                     }}
                     style={{
                       cursor: 'pointer',
                       margin: 0,
                     }}
                   >
-                    {searchValue !== 'Todo'
-                      ? `Producto ${item.codigo_producto.titulo}`
-                      : `Producto ${item[0].codigo_producto.titulo}`}
+                    {item[0].codigo_producto.titulo}
                   </p>
                 }
                 description={
                   searchValue !== 'Todo'
-                    ? `Almacen: ${item.clave_almacen}`
+                    ? `Almacén: ${item[0].clave_almacen.clave}`
                     : `Almacenes: ${item
-                        .map((inv) => inv.clave_almacen)
+                        .map((inv) => inv.clave_almacen.clave)
                         .toString()}`
                 }
               />
@@ -172,7 +167,7 @@ const Index = ({ onClickItem }) => {
                 >
                   Cantidad:{' '}
                   {searchValue !== 'Todo' ? (
-                    <b>{`${item.cantidad}`}</b>
+                    <b>{`${item[0].cantidad}`}</b>
                   ) : (
                     <b>{`${item
                       .map((dato) => dato.cantidad)
