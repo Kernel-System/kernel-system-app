@@ -292,6 +292,13 @@ const Rutas = () => {
       />
       {/* Facturar ticket */}
       <PrivateRoute
+        //lel
+        allowedRoles={['*', 'cliente']}
+        path='/facturar-ticket'
+        exact
+        component={FacturarTicket}
+      />
+      <GuestRoute
         allowedRoles='*'
         path='/facturar-ticket'
         exact

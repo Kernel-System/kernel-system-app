@@ -13,6 +13,7 @@ import {
   SnippetsOutlined,
   ReconciliationOutlined,
   StockOutlined,
+  FileDoneOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -50,6 +51,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/venta'>Punto de Venta</Link>
+    </Menu.Item>
+  );
+
+  const TicketFacturarItem = (
+    <Menu.Item
+      key='ticket'
+      icon={<FileDoneOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/facturar-ticket'>Facturar Ticket de Compra</Link>
     </Menu.Item>
   );
 
@@ -316,6 +327,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {SolicitudesCompraMenuItem}
           </>
         )}
+        {TicketFacturarItem}
       </Menu>
     </Sider>
   );
