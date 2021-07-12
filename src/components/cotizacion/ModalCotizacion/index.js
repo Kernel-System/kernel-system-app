@@ -381,7 +381,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
         if (data.column.dataKey === 2 && data.cell.section === 'body') {
           console.log(data);
           doc.autoTable({
-            styles: { halign: 'right' },
+            styles: { halign: 'right', fontSize: 9, cellPadding: 1 },
             columnStyles: {
               0: { fillColor: [0, 0, 0] },
               1: { fillColor: [0, 0, 0] },
@@ -402,10 +402,6 @@ const Index = ({ visible, cotizacion, setVis }) => {
             startX: data.cell.x + 1,
             margin: { left: data.cell.x + data.cell.padding('left') },
             tableWidth: 'wrap',
-            styles: {
-              fontSize: 9,
-              cellPadding: 1,
-            },
           });
         }
       },
