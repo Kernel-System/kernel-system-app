@@ -1,4 +1,9 @@
-import { DeleteOutlined } from '@ant-design/icons';
+import './styles.css';
+import {
+  DeleteOutlined,
+  CaretDownFilled,
+  ShoppingOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Checkbox,
@@ -15,6 +20,7 @@ import {
   Typography,
 } from 'antd';
 import { http } from 'api';
+import { Link } from 'react-router-dom';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
@@ -23,11 +29,14 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { conceptosMovimientos } from 'utils/almacen';
 import { itemsToGrid } from 'utils/gridUtils';
+import moment from 'moment';
 
 const { Search } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
 const { TextArea } = Input;
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const EditableCell = ({
   editing,
@@ -82,6 +91,7 @@ const Index = () => {
   const [productos, setProductos] = useState([]);
   const [almacen, setAlmacen] = useState('1');
   const [concepto, setConcepto] = useState('Compra');
+  const [compraIndex, setCompraIndex] = useState();
 
   const [visible, setVisible] = useState(false);
   const history = useHistory();
@@ -95,7 +105,7 @@ const Index = () => {
 
   useEffect(() => {
     http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
-      onSetArreglo(result.data.data.empleado[0], setEmpleado);
+      setEmpleado(result.data.data.empleado[0]);
       if (
         result.data.data.empleado[0].puesto ===
         'd5432f92-7a74-4372-907c-9868507e0fd5'
@@ -140,14 +150,18 @@ const Index = () => {
         onSetArreglo(result.data.data, setTransferencias);
       });
     http
-      .get(`/items/compras/?fields=*,productos_comprados.*`, putToken)
+      .get(
+        `/items/compras/?fields=*,proveedor.rfc, productos_comprados.*, productos_comprados.producto_catalogo.*`,
+        putToken
+      )
       .then((result) => {
-        console.log(result.data.data);
         onSetArreglo(result.data.data, setCompras);
       });
-    http.get(`/items/ventas/?fields=*`, putToken).then((result) => {
-      onSetArreglo(result.data.data, setVentas);
-    });
+    http
+      .get(`/items/ventas/?fields=*, id_cliente.rfc`, putToken)
+      .then((result) => {
+        onSetArreglo(result.data.data, setVentas);
+      });
     http.get(`/items/almacenes/`, putToken).then((result) => {
       onSetArreglo(result.data.data, setAlmacenes);
     });
@@ -159,24 +173,26 @@ const Index = () => {
   };
 
   useEffect(() => {
-    http
-      .get(
-        `/items/productos?fields=*,imagenes.directus_files_id,inventario.*`,
-        putToken
-      )
-      .then((result) => {
-        onSetProductos(result.data.data);
-      });
+    setListProducts([]);
+    if (concepto !== 'Compra') {
+      http
+        .get(
+          `/items/productos?fields=*,imagenes.directus_files_id,inventario.*`,
+          putToken
+        )
+        .then((result) => {
+          onSetProductos(result.data.data);
+        });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [almacen, concepto]);
 
   const onSetProductos = (lista) => {
-    const newData = JSON.parse(JSON.stringify(lista));
     const newProductos = [];
-    lista.forEach((producto, index) => {
-      let inventarios = [];
+    lista.forEach((producto) => {
+      const inventarios = [];
       producto.inventario.forEach((inventario) => {
-        if (sumar(concepto)) {
+        if (esSuma(concepto)) {
           inventarios.push(inventario);
         } else if (
           inventario.clave_almacen === almacen &&
@@ -184,19 +200,17 @@ const Index = () => {
         )
           inventarios.push(inventario);
       });
-      if (inventarios.length !== 0 || sumar(concepto)) {
-        newData[index].inventario = inventarios;
-        newProductos.push(newData[index]);
+      if (inventarios.length !== 0 || esSuma(concepto)) {
+        producto.inventario = inventarios;
+        newProductos.push(producto);
       }
     });
     setProductos(newProductos);
-    setListProducts([]);
     setListProductsToShow(newProductos);
   };
 
   const onSetArreglo = (lista, asignar) => {
-    const newLista = JSON.parse(JSON.stringify(lista));
-    asignar(newLista);
+    asignar(lista && Array.isArray(lista) ? lista.slice() : []);
   };
 
   const handleChangeTipo = (value) => {
@@ -211,21 +225,9 @@ const Index = () => {
     });
   };
 
-  const obtenerFecha = () => {
-    const date = new Date();
-    return (
-      date.getUTCFullYear() +
-      '-' +
-      ('00' + (date.getUTCMonth() + 1)).slice(-2) +
-      '-' +
-      ('00' + date.getUTCDate()).slice(-2) +
-      ' ' +
-      ('00' + date.getUTCHours()).slice(-2) +
-      ':' +
-      ('00' + date.getUTCMinutes()).slice(-2) +
-      ':' +
-      ('00' + date.getUTCSeconds()).slice(-2)
-    );
+  const obtenerFechaActual = () => {
+    const fechaActual = moment().format('YYYY-MM-DDTHH:mm:ss');
+    return fechaActual;
   };
 
   const switchVerificarConcepto = (concepto, values) => {
@@ -267,11 +269,13 @@ const Index = () => {
   const onFinish = (values) => {
     if (switchVerificarConcepto(values.concepto, values)) {
       if (verificarSeriesProductos()) {
+        const hide = message.loading('Agregando movimiento de almacén...', 0);
+
         http
           .post(
             `/items/movimientos_almacen/`,
             {
-              fecha: obtenerFecha(),
+              fecha: obtenerFechaActual(),
               concepto: values.concepto,
               comentario: values.comentario,
               rma: values.rma,
@@ -307,22 +311,24 @@ const Index = () => {
             }
             let productos = [];
             let productosCoV = [];
+            // console.log({ listProducts });
             listProducts.forEach((producto) => {
-              productos.push({
-                codigo: producto.codigo,
-                clave: producto.clave,
-                cantidad: producto.cantidad,
-                titulo: producto.titulo,
-                clave_unidad: producto.clave_unidad,
-                id_movimiento: result.data.data.id,
-              });
-              if (concepto === 'Compra')
-                productosCoV.push({
-                  id: producto.id,
+              if (producto.cantidad > 0) {
+                productos.push({
+                  codigo: producto.codigo,
+                  clave: producto.clave,
                   cantidad: producto.cantidad,
+                  titulo: producto.titulo,
+                  clave_unidad: producto.clave_unidad,
+                  id_movimiento: result.data.data.id,
                 });
+                if (concepto === 'Compra')
+                  productosCoV.push({
+                    id: producto.id,
+                    cantidad: producto.cantidad,
+                  });
+              }
             });
-            console.log(productosCoV);
             if (concepto === 'Compra')
               http.post(
                 '/custom/productos-compras/',
@@ -334,84 +340,99 @@ const Index = () => {
               .then((result_productos) => {
                 let series = [];
                 let num = 0;
-                listProducts.forEach((productos) => {
-                  const idMov = result_productos.data.data[num].id;
-                  num = num + 1;
-                  productos.series.forEach((serie) => {
-                    series.push({
-                      serie: serie,
-                      producto_movimiento: idMov,
+                listProducts.forEach((producto) => {
+                  if (producto.cantidad > 0) {
+                    const idMov = result_productos.data.data[num].id;
+                    num = num + 1;
+                    producto.series.forEach((serie) => {
+                      series.push({
+                        serie: serie,
+                        producto_movimiento: idMov,
+                      });
                     });
-                  });
+                  }
                 });
                 http
                   .post(`/items/series_producto_movimiento/`, series, putToken)
                   .then((result_series) => {
-                    agregarInventarios(values);
+                    agregarInventarios(values, hide);
                   });
               });
           });
       } else {
-        message.error('Falta de llenar datos en productos.');
+        message.error('Falta llenar datos de productos');
       }
     } else {
-      message.error('Falta de llenar una justificación.');
+      message.error('Falta especificar una justificación');
     }
   };
 
-  const Mensaje = () => {
+  const Mensaje = (hideLoading) => {
+    hideLoading();
     message
       .success('El movimiento ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
   };
 
   const verificarSeriesProductos = () => {
-    if (listProducts.length !== 0) {
-      for (let i = 0; i < listProducts.length; i++) {
-        if (listProducts[i].expand) {
-          if (listProducts[i].series.length !== 0)
-            for (let j = 0; j < listProducts[i].series.length; j++) {
-              if (listProducts[i].series[j] === '') return false;
-            }
-          else return false;
-        }
-        if (listProducts.length - 1 === i) {
-          return true;
-        }
+    if (!listProducts.length) return false;
+    const cantidadTotal = listProducts.reduce(
+      (total, actual) => total + parseInt(actual.cantidad),
+      0
+    );
+    if (cantidadTotal <= 0) return false;
+    for (let i = 0; i < listProducts.length; i++) {
+      const producto = listProducts[i];
+      if (producto.expand && producto.cantidad > 0) {
+        if (producto.series.length > 0)
+          for (let j = 0; j < producto.series.length; j++) {
+            if (producto.series[j] === '') return false;
+          }
+        else return false;
       }
-    } else return false;
+      if (listProducts.length - 1 === i) {
+        return true;
+      }
+    }
   };
 
-  const onChangeCompra = (all) => {
+  const onChangeCompra = (index) => {
     setTipo('facturas_externas');
-    console.log(compras[all.index]);
-    if (compras[all.index]?.factura !== undefined) {
-      const catalogos = [];
+    if (compras[index]?.factura !== undefined) {
+      const productos_comprados = [];
 
-      compras[all.index].productos_comprados.forEach((producto) => {
-        if (producto.producto_catalogo !== null) {
-          catalogos.push(producto);
+      compras[index].productos_comprados.forEach((producto) => {
+        const producto_catalogo = producto.producto_catalogo;
+        if (
+          producto.cantidad_ingresada < producto.cantidad &&
+          producto_catalogo &&
+          producto_catalogo !== {} &&
+          producto_catalogo.tipo_de_venta !== 'Servicio'
+        ) {
+          const productoEnTabla = listProducts.find(
+            (prod) => prod.key === producto.id
+          );
+          const cantidad = productoEnTabla ? productoEnTabla.cantidad : 0;
+          const expand = productoEnTabla ? productoEnTabla.expand : true;
+          const series = productoEnTabla ? productoEnTabla.series : [];
+          const nuevoProducto = {
+            key: producto.id,
+            expand: expand,
+            titulo: producto.descripcion,
+            id: producto.id,
+            clave: producto.clave,
+            clave_unidad: producto.clave_unidad,
+            series: series,
+            productimage: '',
+            max: producto.cantidad - producto.cantidad_ingresada,
+            cantidad: cantidad,
+            codigo: producto_catalogo.codigo,
+          };
+          productos_comprados.push(nuevoProducto);
         }
       });
-      console.log(catalogos);
-      let lista = [];
-      catalogos.forEach((producto) => {
-        lista.push({
-          key: lista.length.toString(),
-          expand: true,
-          titulo: producto.descripcion,
-          codigo: producto.producto_catalogo,
-          id: producto.id,
-          clave: producto.clave,
-          clave_unidad: producto.clave_unidad,
-          series: [],
-          max: 10,
-          productimage: '',
-          cantidad: 1,
-        });
-      });
-      setListProducts(JSON.parse(JSON.stringify(lista)));
-      setFactura(compras[all.index].factura);
+      setListProducts(productos_comprados);
+      setFactura(compras[index].factura);
     } else {
       setFactura('');
     }
@@ -420,7 +441,7 @@ const Index = () => {
   //+ Compra, Entrada por transferencia, Componente defectuoso
   //- Venta, Devolución a cliente, Devolución a proveedor, Salida por transferencia, Componente para ensamble
 
-  const sumar = (concepto) => {
+  const esSuma = (concepto) => {
     if (
       concepto === 'Compra' ||
       concepto === 'Entrada por transferencia' ||
@@ -432,7 +453,7 @@ const Index = () => {
     }
   };
 
-  const agregarInventarios = (values) => {
+  const agregarInventarios = (values, hideLoading) => {
     let codigos = [];
     listProducts.forEach((producto) => {
       codigos.push(producto.codigo);
@@ -459,11 +480,14 @@ const Index = () => {
         let porAgregar = codigos.filter(
           (codigo) => !codigosInventario.includes(codigo)
         );
-        let productosAgregados = listProducts.filter((producto) =>
-          yaAgregados.includes(producto.codigo)
+        let productosAgregados = listProducts.filter(
+          (producto) =>
+            producto.cantidad > 0 && yaAgregados.includes(producto.codigo)
         );
-        let productosPorAgregar = listProducts.filter((producto) =>
-          porAgregar.includes(producto.codigo)
+        console.log({ productosAgregados });
+        let productosPorAgregar = listProducts.filter(
+          (producto) =>
+            producto.cantidad > 0 && porAgregar.includes(producto.codigo)
         );
 
         inventario.data.data.forEach((producto_inv, index) => {
@@ -471,7 +495,7 @@ const Index = () => {
             .patch(
               `/items/inventario/${producto_inv.id}`,
               {
-                cantidad: sumar(values.concepto)
+                cantidad: esSuma(values.concepto)
                   ? producto_inv.cantidad + productosAgregados[index].cantidad
                   : producto_inv.cantidad - productosAgregados[index].cantidad,
                 estado: 'normal',
@@ -484,7 +508,7 @@ const Index = () => {
               putToken
             )
             .then((producto_inv_anl) => {
-              if (sumar(values.concepto)) {
+              if (esSuma(values.concepto)) {
                 let series = [];
                 productosAgregados[index].series.forEach((serie) => {
                   series.push({
@@ -531,13 +555,13 @@ const Index = () => {
                 .post(`/items/series_inventario`, series, putToken)
                 .then(() => {
                   if (productosPorAgregar.length - 1 === index) {
-                    Mensaje();
+                    Mensaje(hideLoading);
                   }
                 });
             });
         });
         if (mostrarMensaje) {
-          Mensaje();
+          Mensaje(hideLoading);
         }
       });
   };
@@ -569,10 +593,11 @@ const Index = () => {
 
   const isEditing = (record) => record.key === editingKey;
 
-  const changeSerie = (value, indice, actual) => {
-    const lista = JSON.parse(JSON.stringify(listProducts));
-    lista[indice].series[actual] = value;
-    setListProducts(JSON.parse(JSON.stringify(lista)));
+  const changeSerie = (value, key, actual) => {
+    const lista = listProducts.slice();
+    const prod = lista.find((prod) => prod.key === key);
+    prod.series[actual] = value;
+    setListProducts(lista);
   };
 
   const inputs = (fila, numero, indice) => {
@@ -583,6 +608,7 @@ const Index = () => {
           key={`${fila.key}${actual}`}
           placeholder='Número de Serie'
           style={{ width: '100%', marginBottom: '10px' }}
+          maxLength={100}
           onBlur={(e) => {
             changeSerie(e.target.value, indice, actual);
           }}
@@ -619,15 +645,18 @@ const Index = () => {
     }
   };
 
-  const onChangeCantidad = (value, index) => {
-    if (value !== 0) {
-      const newData = JSON.parse(JSON.stringify(listProducts));
-      const cantidad = newData[index].cantidad;
-      if (value < cantidad) newData[index].series.splice(cantidad - 2, value);
-      newData[index].cantidad = value;
+  const onChangeCantidad = (value, key) => {
+    if (value >= 0) {
+      const newData = listProducts.slice();
+      const producto = newData.find((prod) => prod.key === key);
+      const cantidad = producto.cantidad;
+      if (value < cantidad) {
+        producto.series.splice(cantidad - 2, value);
+      }
+      producto.cantidad = value;
+      setListProducts(newData);
       setListProducts(newData);
       setEditingKey('');
-      setListProducts(newData);
     }
   };
 
@@ -635,70 +664,51 @@ const Index = () => {
     {
       title: 'Imagen',
       dataIndex: 'image',
-      width: '20px',
       //fixed: "left",
+      width: '100px',
       render: (_, record) => <Image width={50} src={record.productimage} />,
       editable: false,
     },
     {
-      title: 'NOMBRE',
+      title: 'Nombre',
       dataIndex: 'titulo',
-      width: '70px',
       //fixed: 'left',
       ellipsis: true,
       editable: false,
     },
     {
-      title: 'CANTIDAD',
+      title: 'Cantidad',
       dataIndex: 'cantidad',
-      width: '30px',
-      render: (_, record) => {
-        if (sumar(concepto)) {
-          return (
-            <InputNumber
-              min={1}
-              defaultValue={record.cantidad}
-              onChange={(value) => {
-                onChangeCantidad(value, record.key);
-              }}
-            />
-          );
-        } else {
-          return (
-            <InputNumber
-              max={record.max}
-              min={1}
-              defaultValue={record.cantidad}
-              onChange={(value) => {
-                onChangeCantidad(value, record.key);
-              }}
-            />
-          );
-        }
-      },
-      editable: true,
-    },
-    {
-      title: '¿TIENE SERIE?',
-      dataIndex: 'expand',
-      width: '30px',
-      editable: true,
       render: (_, record) => {
         return (
-          <Checkbox
-            onClick={() => {
-              changeCheck(record.key);
-            }}
-            checked={record.expand}
-          />
+          <>
+            <InputNumber
+              max={record.max}
+              min={0}
+              defaultValue={record.cantidad}
+              onChange={(value) => {
+                onChangeCantidad(value, record.key);
+              }}
+            />
+            <Checkbox
+              style={{ marginLeft: 16 }}
+              onClick={() => {
+                changeCheck(record.key);
+              }}
+              checked={record.expand}
+            >
+              ¿Son productos con serie?
+            </Checkbox>
+          </>
         );
       },
+      editable: true,
     },
     {
       title: '',
       dataIndex: 'operation',
       //fixed: breakpoint.lg ? "left": false,
-      width: '20px',
+      width: '50px',
       render: (_, record) => {
         return (
           <Popconfirm
@@ -712,24 +722,26 @@ const Index = () => {
     },
   ];
 
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    if (col.dataIndex !== 'expand') {
-      return {
-        ...col,
+  const mergedColumns = columns
+    .slice(concepto === 'Compra' ? 1 : 0)
+    .map((col) => {
+      if (!col.editable) {
+        return col;
+      }
+      if (col.dataIndex !== 'expand') {
+        return {
+          ...col,
 
-        onCell: (record) => ({
-          record,
-          inputType: typeColumn(col.dataIndex),
-          dataIndex: col.dataIndex,
-          title: col.title,
-          editing: isEditing(record),
-        }),
-      };
-    } else return col;
-  });
+          onCell: (record) => ({
+            record,
+            inputType: typeColumn(col.dataIndex),
+            dataIndex: col.dataIndex,
+            title: col.title,
+            editing: isEditing(record),
+          }),
+        };
+      } else return col;
+    });
 
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
@@ -757,8 +769,72 @@ const Index = () => {
   };
   //#endregion
 
+  const totalProductosPendientes = (productos) => {
+    const total = productos.reduce((total, current) => {
+      const producto_catalogo = current.producto_catalogo;
+      return (
+        total +
+        (producto_catalogo &&
+          producto_catalogo !== {} &&
+          producto_catalogo.tipo_de_venta !== 'Servicio' &&
+          current.cantidad > current.cantidad_ingresada)
+      );
+    }, 0);
+    return total;
+  };
+
+  const textoProductosPendientes = (total) => {
+    let color = 'inherit';
+    let texto = 'compra completada';
+    if (total) {
+      color = 'red';
+      const s = total > 1 ? 's' : '';
+      texto = `${total} producto${s} pendiente${s}`;
+    }
+    return <span style={{ color: color }}>{texto}</span>;
+  };
+
   const camposGenerales = (
     <>
+      <Form.Item
+        label='Clave de Almacén'
+        name='almacen'
+        rules={[
+          {
+            required: true,
+            message: `Seleccione un almacen.`,
+          },
+        ]}
+      >
+        <Select
+          showSearch
+          style={{ width: '100%' }}
+          placeholder='Almacén'
+          onChange={(value) => {
+            onSetAlmacen(value);
+          }}
+        >
+          {almacenes.map((almacen) => (
+            <Option value={almacen.clave} key={almacen.clave}>
+              <b
+                style={{
+                  opacity: 0.6,
+                }}
+              >
+                {almacen.clave}
+              </b>
+              : de sucursal{' '}
+              <b
+                style={{
+                  opacity: 0.6,
+                }}
+              >
+                {almacen.clave_sucursal}
+              </b>
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
       <Form.Item
         label='Concepto'
         name='concepto'
@@ -787,34 +863,6 @@ const Index = () => {
           ))}
         </Select>
       </Form.Item>
-      {empleado.puesto === 'd5432f92-7a74-4372-907c-9868507e0fd5' ? (
-        <Form.Item
-          label='Almacén'
-          name='almacen'
-          rules={[
-            {
-              required: true,
-              message: `Seleccione un almacen.`,
-            },
-          ]}
-        >
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Almacén'
-            onChange={(value) => {
-              onSetAlmacen(value);
-            }}
-          >
-            {almacenes.map((almacen) => (
-              <Option
-                value={almacen.clave}
-                key={almacen.clave}
-              >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
-            ))}
-          </Select>
-        </Form.Item>
-      ) : null}
       <Form.Item
         label='Comentario'
         name='comentario'
@@ -837,41 +885,70 @@ const Index = () => {
   const camposJustificacion = (
     <>
       {concepto === 'Compra' ? (
-        <Form.Item
-          label='Número de Compra'
-          name='compras'
-          rules={[
-            {
-              required: true,
-              message: 'Asigna un número de compra',
-            },
-          ]}
-        >
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Justifica una entrada por compra a proveedor'
-            initialvalues=''
-            onChange={(value, all) => {
-              onChangeCompra(all);
-            }}
+        <>
+          <Form.Item
+            label='Número de Compra'
+            name='compras'
+            rules={[
+              {
+                required: true,
+                message: 'Asigna un número de compra',
+              },
+            ]}
           >
-            <Option key='' value=''>
-              Ninguna
-            </Option>
-            {compras.map((compra, index) => {
-              return (
-                <Option
-                  key={compra.no_compra}
-                  value={compra.no_compra}
-                  index={index}
-                >
-                  {`${compra.no_compra} : ${compra.fecha_compra}`}
-                </Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
+            <Select
+              showSearch
+              style={{ width: '100%' }}
+              placeholder='Justifica una entrada por compra a proveedor'
+              initialvalues=''
+              onChange={(value, all) => {
+                const index = all.index;
+                setCompraIndex(index);
+                onChangeCompra(index);
+              }}
+            >
+              {compras.map((compra, index) => {
+                return (
+                  <Option
+                    key={compra.no_compra}
+                    value={compra.no_compra}
+                    index={index}
+                  >
+                    <b
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      {compra.no_compra}
+                    </b>
+                    : comprado a{' '}
+                    <b
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      {compra.proveedor.rfc}
+                    </b>{' '}
+                    el{' '}
+                    <b
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      {moment(new Date(compra.fecha_compra)).format(
+                        formatoFecha
+                      )}
+                    </b>{' '}
+                    -{' '}
+                    {textoProductosPendientes(
+                      totalProductosPendientes(compra.productos_comprados)
+                    )}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+        </>
       ) : null}
       {concepto === 'Venta' ? (
         <Form.Item
@@ -890,13 +967,33 @@ const Index = () => {
             placeholder='Justifica una salida por venta a cliente'
             initialvalues=''
           >
-            <Option key='' value=''>
-              Ninguna
-            </Option>
             {ventas.map((venta) => {
               return (
                 <Option key={venta.no_venta} value={venta.no_venta}>
-                  {`${venta.no_venta} : ${venta.fecha_venta}`}
+                  <b
+                    style={{
+                      opacity: 0.6,
+                    }}
+                  >
+                    {venta.no_venta}
+                  </b>
+                  : {venta.id_cliente ? 'vendido a ' : 'venta en tienda'}
+                  <b
+                    style={{
+                      opacity: 0.6,
+                    }}
+                  >
+                    {venta.id_cliente?.rfc}
+                  </b>{' '}
+                  el{' '}
+                  <b
+                    style={{
+                      opacity: 0.6,
+                    }}
+                  >
+                    {moment(new Date(venta.fecha_venta)).format(formatoFecha)}
+                  </b>
+                  {/* {`${venta.no_venta} : ${venta.fecha_venta}`} */}
                 </Option>
               );
             })}
@@ -1060,9 +1157,13 @@ const Index = () => {
                   Ninguna
                 </Option>
                 {facturas.map((factura) => {
-                  return (
+                  return tipo === 'facturas_internas' ? (
+                    <Option key={factura.folio} value={factura.folio}>
+                      {factura.folio}
+                    </Option>
+                  ) : (
                     <Option key={factura.id} value={factura.id}>
-                      {factura.id}
+                      {`${factura.id} : ${factura.folio}`}
                     </Option>
                   );
                 })}
@@ -1070,14 +1171,8 @@ const Index = () => {
             </Form.Item>
           </Col>
         </Row>
-      ) : factura !== '' ? (
-        <TextLabel
-          title={`${
-            tipo === 'facturas_externas'
-              ? 'Factura Externa ID : ' + factura
-              : 'Factura Interna ID : ' + factura
-          }`}
-        />
+      ) : factura !== '' && tipo === 'facturas_internas' ? (
+        <TextLabel title={`Factura Interna folio: ${factura}}`} />
       ) : null}
     </>
   );
@@ -1086,6 +1181,7 @@ const Index = () => {
     <div>
       <Form
         name='nuevo_movimiento'
+        layout='vertical'
         initialValues={{ remember: true, concepto: 'Compra' }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
@@ -1093,28 +1189,51 @@ const Index = () => {
         <HeadingBack title='Movimiento de Almacén' />
         <TextLabel title='Datos generales' />
         {itemsToGrid(camposGenerales.props.children, 'auto', 2, 16)}
+
         <TextLabel title='Justificación' />
         <Text type='secondary' style={{ display: 'block', marginBottom: 10 }}>
           Debe llenar mínimo 1 de los campos a continuación.
         </Text>
         {camposJustificacion}
-        <TextLabel title='Productos' />
-        <Search
-          placeholder='Ingrese nombre del producto.'
-          allowClear
-          enterButton='Buscar'
-          onSearch={(value) => {
-            onSearchChange(value);
-            setVisible(!visible);
-          }}
-        />
 
-        <br />
-        <br />
+        <TextLabel title='Productos' />
+        <Form.Item>
+          {concepto === 'Compra' ? (
+            <>
+              <Button
+                type='default'
+                onClick={() => onChangeCompra(compraIndex)}
+              >
+                <CaretDownFilled />
+                Agregar todos de la compra
+              </Button>
+              <Link to='/productos-comprados'>
+                <Button
+                  type='default'
+                  icon={<ShoppingOutlined />}
+                  style={{ marginLeft: 16 }}
+                >
+                  Ver productos comprados
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <Search
+              placeholder='Buscar por producto de catálogo'
+              allowClear
+              enterButton='Buscar'
+              onSearch={(value) => {
+                onSearchChange(value);
+                setVisible(!visible);
+              }}
+            />
+          )}
+        </Form.Item>
+
         <Form form={form} component={false}>
           <Table
             defaultExpandAllRows={true}
-            columnWidth='10px'
+            // columnWidth='10px'
             components={{
               body: {
                 cell: EditableCell,
@@ -1122,15 +1241,20 @@ const Index = () => {
             }}
             bordered
             expandable={{
+              expandIconColumnIndex: concepto === 'Compra' ? 2 : 3,
               expandedRowRender: (record) => (
                 <div style={{ margin: 0 }}>
                   <Title level={5}>Series</Title>
-                  {inputs(record, record.cantidad, record.key)}
+                  {record.cantidad > 0 ? (
+                    inputs(record, record.cantidad, record.key)
+                  ) : (
+                    <span>Incremente la cantidad para agregar series.</span>
+                  )}
                 </div>
               ),
               rowExpandable: (record) => record.expand,
             }}
-            scroll={{ x: 1000, y: 600 }}
+            // scroll={{ x: 1000, y: 600 }}
             dataSource={listProducts}
             columns={mergedColumns}
             rowClassName='editable-row'

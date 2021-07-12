@@ -1,9 +1,8 @@
 import './styles.css';
 import { useState } from 'react';
 import { Typography, Select, Row, Col } from 'antd';
-import { focusManager, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { getItems } from 'api/compras/productos_comprados';
-import { arraysMatch } from 'utils/functions';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import Header from 'components/UI/Heading';
 import ProductosCompradosData from './ProductosCompradosData';
@@ -11,7 +10,7 @@ import ProductosCompradosData from './ProductosCompradosData';
 const { Text } = Typography;
 const { Option } = Select;
 
-const ProductosCompradosList = ({ editItem, onClickItem, itemOpened }) => {
+const ProductosCompradosList = ({ editItem, onClickItem, refreshItem }) => {
   const [rfcSearch, setRfcSearch] = useState(undefined);
   const [nombreSearch, setNombreSearch] = useState(undefined);
   const [pendiente, setPendiente] = useState('falta-ingresar');
@@ -20,7 +19,6 @@ const ProductosCompradosList = ({ editItem, onClickItem, itemOpened }) => {
 
   const [proveedores, setProveedores] = useState([]);
   const [listToShow, setListToShow] = useState([]);
-  const [prevData, setPrevData] = useState([]);
 
   function onChangeProveedor(value) {
     setRfcSearch(value);
@@ -43,53 +41,40 @@ const ProductosCompradosList = ({ editItem, onClickItem, itemOpened }) => {
     setCodigoFilter(value);
   }
 
-  const { data: list } = useQuery(
+  useQuery(
     'productos_comprados',
     async () => {
       const { data: fetchedData } = await getItems();
       const data = fetchedData.data;
-      const newData = data.map(
-        ({ id, producto_catalogo, no_compra: { fecha_entrega, no_guia } }) => ({
-          id,
-          producto_catalogo,
-          fecha_entrega,
-          no_guia,
-        })
-      );
-      if (!arraysMatch(newData, prevData)) {
-        console.log("Don't match. Time to update");
-        const productos_comprados = [];
-        const newProveedores = [];
-        data.forEach(({ no_compra, ...elem }) => {
-          const { rfc_emisor, nombre_emisor } = no_compra.factura;
-          productos_comprados.push({
-            rfc_emisor,
-            nombre_emisor,
-            fecha_compra: no_compra.fecha_compra,
-            fecha_entrega: no_compra.fecha_entrega,
-            no_guia: no_compra.no_guia,
-            ...elem,
-          });
-          if (!newProveedores.some((prov) => prov.rfc_emisor === rfc_emisor))
-            newProveedores.push({ rfc_emisor, nombre_emisor });
+      const productos_comprados = [];
+      const newProveedores = [];
+      data.forEach(({ no_compra, ...elem }) => {
+        const { rfc_emisor, nombre_emisor } = no_compra.factura;
+        productos_comprados.push({
+          rfc_emisor,
+          nombre_emisor,
+          fecha_compra: no_compra.fecha_compra,
+          fecha_entrega: no_compra.fecha_entrega,
+          no_guia: no_compra.no_guia,
+          ...elem,
         });
-        const sortedData = sortData(
-          productos_comprados,
-          compraSort,
-          'fecha_compra'
-        );
-        if (itemOpened) onClickItem(undefined, sortedData);
-        setListToShow(sortedData);
-        setProveedores(newProveedores);
-        setPrevData(newData);
+        if (!newProveedores.some((prov) => prov.rfc_emisor === rfc_emisor))
+          newProveedores.push({ rfc_emisor, nombre_emisor });
+      });
+      const sortedData = sortData(
+        productos_comprados,
+        compraSort,
+        'fecha_compra'
+      );
+      setListToShow(sortedData);
+      setProveedores(newProveedores);
 
-        return data;
-      } else if (prevData.length) {
-        console.log("It's the same data");
-        return list;
-      }
+      return sortedData;
     },
     {
+      onSettled: (data) => {
+        refreshItem(data); // can't change of place!
+      },
       notifyOnChangeProps: ['error'],
     }
   );

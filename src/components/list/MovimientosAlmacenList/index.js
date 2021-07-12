@@ -22,7 +22,7 @@ const Index = ({ onClickItem, seeItem }) => {
   };
   const getItems = async (sort) => {
     const { data } = await http.get(
-      '/items/movimientos_almacen?fields=*,productos_movimiento.*,productos_movimiento.series_producto_movimiento.*, rfc_empleado.rfc,rfc_empleado.nombre' +
+      '/items/movimientos_almacen?fields=*, clave_almacen.clave, clave_almacen.clave_sucursal, productos_movimiento.*,productos_movimiento.series_producto_movimiento.*, rfc_empleado.rfc,rfc_empleado.nombre' +
         `&sort[]=${sort === 'recent' ? '-' : '+'}fecha`,
       putToken
     );
