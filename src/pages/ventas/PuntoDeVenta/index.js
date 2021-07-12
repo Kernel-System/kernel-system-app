@@ -196,8 +196,8 @@ const PuntoDeVenta = () => {
           Currency: 'MXN',
           ExpeditionPlace: empleado.sucursal.cp,
           CfdiType: 'I',
-          PaymentForm: metodoPago,
-          PaymentMethod: formaPago,
+          PaymentForm: formaPago,
+          PaymentMethod: metodoPago,
           Receiver: {
             Rfc: datos.rfc,
             Name: datos.razon_social,
@@ -229,8 +229,8 @@ const PuntoDeVenta = () => {
                 uuid: result.data.Complement.TaxStamp.Uuid,
                 fecha_timbrado: result.data.Complement.TaxStamp.Date,
                 no_certificado_sat: result.data.Complement.TaxStamp.SatSign,
-                forma_pago: metodoPago,
-                metodo_pago: formaPago,
+                forma_pago: formaPago,
+                metodo_pago: metodoPago,
                 moneda: result.data.Currency,
                 descuento: result.data.Discount,
                 subtotal: result.data.Total,
@@ -252,6 +252,7 @@ const PuntoDeVenta = () => {
         })
         .catch((error) => console.log(error));
     } else {
+      console.log('entre');
       ingresarVenta(datos);
     }
     //facturas_internas
@@ -259,6 +260,8 @@ const PuntoDeVenta = () => {
 
   const ingresarVenta = (datos, factura) => {
     //venta
+    const clienteInt =
+      Object.keys(cliente).length !== 0 ? { id_cliente: cliente } : {};
     http
       .post(
         `/items/ventas`,
@@ -297,14 +300,15 @@ const PuntoDeVenta = () => {
                 product.cantidad,
             0
           ),
-          metodo_pago: metodoPago,
-          forma_pago: formaPago,
+          metodo_pago: formaPago,
+          forma_pago: metodoPago,
           comentarios: 'Venta en Tienda',
           factura: factura?.id_int,
           rfc_vendedor: empleado.rfc,
           cantidad_recibida: datos.cantidad,
-          ucantidad_salida: datos.cambio,
+          cantidad_salida: datos.cambio,
           solicitud_compra: query.get('solicitd') && query.get('solicitud'),
+          ...clienteInt,
         },
         putToken
       )
@@ -318,6 +322,7 @@ const PuntoDeVenta = () => {
             descripcion: producto.titulo,
             unidad: 'NO APLICA',
             clave_unidad: producto.unidad_cfdi,
+            nombre_unidad_cfdi: producto.nombre_unidad_cfdi.substring(0, 20),
             precio_unitario: calcPrecioVariable(producto, nivel),
             cantidad: producto.cantidad,
             importe: calcPrecioVariable(producto, nivel) * producto.cantidad,
@@ -725,7 +730,7 @@ const PuntoDeVenta = () => {
       httpSAT.get(`/cfdi/pdf/issued/${factura.id}`).then((result) => {
         const linkSource = 'data:application/pdf;base64,' + result.data.Content;
         const downloadLink = document.createElement('a');
-        const fileName = `${factura.id}.pdf`;
+        const fileName = 'Y-cBTZ-NI21-sO98EVHYQQ2.pdf';
         downloadLink.href = linkSource;
         downloadLink.download = fileName;
         downloadLink.click();
@@ -966,26 +971,10 @@ const PuntoDeVenta = () => {
               </Card>
             </Col>
             <Col span={breakpoint.lg ? 6 : 24}>
-              <Card size='small' title='Método de Pago'>
-                <Paragraph type='secondary'>Elija una opción</Paragraph>
-                <Radio.Group
-                  defaultValue={metodoPago}
-                  onChange={(e) => setMetodoPago(e.target.value)}
-                >
-                  <Space direction='vertical'>
-                    <Radio value={'01'}>Pago en efectivo</Radio>
-                    <Radio value={'04'}>
-                      Pago con tarjeta de débito o crédito
-                    </Radio>
-                  </Space>
-                </Radio.Group>
-              </Card>
-            </Col>
-            <Col span={breakpoint.lg ? 6 : 24}>
               <Card size='small' title='Forma de pago'>
                 <Paragraph type='secondary'>Elija una opción</Paragraph>
                 <Radio.Group
-                  defaultValue={metodoPago}
+                  defaultValue={formaPago}
                   onChange={(e) => setFormaPago(e.target.value)}
                 >
                   <Space direction='vertical'>
@@ -1001,7 +990,7 @@ const PuntoDeVenta = () => {
               <Card size='small' title='Método de Pago'>
                 <Paragraph type='secondary'>Elija una opción</Paragraph>
                 <Radio.Group
-                  defaultValue={formaPago}
+                  defaultValue={metodoPago}
                   disabled={tipoComprobante !== 'factura'}
                   onChange={(e) => setMetodoPago(e.target.value)}
                 >
@@ -1034,7 +1023,7 @@ const PuntoDeVenta = () => {
             onOk={handleOk}
             onCancel={handleCancel}
             tipoComprobante={tipoComprobante}
-            metodoPago={metodoPago}
+            metodoPago={formaPago}
             nivel={query.get('solicitud') === null && nivel}
           />
         </>
