@@ -96,7 +96,7 @@ const SolicitudDeCompra = () => {
               ...product,
               [campo]:
                 campo === 'precio_ofrecido'
-                  ? parseFloat(valor.replace(/[$]|,*/g, ''))
+                  ? parseFloat(valor)
                   : parseInt(valor),
             }
           : product
