@@ -85,34 +85,44 @@ const SolicitudCompraProductsTable = ({
         title='Descuento(%)'
         dataIndex='descuento_ofrecido'
         render={(descuento_ofrecido, record) => (
-          <InputNumber
-            formatter={(value) => `${value}%`}
-            parser={(value) => value.replace('%', '')}
-            min={0}
-            max={100}
-            disabled={estado !== 'pendiente'}
-            value={descuento_ofrecido}
-            onStep={(_, { type }) => {
-              if (type === 'up') {
-                addOneToItem(
-                  'descuento_ofrecido',
-                  record.codigo_producto.codigo
-                );
-              } else {
-                subOneToItem(
-                  'descuento_ofrecido',
-                  record.codigo_producto.codigo
-                );
-              }
-            }}
-            onBlur={({ target: { value } }) =>
-              setValueToItem({
-                campo: 'descuento_ofrecido',
-                codigo: record.codigo_producto.codigo,
-                valor: value,
-              })
-            }
-          />
+          <>
+            <InputNumber
+              min={0}
+              max={100}
+              type='number'
+              disabled={estado !== 'pendiente'}
+              value={descuento_ofrecido}
+              onStep={(_, { type }) => {
+                if (type === 'up') {
+                  addOneToItem(
+                    'descuento_ofrecido',
+                    record.codigo_producto.codigo
+                  );
+                } else {
+                  subOneToItem(
+                    'descuento_ofrecido',
+                    record.codigo_producto.codigo
+                  );
+                }
+              }}
+              onBlur={({ target: { value } }) => {
+                let newValue;
+                if (value > 100) {
+                  newValue = 100;
+                } else if (value < 0 || value === '') {
+                  newValue = 0;
+                } else {
+                  newValue = Math.ceil(value);
+                }
+                setValueToItem({
+                  campo: 'descuento_ofrecido',
+                  codigo: record.codigo_producto.codigo,
+                  valor: newValue,
+                });
+              }}
+            />
+            <Text> %</Text>
+          </>
         )}
       />
       <Table.Column
@@ -120,28 +130,43 @@ const SolicitudCompraProductsTable = ({
         title='Precio Unitario'
         dataIndex='precio_ofrecido'
         render={(precio_ofrecido, record) => (
-          <InputNumber
-            style={{ width: '150px' }}
-            formatter={(value) => formatPrice(value)}
-            min={0}
-            disabled={estado !== 'pendiente'}
-            precision={2}
-            value={precio_ofrecido}
-            onStep={(_, { type }) => {
-              if (type === 'up') {
-                addOneToItem('precio_ofrecido', record.codigo_producto.codigo);
-              } else {
-                subOneToItem('precio_ofrecido', record.codigo_producto.codigo);
-              }
-            }}
-            onBlur={({ target: { value } }) =>
-              setValueToItem({
-                campo: 'precio_ofrecido',
-                codigo: record.codigo_producto.codigo,
-                valor: value,
-              })
-            }
-          />
+          <>
+            <Text>$ </Text>
+            <InputNumber
+              style={{ width: '120px' }}
+              min={0}
+              type='number'
+              disabled={estado !== 'pendiente'}
+              precision={2}
+              value={precio_ofrecido}
+              onStep={(_, { type }) => {
+                if (type === 'up') {
+                  addOneToItem(
+                    'precio_ofrecido',
+                    record.codigo_producto.codigo
+                  );
+                } else {
+                  subOneToItem(
+                    'precio_ofrecido',
+                    record.codigo_producto.codigo
+                  );
+                }
+              }}
+              onBlur={({ target: { value } }) => {
+                let newValue;
+                if (value < 0 || value === '') {
+                  newValue = 0;
+                } else {
+                  newValue = value;
+                }
+                setValueToItem({
+                  campo: 'precio_ofrecido',
+                  codigo: record.codigo_producto.codigo,
+                  valor: newValue,
+                });
+              }}
+            />
+          </>
         )}
       />
       <Table.Column
@@ -169,6 +194,7 @@ const SolicitudCompraProductsTable = ({
                   ? 999
                   : calcCantidad(record.codigo_producto)
               }
+              type='number'
               disabled={estado !== 'pendiente'}
               value={cantidad}
               onStep={(_, { type }) => {
@@ -178,13 +204,21 @@ const SolicitudCompraProductsTable = ({
                   subOneToItem('cantidad', record.codigo_producto.codigo);
                 }
               }}
-              onBlur={({ target: { value } }) =>
+              onBlur={({ target: { value } }) => {
+                let newValue;
+                if (value > calcCantidad(record.codigo_producto)) {
+                  newValue = calcCantidad(record.codigo_producto);
+                } else if (value <= 0 || value === '') {
+                  newValue = 1;
+                } else {
+                  newValue = Math.ceil(value);
+                }
                 setValueToItem({
                   campo: 'cantidad',
                   codigo: record.codigo_producto.codigo,
-                  valor: value,
-                })
-              }
+                  valor: newValue,
+                });
+              }}
             />
           </>
         )}
@@ -222,7 +256,7 @@ const SolicitudCompraProductsTable = ({
                   record.precio_ofrecido *
                     toPercent(record.descuento_ofrecido) *
                     record.cantidad
-                )}{' '}
+                )}
                 DTO
               </Text>
             )}
@@ -241,7 +275,7 @@ const SolicitudCompraProductsTable = ({
                   toPercent(100 - record.descuento_ofrecido) *
                   toPercent(record.iva) *
                   record.cantidad
-              )}{' '}
+              )}
               IVA
             </Text>
             <Text strong>
@@ -250,7 +284,7 @@ const SolicitudCompraProductsTable = ({
                   toPercent(100 - record.descuento_ofrecido) *
                   toPercent(100 + record.iva) *
                   record.cantidad
-              )}{' '}
+              )}
             </Text>
           </>
         )}

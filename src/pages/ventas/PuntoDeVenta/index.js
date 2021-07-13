@@ -827,7 +827,7 @@ const PuntoDeVenta = () => {
               ...product,
               [campo]:
                 campo === 'precios_variables' || campo === 'precio_fijo'
-                  ? parseFloat(valor.replace(/[$]|,*/g, ''))
+                  ? parseFloat(valor)
                   : parseInt(valor),
             }
           : product
@@ -966,26 +966,10 @@ const PuntoDeVenta = () => {
               </Card>
             </Col>
             <Col span={breakpoint.lg ? 6 : 24}>
-              <Card size='small' title='Método de Pago'>
-                <Paragraph type='secondary'>Elija una opción</Paragraph>
-                <Radio.Group
-                  defaultValue={metodoPago}
-                  onChange={(e) => setMetodoPago(e.target.value)}
-                >
-                  <Space direction='vertical'>
-                    <Radio value={'01'}>Pago en efectivo</Radio>
-                    <Radio value={'04'}>
-                      Pago con tarjeta de débito o crédito
-                    </Radio>
-                  </Space>
-                </Radio.Group>
-              </Card>
-            </Col>
-            <Col span={breakpoint.lg ? 6 : 24}>
               <Card size='small' title='Forma de pago'>
                 <Paragraph type='secondary'>Elija una opción</Paragraph>
                 <Radio.Group
-                  defaultValue={metodoPago}
+                  defaultValue={formaPago}
                   onChange={(e) => setFormaPago(e.target.value)}
                 >
                   <Space direction='vertical'>
@@ -1001,7 +985,7 @@ const PuntoDeVenta = () => {
               <Card size='small' title='Método de Pago'>
                 <Paragraph type='secondary'>Elija una opción</Paragraph>
                 <Radio.Group
-                  defaultValue={formaPago}
+                  defaultValue={metodoPago}
                   disabled={tipoComprobante !== 'factura'}
                   onChange={(e) => setMetodoPago(e.target.value)}
                 >
