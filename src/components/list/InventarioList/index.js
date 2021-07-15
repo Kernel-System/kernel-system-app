@@ -1,18 +1,18 @@
+import './styles.css';
 import { EyeFilled } from '@ant-design/icons';
-import { Button, Col, List, Row, Select, Typography } from 'antd';
+import { Button, Col, List, Row, Select, Typography, Grid } from 'antd';
 import { useStoreState } from 'easy-peasy';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/almacen/inventario';
+import { contentCol } from 'utils/gridUtils';
 
-import './styles.css';
+const { useBreakpoint } = Grid;
 const { Option } = Select;
 const { Text } = Typography;
 
 const Index = ({ onClickItem }) => {
   const [almacenes, setAlmacenes] = useState([]);
-  const [productos, setProductos] = useState([]);
-  const [inventario, setInventario] = useState([]);
   const [searchValue, setSearchValue] = useState('Todo');
   const [listToShow, setListToShow] = useState([]);
   const token = useStoreState((state) => state.user.token.access_token);
@@ -31,11 +31,6 @@ const Index = ({ onClickItem }) => {
     return datos;
   });
 
-  const onSetInventarios = (inventarios) => {
-    setInventario(inventarios);
-    onSetProductos(inventarios);
-  };
-
   const onSearchChange = (value) => {
     setSearchValue(value);
     const filteredresult = filtrarPorAlmacen(list, value);
@@ -48,7 +43,7 @@ const Index = ({ onClickItem }) => {
       return inventario?.filter((item) => item.clave_almacen.clave === clave);
   };
 
-  const onSetProductos = (inventario) => {
+  const onSetInventarios = (inventario) => {
     const productosJuntados = {};
     const newProductos = [];
     inventario?.forEach((dato) => {
@@ -62,14 +57,15 @@ const Index = ({ onClickItem }) => {
     Object.keys(productosJuntados).map((key) => {
       return newProductos.push(productosJuntados[key]);
     });
-    setProductos(newProductos);
     setListToShow(newProductos);
   };
 
+  const screen = useBreakpoint();
+
   return (
     <>
-      <Row gutter={[16, 12]}>
-        <Col xs={24} lg={4}>
+      <Row gutter={[10, 12]} style={{ marginBottom: 10 }}>
+        <Col>
           <Text
             style={{
               verticalAlign: 'sub',
@@ -78,7 +74,7 @@ const Index = ({ onClickItem }) => {
             Filtrar por Almacén:
           </Text>
         </Col>
-        <Col xs={24} lg={20}>
+        <Col {...contentCol(screen, 'auto')}>
           <Select
             style={{ width: '100%' }}
             placeholder='Filtrar por Almacén'
@@ -114,7 +110,6 @@ const Index = ({ onClickItem }) => {
           </Select>
         </Col>
       </Row>
-      <br />
       <List
         itemLayout='horizontal'
         size='default'
