@@ -150,7 +150,7 @@ const Index = () => {
               regimen_fiscal: result.data.Issuer.FiscalRegime,
               rfc_receptor: result.data.Receiver.Rfc,
               nombre_receptor: result.data.Receiver.Name,
-              uso_cfdi: '01',
+              uso_cfdi: 'P01',
               //total_inpuestos_translados:"",
               //total_impuestos_retenidos:"",
               tipo_relacion: '',
