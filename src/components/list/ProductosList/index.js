@@ -1,9 +1,15 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Input, Space } from 'antd';
-import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
+import { Popconfirm, List, Button, Input, Space, Tag } from 'antd';
+import {
+  DeleteFilled,
+  EditFilled,
+  EyeFilled,
+  WarningTwoTone,
+} from '@ant-design/icons';
 import { useQuery } from 'react-query';
+import { categoriasProductos } from 'utils/facturas/catalogo';
 import { Link } from 'react-router-dom';
 
 const Index = ({ putToken, onConfirmDelete }) => {
@@ -16,12 +22,18 @@ const Index = ({ putToken, onConfirmDelete }) => {
   const onSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
-    filtrarProductosPorNombre(data, value);
+    filtrarProducto(data, value);
   };
 
-  const filtrarProductosPorNombre = async (productos, value) => {
+  const filtrarProducto = async (productos, value) => {
     if (productos)
-      setListToShow(productos.filter((item) => item.titulo.includes(value)));
+      setListToShow(
+        productos.filter(
+          (item) =>
+            item.titulo.toUpperCase().includes(value.toUpperCase()) ||
+            item.codigo.toUpperCase().includes(value.toUpperCase())
+        )
+      );
   };
 
   const [searchValue, setSearchValue] = useState('');
@@ -29,7 +41,7 @@ const Index = ({ putToken, onConfirmDelete }) => {
   const { data } = useQuery('productos', async () => {
     const result = await fetchProducts();
     setListToShow(result);
-    filtrarProductosPorNombre(result, searchValue);
+    filtrarProducto(result, searchValue);
     return result;
   });
   const [listToShow, setListToShow] = useState([]);
@@ -38,7 +50,7 @@ const Index = ({ putToken, onConfirmDelete }) => {
     <>
       <Input.Search
         onChange={onSearchChange}
-        placeholder='Buscar por nombre'
+        placeholder='Buscar por nombre o código'
         value={searchValue}
       ></Input.Search>
       <br />
@@ -52,59 +64,75 @@ const Index = ({ putToken, onConfirmDelete }) => {
           pageSize: 10,
         }}
         dataSource={listToShow}
-        renderItem={(item) => (
-          <List.Item
-            key={item.codigo}
-            actions={[
-              <Link to={`/productos/mostrar/${item.codigo}`}>
-                <Button icon={<EyeFilled />}></Button>
-              </Link>,
-              <Space>
-                <Link to={`/productos/editar/${item.codigo}`}>
-                  <Button icon={<EditFilled />} />
-                </Link>
-                {item?.productos_solicitados?.length === 0 &&
-                item?.inventario?.length === 0 ? (
-                  <Popconfirm
-                    placement='left'
-                    title='¿Está seguro de querer borrar este registro?'
-                    okText='Sí'
-                    cancelText='No'
-                    onConfirm={() => onConfirmDelete(item)}
-                  >
-                    <Button danger icon={<DeleteFilled />} />
-                  </Popconfirm>
-                ) : null}
-              </Space>,
-            ]}
-          >
-            <List.Item.Meta
-              title={
+        renderItem={(item) => {
+          const eliminarDesactivado =
+            item.productos_solicitados?.length || item.inventario?.length;
+          return (
+            <List.Item
+              key={item.codigo}
+              actions={[
                 <Link to={`/productos/mostrar/${item.codigo}`}>
-                  <p
-                    style={{
-                      cursor: 'pointer',
-                      margin: 0,
-                    }}
-                  >
-                    {item.codigo}
-                  </p>
-                </Link>
-              }
-              description={item.titulo}
-            />
-            {
-              <span
-                style={{
-                  display: 'inline',
-                  opacity: 0.8,
-                }}
-              >
-                <b>{item.descripcion}</b>
-              </span>
-            }
-          </List.Item>
-        )}
+                  <Button icon={<EyeFilled />}></Button>
+                </Link>,
+                <Space>
+                  <Link to={`/productos/editar/${item.codigo}`}>
+                    <Button icon={<EditFilled />} />
+                  </Link>
+                  {
+                    <Popconfirm
+                      placement='left'
+                      {...{
+                        icon: eliminarDesactivado ? (
+                          <WarningTwoTone twoToneColor='red' />
+                        ) : undefined,
+                      }}
+                      title={
+                        eliminarDesactivado
+                          ? 'Existe inventario o solicitudes de este producto.'
+                          : '¿Está seguro de querer borrar este registro?'
+                      }
+                      okText={eliminarDesactivado ? 'OK' : 'Sí'}
+                      cancelText='Cancelar'
+                      cancelButtonProps={{
+                        style: {
+                          display: eliminarDesactivado ? 'none' : 'initial',
+                        },
+                      }}
+                      onConfirm={() =>
+                        eliminarDesactivado ? null : onConfirmDelete(item)
+                      }
+                    >
+                      <Button
+                        danger
+                        disabled={eliminarDesactivado}
+                        icon={<DeleteFilled />}
+                      />
+                    </Popconfirm>
+                  }
+                </Space>,
+              ]}
+            >
+              <List.Item.Meta
+                title={
+                  <Link to={`/productos/mostrar/${item.codigo}`}>
+                    <p
+                      style={{
+                        cursor: 'pointer',
+                        margin: 0,
+                      }}
+                    >
+                      {item.codigo + ' - ' + item.titulo}
+                    </p>
+                  </Link>
+                }
+                description={`${item.descripcion}`}
+              />
+              {item.categorias.map((cat) => {
+                return <Tag key={cat}>{categoriasProductos[cat]}</Tag>;
+              })}
+            </List.Item>
+          );
+        }}
       />
     </>
   );
