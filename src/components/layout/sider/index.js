@@ -13,6 +13,8 @@ import {
   SnippetsOutlined,
   ReconciliationOutlined,
   StockOutlined,
+  FileDoneOutlined,
+  RedEnvelopeOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -50,6 +52,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/venta'>Punto de Venta</Link>
+    </Menu.Item>
+  );
+
+  const TicketFacturarItem = (
+    <Menu.Item
+      key='ticket'
+      icon={<FileDoneOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/facturar-ticket'>Facturar Ticket de Compra</Link>
     </Menu.Item>
   );
 
@@ -173,6 +185,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const OrdenesComprasMenuItem = (showIcon) => (
+    <Menu.Item
+      key='ordenes-compra'
+      icon={!showIcon ?? <RedEnvelopeOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/ordenes-compra'>Ordenes de Compra</Link>
+    </Menu.Item>
+  );
+
   const ProductosCompradosMenuItem = (showIcon) => (
     <Menu.Item
       key='productos-comprados'
@@ -207,6 +229,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     <Menu.SubMenu key='subCompras' icon={<ShoppingOutlined />} title='Compras'>
       {ComprasMenuItem()}
       {ProductosCompradosMenuItem()}
+      {OrdenesComprasMenuItem()}
     </Menu.SubMenu>
   );
 
@@ -316,6 +339,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {SolicitudesCompraMenuItem}
           </>
         )}
+        {TicketFacturarItem}
       </Menu>
     </Sider>
   );

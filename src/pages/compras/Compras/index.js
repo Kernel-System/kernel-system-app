@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { focusManager, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import CompraForm from 'components/forms/CompraForm';
 import ListaCompras from 'components/list/ComprasList';
 import * as CRUD from 'api/compras';
