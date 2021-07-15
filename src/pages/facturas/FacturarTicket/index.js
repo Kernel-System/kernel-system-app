@@ -105,8 +105,8 @@ const Index = () => {
                 ExpeditionPlace:
                   result_venta.data.data.rfc_vendedor.sucursal.cp,
                 CfdiType: 'I',
-                PaymentForm: result_venta.data.data.forma_pago,
-                PaymentMethod: result_venta.data.data.metodo_pago,
+                PaymentForm: result_venta.data.data.metodo_pago,
+                PaymentMethod: result_venta.data.data.forma_pago,
                 Receiver: {
                   Rfc: 'XAXX010101000', //values.rfc,
                   Name: values.razon_social,

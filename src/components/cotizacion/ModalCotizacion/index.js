@@ -3,10 +3,20 @@ import TextLabel from '../../UI/TextLabel';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { useState, useEffect } from 'react';
+import { NumeroALetras } from 'api/numeroTexto';
 import logo from 'utils/Cotizacion.png';
 
 const Index = ({ visible, cotizacion, setVis }) => {
   const [lista, setlista] = useState([]);
+
+  const formatPrice = (price) => {
+    var formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+    return formatter.format(price);
+  };
+
   useEffect(() => {
     let productos = [];
     cotizacion?.productos_cotizados?.forEach((producto, index) => {
@@ -124,11 +134,11 @@ const Index = ({ visible, cotizacion, setVis }) => {
         producto.clave,
         producto.descripcion,
         producto.clave_unidad,
-        '$ ' + producto.precio_unitario,
+        formatPrice(producto.precio_unitario),
         producto.cantidad,
         producto.iva + ' %',
         producto.descuento + ' %',
-        '$ ' + producto.total,
+        formatPrice(producto.total),
       ]);
     });
     doc.autoTable({
@@ -182,7 +192,6 @@ const Index = ({ visible, cotizacion, setVis }) => {
         }
         if (data.column.index === 1 && data.cell.section === 'body') {
           let borderLineOffset = 1;
-
           doc.addFont('./CgBroadway.ttf', 'Broadway', 'normal');
           doc.setFont('Broadway');
           doc.setFontSize(18.4);
@@ -301,7 +310,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
       },
     });
     doc.autoTable({
-      styles: { halign: 'right', fillColor: [255, 0, 0] },
+      styles: { fillColor: [255, 0, 0] },
       //columnStyles: { 0: { halign: 'center', fillColor: [0, 255, 0] } }, // Cells in first column centered and green
       headStyles: {
         fillColor: [167, 168, 167],
@@ -315,8 +324,14 @@ const Index = ({ visible, cotizacion, setVis }) => {
         lineColor: [0, 0, 0],
       },
       columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 60, halign: 'left' },
+        0: { cellWidth: 15, halign: 'left' },
+        1: { halign: 'left' },
+        2: { cellWidth: 60, halign: 'left' },
+        3: { halign: 'right' },
+        4: { halign: 'right' },
+        5: { halign: 'right' },
+        6: { halign: 'right' },
+        7: { halign: 'right' },
         // etc
       },
       pageBreak: 'auto',
@@ -351,12 +366,21 @@ const Index = ({ visible, cotizacion, setVis }) => {
         ],
         [[], [`Tiempo de entrega ${cotizacion.dias_entrega} días`]],
         [],
+        [
+          '',
+          NumeroALetras(cotizacion.total, {
+            plural: 'PESOS',
+            singular: 'PESO',
+            centPlural: 'CENTAVOS',
+            centSingular: 'CENTAVO',
+          }),
+        ],
         [],
       ],
       didParseCell: (data) => {
         //console.log(data);
         if (data.row.index !== 0) data.cell.styles.fillColor = [255, 255, 255];
-        if (data.row.index === cotizacion?.productos_cotizados.length + 5) {
+        if (data.row.index === cotizacion?.productos_cotizados.length + 6) {
           data.cell.styles.fillColor = [255, 255, 128]; //128
         }
       },
@@ -394,9 +418,9 @@ const Index = ({ visible, cotizacion, setVis }) => {
               halign: 'right',
             },
             body: [
-              ['SUBTOTAL', `$ ${cotizacion.total - cotizacion.iva}`],
-              ['IVA', `$ ${cotizacion.iva}`],
-              ['TOTAL', `$ ${cotizacion.total}`],
+              ['SUBTOTAL', `${formatPrice(cotizacion.total - cotizacion.iva)}`],
+              ['IVA', `${formatPrice(cotizacion.iva)}`],
+              ['TOTAL', `${formatPrice(cotizacion.total)}`],
             ],
             startY: data.cell.y + 2,
             startX: data.cell.x + 1,

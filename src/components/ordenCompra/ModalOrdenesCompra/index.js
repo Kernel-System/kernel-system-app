@@ -3,6 +3,7 @@ import TextLabel from '../../UI/TextLabel';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { useState, useEffect } from 'react';
+import { NumeroALetras } from 'api/numeroTexto';
 import logo from 'utils/Cotizacion.png';
 
 const Index = ({ visible, orden, setVis }) => {
@@ -14,6 +15,14 @@ const Index = ({ visible, orden, setVis }) => {
     });
     onSetLista(productos);
   }, [orden]);
+
+  const formatPrice = (price) => {
+    var formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+    return formatter.format(price);
+  };
 
   const onSetLista = (prodLista) => {
     const newLista = JSON.parse(JSON.stringify(prodLista));
@@ -118,8 +127,8 @@ const Index = ({ visible, orden, setVis }) => {
         producto.descripcion,
         producto.unidad,
         producto.cantidad,
-        '$ ' + producto.precio_unitario,
-        '$ ' + producto.total,
+        formatPrice(producto.precio_unitario),
+        formatPrice(producto.total),
       ]);
     });
     doc.autoTable({
@@ -353,7 +362,7 @@ const Index = ({ visible, orden, setVis }) => {
       },
     });
     doc.autoTable({
-      styles: { halign: 'right', fillColor: [255, 0, 0] },
+      styles: { fillColor: [255, 0, 0] },
       //columnStyles: { 0: { halign: 'center', fillColor: [0, 255, 0] } }, // Cells in first column centered and green
       headStyles: {
         fillColor: [167, 168, 167],
@@ -370,6 +379,9 @@ const Index = ({ visible, orden, setVis }) => {
         0: { cellWidth: 23 },
         1: { cellWidth: 20 },
         2: { cellWidth: 58, halign: 'left' },
+        4: { halign: 'right' },
+        5: { halign: 'right' },
+        6: { halign: 'right' },
         // etc
       },
       pageBreak: 'auto',
@@ -385,7 +397,20 @@ const Index = ({ visible, orden, setVis }) => {
           'TOTAL',
         ],
       ],
-      body: [...productos, []],
+      body: [
+        ...productos,
+        [
+          '',
+          '',
+          NumeroALetras(orden.total, {
+            plural: 'PESOS',
+            singular: 'PESO',
+            centPlural: 'CENTAVOS',
+            centSingular: 'CENTAVO',
+          }),
+        ],
+        [],
+      ],
       didParseCell: (data) => {
         //console.log(data);
         if (data.row.index !== 0) data.cell.styles.fillColor = [255, 255, 255];
@@ -424,9 +449,9 @@ const Index = ({ visible, orden, setVis }) => {
               halign: 'right',
             },
             body: [
-              ['', 'SUBTOTAL', `$ ${orden.total - orden.iva}`],
-              ['16.00%', 'IVA', `$ ${orden.iva}`],
-              ['', 'TOTAL', `$ ${orden.total}`],
+              ['', 'SUBTOTAL', `${formatPrice(orden.total - orden.iva)}`],
+              ['16.00%', 'IVA', `${formatPrice(orden.iva)}`],
+              ['', 'TOTAL', `${formatPrice(orden.total)}`],
             ],
             startY: data.cell.y + 2,
             startX: data.cell.x + 1,
