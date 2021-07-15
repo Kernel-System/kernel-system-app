@@ -92,6 +92,10 @@ const Index = () => {
   const [almacen, setAlmacen] = useState('1');
   const [concepto, setConcepto] = useState('Compra');
   const [compraIndex, setCompraIndex] = useState();
+  const [ventaIndex, setVentaIndex] = useState();
+
+  const [ocultarAgregar1, setOcultarAgregar1] = useState(true);
+  const [ocultarAgregar2, setOcultarAgregar2] = useState(true);
 
   const [visible, setVisible] = useState(false);
   const history = useHistory();
@@ -158,7 +162,10 @@ const Index = () => {
         onSetArreglo(result.data.data, setCompras);
       });
     http
-      .get(`/items/ventas/?fields=*, id_cliente.rfc`, putToken)
+      .get(
+        `/items/ventas/?fields=*, id_cliente.rfc,productos_venta.*, productos_venta.codigo.*`,
+        putToken
+      )
       .then((result) => {
         onSetArreglo(result.data.data, setVentas);
       });
@@ -173,8 +180,8 @@ const Index = () => {
   };
 
   useEffect(() => {
-    setListProducts([]);
-    if (concepto !== 'Compra') {
+    setListProducts([]); //aqui
+    if (concepto !== 'Compra' && concepto !== 'Venta') {
       http
         .get(
           `/items/productos?fields=*,imagenes.directus_files_id,inventario.*`,
@@ -270,7 +277,6 @@ const Index = () => {
     if (switchVerificarConcepto(values.concepto, values)) {
       if (verificarSeriesProductos()) {
         const hide = message.loading('Agregando movimiento de almacén...', 0);
-
         http
           .post(
             `/items/movimientos_almacen/`,
@@ -311,7 +317,6 @@ const Index = () => {
             }
             let productos = [];
             let productosCoV = [];
-            // console.log({ listProducts });
             listProducts.forEach((producto) => {
               if (producto.cantidad > 0) {
                 productos.push({
@@ -322,7 +327,7 @@ const Index = () => {
                   clave_unidad: producto.clave_unidad,
                   id_movimiento: result.data.data.id,
                 });
-                if (concepto === 'Compra')
+                if (concepto === 'Compra' || concepto === 'Venta')
                   productosCoV.push({
                     id: producto.id,
                     cantidad: producto.cantidad,
@@ -335,27 +340,54 @@ const Index = () => {
                 { productos: productosCoV },
                 putToken
               );
+            else if (concepto === 'Venta') {
+              http.post(
+                '/custom/productos-ventas/',
+                { productos: productosCoV },
+                putToken
+              );
+            }
             http
               .post(`/items/productos_movimiento/`, productos, putToken)
               .then((result_productos) => {
                 let series = [];
+                let seriesVenta = [];
                 let num = 0;
                 listProducts.forEach((producto) => {
                   if (producto.cantidad > 0) {
                     const idMov = result_productos.data.data[num].id;
                     num = num + 1;
-                    producto.series.forEach((serie) => {
-                      series.push({
-                        serie: serie,
-                        producto_movimiento: idMov,
+                    if (producto.series !== undefined)
+                      producto.series.forEach((serie) => {
+                        series.push({
+                          serie: serie,
+                          producto_movimiento: idMov,
+                        });
+                        if (concepto === 'Venta') {
+                          seriesVenta.push({
+                            serie: serie,
+                            producto_venta: producto.id,
+                          });
+                        }
                       });
-                    });
                   }
                 });
                 http
                   .post(`/items/series_producto_movimiento/`, series, putToken)
-                  .then((result_series) => {
-                    agregarInventarios(values, hide);
+                  .then(() => {
+                    if (concepto === 'Venta' && series.length !== 0) {
+                      http
+                        .post(
+                          `/items/series_producto_venta/`,
+                          seriesVenta,
+                          putToken
+                        )
+                        .then(() => {
+                          agregarInventarios(values, hide);
+                        });
+                    } else {
+                      agregarInventarios(values, hide);
+                    }
                   });
               });
           });
@@ -396,11 +428,17 @@ const Index = () => {
     }
   };
 
-  const onChangeCompra = (index) => {
-    setTipo('facturas_externas');
-    if (compras[index]?.factura !== undefined) {
-      const productos_comprados = [];
+  const onChangeCompraVenta = (index) => {
+    if (concepto === 'Compra') {
+      setTipo('facturas_externas');
+      if (
+        compras[index]?.factura !== undefined &&
+        compras[index]?.factura !== null
+      )
+        setFactura(compras[index].factura);
+      else setFactura('');
 
+      const productos_comprados = [];
       compras[index].productos_comprados.forEach((producto) => {
         const producto_catalogo = producto.producto_catalogo;
         if (
@@ -432,9 +470,48 @@ const Index = () => {
         }
       });
       setListProducts(productos_comprados);
-      setFactura(compras[index].factura);
     } else {
-      setFactura('');
+      setTipo('facturas_internas');
+      if (
+        ventas[index]?.factura !== undefined &&
+        ventas[index]?.factura !== null
+      )
+        setFactura(ventas[index].factura);
+      else setFactura('');
+      const productos_comprados = [];
+      ventas[index].productos_venta.forEach((producto) => {
+        const producto_catalogo = producto.codigo;
+        if (
+          producto.cantidad_entregada < producto.cantidad &&
+          producto_catalogo &&
+          producto_catalogo !== {} &&
+          producto_catalogo.tipo_de_venta !== 'Servicio'
+        ) {
+          const productoEnTabla = listProducts.find(
+            (prod) => prod.key === producto.id
+          );
+          const cantidad = productoEnTabla ? productoEnTabla.cantidad : 0;
+          const expand = productoEnTabla ? productoEnTabla.expand : true;
+          const series = productoEnTabla
+            ? productoEnTabla.series_producto_venta
+            : [];
+          const nuevoProducto = {
+            key: producto.id,
+            expand: expand,
+            titulo: producto.descripcion,
+            id: producto.id,
+            clave: producto.clave,
+            clave_unidad: producto.clave_unidad,
+            series: series,
+            productimage: '',
+            max: producto.cantidad - producto.cantidad_entregada,
+            cantidad: cantidad,
+            codigo: producto_catalogo.codigo,
+          };
+          productos_comprados.push(nuevoProducto);
+        }
+      });
+      setListProducts(productos_comprados);
     }
   };
 
@@ -484,7 +561,6 @@ const Index = () => {
           (producto) =>
             producto.cantidad > 0 && yaAgregados.includes(producto.codigo)
         );
-        console.log({ productosAgregados });
         let productosPorAgregar = listProducts.filter(
           (producto) =>
             producto.cantidad > 0 && porAgregar.includes(producto.codigo)
@@ -723,7 +799,7 @@ const Index = () => {
   ];
 
   const mergedColumns = columns
-    .slice(concepto === 'Compra' ? 1 : 0)
+    .slice(concepto === 'Compra' || concepto === 'Venta' ? 1 : 0)
     .map((col) => {
       if (!col.editable) {
         return col;
@@ -746,7 +822,6 @@ const Index = () => {
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
     const dato = lista.findIndex((producto) => producto.codigo === item.codigo);
-    console.log(lista);
     if (dato === -1)
       lista.push({
         key: lista.length.toString(),
@@ -903,8 +978,9 @@ const Index = () => {
               initialvalues=''
               onChange={(value, all) => {
                 const index = all.index;
+                setOcultarAgregar1(false);
                 setCompraIndex(index);
-                onChangeCompra(index);
+                onChangeCompraVenta(index);
               }}
             >
               {compras.map((compra, index) => {
@@ -966,10 +1042,20 @@ const Index = () => {
             style={{ width: '100%' }}
             placeholder='Justifica una salida por venta a cliente'
             initialvalues=''
+            onChange={(value, all) => {
+              const index = all.index;
+              setOcultarAgregar2(false);
+              setVentaIndex(index);
+              onChangeCompraVenta(index);
+            }}
           >
-            {ventas.map((venta) => {
+            {ventas.map((venta, index) => {
               return (
-                <Option key={venta.no_venta} value={venta.no_venta}>
+                <Option
+                  key={venta.no_venta}
+                  value={venta.no_venta}
+                  index={index}
+                >
                   <b
                     style={{
                       opacity: 0.6,
@@ -1198,24 +1284,35 @@ const Index = () => {
 
         <TextLabel title='Productos' />
         <Form.Item>
-          {concepto === 'Compra' ? (
+          {concepto === 'Compra' || concepto === 'Venta' ? (
             <>
               <Button
                 type='default'
-                onClick={() => onChangeCompra(compraIndex)}
+                onClick={() =>
+                  onChangeCompraVenta(
+                    concepto === 'Compra' ? compraIndex : ventaIndex
+                  )
+                }
+                disabled={
+                  concepto === 'Compra' ? ocultarAgregar1 : ocultarAgregar2
+                }
               >
                 <CaretDownFilled />
-                Agregar todos de la compra
+                {concepto === 'Compra'
+                  ? 'Agregar todos los productos de la compra'
+                  : 'Agregar todos los productos de la venta'}
               </Button>
-              <Link to='/productos-comprados'>
-                <Button
-                  type='default'
-                  icon={<ShoppingOutlined />}
-                  style={{ marginLeft: 16 }}
-                >
-                  Ver productos comprados
-                </Button>
-              </Link>
+              {concepto === 'Compra' ? (
+                <Link to='/productos-comprados'>
+                  <Button
+                    type='default'
+                    icon={<ShoppingOutlined />}
+                    style={{ marginLeft: 16 }}
+                  >
+                    Ver productos comprados
+                  </Button>
+                </Link>
+              ) : null}
             </>
           ) : (
             <Search
@@ -1241,7 +1338,8 @@ const Index = () => {
             }}
             bordered
             expandable={{
-              expandIconColumnIndex: concepto === 'Compra' ? 2 : 3,
+              expandIconColumnIndex:
+                concepto === 'Compra' || concepto === 'Venta' ? 2 : 3,
               expandedRowRender: (record) => (
                 <div style={{ margin: 0 }}>
                   <Title level={5}>Series</Title>
