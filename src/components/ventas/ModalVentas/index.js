@@ -6,6 +6,8 @@ const { Option } = Select;
 
 const Index = ({ visible, venta, hideModal }) => {
   const [productos, setProductos] = useState([]);
+  const [productosVentas, setProductosVentas] = useState([]);
+
   const breakpoint = useBreakpoint();
 
   const onSetDato = (dato, setDato) => {
@@ -13,13 +15,13 @@ const Index = ({ visible, venta, hideModal }) => {
   };
 
   useEffect(() => {
-    console.log(venta?.id_cliente);
     let productosIngresar = [];
+    let productosVentas = [];
     venta?.movimientos_almacen?.forEach((movimiento) => {
       movimiento?.productos_movimiento.forEach((producto) => {
         productosIngresar.push({
           id: producto.id,
-          descripcion: producto.codigo_producto.descripcion,
+          descripcion: producto.titulo,
           codigo: producto.codigo,
           almacen: movimiento.clave_almacen,
           cantidad: producto.cantidad,
@@ -27,7 +29,19 @@ const Index = ({ visible, venta, hideModal }) => {
         });
       });
     });
+    venta?.productos_venta?.forEach((producto) => {
+      productosVentas.push({
+        id: producto.id,
+        descripcion: producto.descripcion,
+        codigo: producto.codigo,
+        cantidad: producto.cantidad,
+        cantidad_entregada: producto.cantidad_entregada,
+        total: '$' + (producto.importe - producto.descuento + producto.iva),
+        series: producto.series_producto_venta,
+      });
+    });
     onSetDato(productosIngresar, setProductos);
+    onSetDato(productosVentas, setProductosVentas);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [venta]);
 
@@ -40,7 +54,7 @@ const Index = ({ visible, venta, hideModal }) => {
     {
       title: 'Cod.',
       dataIndex: 'codigo',
-      width: 50,
+      width: 100,
     },
     {
       title: 'Descripción',
@@ -64,14 +78,69 @@ const Index = ({ visible, venta, hideModal }) => {
         if (record.series.length !== 0) {
           return (
             <Select
-              showSearch
               style={{ width: '100%' }}
-              placeholder='Concepto'
+              placeholder='Serie'
               optionFilterProp='children'
             >
               {record?.series?.map((serie, indx) => (
-                <Option key={indx} value={serie.id}>
-                  {serie.serie}
+                <Option key={indx} value={serie}>
+                  {serie}
+                </Option>
+              ))}
+            </Select>
+          );
+        } else {
+          return null;
+        }
+      },
+    },
+  ];
+
+  const columnsVentas = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      width: 50,
+    },
+    {
+      title: 'Cod.',
+      dataIndex: 'codigo',
+      width: 100,
+    },
+    {
+      title: 'Descripción',
+      dataIndex: 'descripcion',
+    },
+    {
+      title: 'Cantidad',
+      dataIndex: 'cantidad',
+      width: 100,
+    },
+    {
+      title: 'Cantidad Entregada',
+      dataIndex: 'cantidad_entregada',
+      width: 100,
+    },
+    {
+      title: 'Total',
+      dataIndex: 'total',
+      width: 100,
+    },
+    {
+      title: 'Series',
+      dataIndex: 'series',
+      width: 250,
+      render: (_, record) => {
+        if (record.series.length !== 0) {
+          return (
+            <Select
+              style={{ width: '100%' }}
+              placeholder='Serie'
+              optionFilterProp='children'
+            >
+              {record?.series?.map((serie, indx) => (
+                <Option key={indx} value={serie}>
+                  {serie}
                 </Option>
               ))}
             </Select>
@@ -121,10 +190,24 @@ const Index = ({ visible, venta, hideModal }) => {
           title='Sucursal'
           subtitle={`${venta?.rfc_vendedor?.sucursal}`}
         />
+        <TextLabel title='Productos de venta' />
+        <Table
+          key='1'
+          columnWidth='10px'
+          bordered
+          scroll={{ x: 1000, y: 600 }}
+          dataSource={productosVentas}
+          columns={columnsVentas}
+          rowClassName='editable-row'
+          /*pagination={{
+          onChange: cancel,
+        }}*/
+        />
         {productos.length !== 0 ? (
           <div>
-            <TextLabel title='Productos con series' />
+            <TextLabel title='Movimientos Realizados' />
             <Table
+              key='2'
               columnWidth='10px'
               bordered
               scroll={{ x: 1000, y: 600 }}
