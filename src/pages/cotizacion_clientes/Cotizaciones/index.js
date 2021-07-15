@@ -29,7 +29,7 @@ const Index = () => {
       />
       <br />
       <Link to='/cotizacion-cliente/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Nueva Cotización
         </Button>
       </Link>
