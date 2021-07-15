@@ -44,7 +44,7 @@ const Index = () => {
       )
       .then((result) => {
         if (result.data.data.cliente.length === 0) {
-          onSetDatos([{}], setUsuario);
+          onSetDatos([{ domicilios_cliente: [{}] }], setUsuario);
           onSetDatos(false, setBloquear);
         } else {
           onSetDatos(result.data.data.cliente, setUsuario);
@@ -52,7 +52,7 @@ const Index = () => {
         }
       })
       .catch(() => {
-        onSetDatos([{}], setUsuario);
+        onSetDatos([{ domicilios_cliente: [{}] }], setUsuario);
         onSetDatos(false, setBloquear);
       });
   }, []);
@@ -206,7 +206,10 @@ const Index = () => {
         rfc: dato.rfc,
         nombres: dato.nombre_comercial,
         razon_social: dato.razon_social,
-        cp: dato.domicilios_cliente[0].cp,
+        cp:
+          dato?.domicilios_cliente !== undefined
+            ? dato?.domicilios_cliente[0]?.cp
+            : '',
       }}
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
@@ -316,7 +319,8 @@ const Index = () => {
           <Form.Item name='razon_social' rules={calleRules}>
             <Input disabled={bloquear} maxLength={100} />
           </Form.Item>
-          {dato?.domicilios_cliente[0]?.cp !== null ? (
+          {dato?.domicilios_cliente[0]?.cp !== null &&
+          dato?.domicilios_cliente[0]?.cp !== undefined ? (
             <div>
               <TextLabel
                 title='C.P.'
@@ -325,6 +329,7 @@ const Index = () => {
             </div>
           ) : (
             <div>
+              <TextLabel title='C.P.' />
               <Form.Item name='cp' rules={cpRules}>
                 <Input />
               </Form.Item>
