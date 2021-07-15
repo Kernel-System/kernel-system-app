@@ -92,7 +92,14 @@ const ProductsTable = ({
           record.tipo_de_venta === 'Servicio' ? (
             `${descuento.toFixed(2)}%`
           ) : (
-            <>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                justifyContent: 'end',
+              }}
+            >
               <InputNumber
                 min={0}
                 max={100}
@@ -122,8 +129,8 @@ const ProductsTable = ({
                   });
                 }}
               />
-              <Text> %</Text>
-            </>
+              <Text>%</Text>
+            </div>
           )
         ) : (
           `${descuento.toFixed(2)}%`
@@ -136,8 +143,15 @@ const ProductsTable = ({
       dataIndex='precios_variables'
       render={(_, record) =>
         record.tipo_de_venta === 'Servicio' ? (
-          <>
-            <Text>$ </Text>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              justifyContent: 'end',
+            }}
+          >
+            <Text>$</Text>
             <InputNumber
               style={{ width: '100px' }}
               min={0}
@@ -165,7 +179,7 @@ const ProductsTable = ({
                 });
               }}
             />
-          </>
+          </div>
         ) : (
           formatPrice(calcPrecioVariable(record, nivel))
         )
