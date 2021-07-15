@@ -19,9 +19,12 @@ import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
+import moment from 'moment';
 
 const { Title } = Typography;
 const { TextArea } = Input;
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 //encargado ensamble, encargado de almacen
 
@@ -461,7 +464,7 @@ const Index = ({ match }) => {
       .then(() => history.goBack());
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     message.error('Ha sucedido un error ' + errorInfo, 5);
   };
 
@@ -475,7 +478,10 @@ const Index = ({ match }) => {
     >
       <HeadingBack
         title={`Ensamble ${match.params.id}`}
-        extra={dato.fecha_orden}
+        extra={
+          'Ordenado el ' +
+          moment(new Date(dato.fecha_orden)).format(formatoFecha)
+        }
       />
       <TextLabel title='Estado' subtitle={dato.estado} />
       <TextLabel title='Codigo del Producto' subtitle={dato.codigo_ensamble} />
@@ -488,14 +494,18 @@ const Index = ({ match }) => {
         <Row key='Row' gutter={[16, 24]} style={{ marginBottom: '10px' }}>
           <Col className='gutter-row' span={12}>
             <TextLabel
-              title='Fecha de Inicio de Ensamble'
-              subtitle={dato.fecha_inicio_ensamble}
+              title='Fecha de Inicio de ensamble'
+              subtitle={moment(new Date(dato.fecha_inicio_ensamble)).format(
+                formatoFecha
+              )}
             />
           </Col>
           <Col className='gutter-row' span={12}>
             <TextLabel
-              title='Fecha de Fin de Ensamble'
-              subtitle={dato.fecha_fin_ensamble}
+              title='Fecha de Fin de ensamble'
+              subtitle={moment(new Date(dato.fecha_fin_ensamble)).format(
+                formatoFecha
+              )}
             />
           </Col>
         </Row>
