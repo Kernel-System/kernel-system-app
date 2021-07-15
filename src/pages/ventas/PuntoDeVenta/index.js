@@ -420,9 +420,7 @@ const PuntoDeVenta = () => {
             [
               `${address.calle} No. ${address.no_ext}${
                 address.entre_calle_1 && `, entre ${address.entre_calle_1}`
-              }${address.entre_calle_2 && ` y ${address.entre_calle_2}`} Col. ${
-                address.colonia
-              } ${address.cp} ${
+              }Col. ${address.colonia} ${address.cp} ${
                 address.localidad && `- ${address.localidad}`
               }, ${address.municipio}, ${address.estado}`,
             ],

@@ -52,6 +52,8 @@ import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
+import CrearOrdenCompra from './pages/ordenesCompraProv/CrearOrden';
+import OrdenesCompra from './pages/ordenesCompraProv/Ordenes';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -255,9 +257,22 @@ const Rutas = () => {
       </PrivateRoute>
       <PrivateRoute
         allowedRoles={['encargado de compras']}
+        path='/ordenes-compra'
+        exact
+        component={OrdenesCompra}
+      />
+      {/* Ordenes de Compra */}
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/ordenes-compra/nuevo'
+        exact
+        component={CrearOrdenCompra}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
         path='/compras/registrar'
         exact
-        component={RegistrarCompra}
+        component={CrearOrdenCompra}
       />
       {/* Ensambles */}
       <PrivateRoute
