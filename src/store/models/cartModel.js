@@ -37,7 +37,7 @@ export const cartModel = {
     const existingItemId = state.cartItems.findIndex(
       (item) => item.id === payload.id
     );
-    state.cartItems[existingItemId].cantidad = parseInt(payload.cantidad);
+    state.cartItems[existingItemId].cantidad = payload.cantidad;
   }),
 
   removeCartItem: action((state, payload) => {

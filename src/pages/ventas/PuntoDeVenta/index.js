@@ -832,7 +832,7 @@ const PuntoDeVenta = () => {
               ...product,
               [campo]:
                 campo === 'precios_variables' || campo === 'precio_fijo'
-                  ? parseFloat(valor.replace(/[$]|,*/g, ''))
+                  ? parseFloat(valor)
                   : parseInt(valor),
             }
           : product
