@@ -14,3 +14,6 @@
 [data-theme='dark'] .demo-infinite-container {
   border: 1px solid #303030;
 }
+.ant-modal-body {
+  padding-top: 12px;
+}
