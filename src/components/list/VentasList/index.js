@@ -1,9 +1,10 @@
 import { EyeFilled } from '@ant-design/icons';
-import { Button, Col, List, Row, Typography, Select } from 'antd';
+import { Button, Col, List, Row, Typography, Select, Badge } from 'antd';
 import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
+import { WarningTwoTone } from '@ant-design/icons';
 import './styles.css';
 const { Option } = Select;
 const { Text } = Typography;
@@ -109,49 +110,74 @@ const Index = ({ onClickItem }) => {
         dataSource={listToShow}
         renderItem={(item) => {
           return (
-            <List.Item
-              key={item.no_venta}
-              actions={[
-                <Button
-                  icon={<EyeFilled />}
-                  onClick={() => onClickItem(item)}
-                ></Button>,
-              ]}
+            <Badge.Ribbon
+              color={item.productos_venta.map((producto, indx) => {
+                if (producto.cantidad !== producto.cantidad_entregada) {
+                  return 'red';
+                } else if (indx === item.productos_venta.length - 1) {
+                  return 'blue';
+                }
+              })}
+              style={{
+                top: -12,
+              }}
+              text={item.productos_venta.map((producto, indx) => {
+                if (producto.cantidad !== producto.cantidad_entregada) {
+                  return (
+                    <b key={indx}>
+                      <WarningTwoTone twoToneColor='orange' /> Falta entrega de
+                      producto
+                      <WarningTwoTone twoToneColor='orange' />
+                    </b>
+                  );
+                } else if (indx === item.productos_venta.length - 1) {
+                  return <b key={indx}>{'Producto entregado correctamente'}</b>;
+                }
+              })}
             >
-              <List.Item.Meta
-                title={
-                  <p
-                    onClick={() => {
-                      onClickItem(item);
-                    }}
+              <List.Item
+                key={item.no_venta}
+                actions={[
+                  <Button
+                    icon={<EyeFilled />}
+                    onClick={() => onClickItem(item)}
+                  ></Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <p
+                      onClick={() => {
+                        onClickItem(item);
+                      }}
+                      style={{
+                        cursor: 'pointer',
+                        margin: 0,
+                      }}
+                    >
+                      {`No. Venta ${item.no_venta} - Movimiento(s): ${
+                        item?.movimientos_almacen?.length !== 0
+                          ? `${item.movimientos_almacen
+                              .map((dato) => dato.id)
+                              .toString()}`
+                          : 'Sin movimiento'
+                      }`}
+                    </p>
+                  }
+                  description={`Fecha de venta: ${item.fecha_venta}`}
+                />
+                {
+                  <span
                     style={{
-                      cursor: 'pointer',
-                      margin: 0,
+                      display: 'inline',
+                      opacity: 0.8,
                     }}
                   >
-                    {`No. Venta ${item.no_venta}`}
-                  </p>
+                    <b>{`TOTAL: $${item.total}`}</b>
+                  </span>
                 }
-                description={`Fecha de venta: ${item.fecha_venta}`}
-              />
-              {
-                <span
-                  style={{
-                    display: 'inline',
-                    opacity: 0.8,
-                  }}
-                >
-                  Movimientos:{' '}
-                  {item?.movimientos_almacen?.length !== 0 ? (
-                    <b>{`${item.movimientos_almacen
-                      .map((dato) => dato.id)
-                      .toString()}`}</b>
-                  ) : (
-                    <b>Sin movimiento</b>
-                  )}
-                </span>
-              }
-            </List.Item>
+              </List.Item>
+            </Badge.Ribbon>
           );
         }}
       />
