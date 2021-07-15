@@ -4,9 +4,9 @@ import { EditFilled, WarningTwoTone } from '@ant-design/icons';
 import moment from 'moment';
 import React from 'react';
 
-const formatoCompra = 'DD MMMM YYYY, h:mm:ss a';
+const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
 
-const ProductoCompradoListItem = ({ item, index, onClickItem, editItem }) => {
+const ProductoCompradoListItem = ({ item, onClickItem, editItem }) => {
   //   console.log('rendering item [' + index + ']');
   return (
     <Badge.Ribbon
