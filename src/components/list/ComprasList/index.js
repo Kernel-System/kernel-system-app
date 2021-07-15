@@ -3,14 +3,16 @@ import { useState } from 'react';
 import Header from 'components/UI/Heading';
 import { Popconfirm, List, Typography, Button, Badge, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
-import { Row, Col } from 'antd';
+import { Grid } from 'antd';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/compras';
+import { pairOfFiltersHeader } from 'utils/gridUtils';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 import 'moment/locale/es-mx';
 import locale from 'antd/es/date-picker/locale/es_ES';
 
+const { useBreakpoint } = Grid;
 const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
 const formatoEntrega = 'DD/MM/YYYY';
 
@@ -70,51 +72,54 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
   const [proveedores, setProveedores] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
+  const screen = useBreakpoint();
+
+  const fields = [
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Buscar por proveedor:
+    </Text>,
+    <Select
+      allowClear
+      value={searchValue}
+      showSearch
+      style={{ width: '100%' }}
+      placeholder='Buscar por proveedor'
+      autoClearSearchValue={false}
+      onSearch={onSearch}
+      onChange={onChange}
+      filterOption={(input, option) => {
+        return option.children.toLowerCase().includes(input.toLowerCase());
+      }}
+    >
+      {proveedores.map((proveedor, index) => (
+        <Option key={index} value={proveedor.rfc_emisor}>
+          {proveedor.nombre_emisor}
+        </Option>
+      ))}
+    </Select>,
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Ordenar por:
+    </Text>,
+    <SortSelect
+      onChange={handleSort}
+      value={compraSort}
+      recentText='Compra más reciente'
+      oldestText='Compra más antigua'
+    />,
+  ];
+
   return (
     <>
       <Header title='Compras' />
-      <Row gutter={[16, 12]}>
-        <Col xs={24} lg={12}>
-          <Select
-            allowClear
-            value={searchValue}
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Buscar por proveedor'
-            autoClearSearchValue={false}
-            onSearch={onSearch}
-            onChange={onChange}
-            filterOption={(input, option) => {
-              return option.children
-                .toLowerCase()
-                .includes(input.toLowerCase());
-            }}
-          >
-            {proveedores.map((proveedor, index) => (
-              <Option key={index} value={proveedor.rfc_emisor}>
-                {proveedor.nombre_emisor}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Ordenar por:
-          </Text>
-        </Col>
-        <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <SortSelect
-            onChange={handleSort}
-            value={compraSort}
-            recentText='Compra más reciente'
-            oldestText='Compra más antigua'
-          />
-        </Col>
-      </Row>
+      {pairOfFiltersHeader(screen, fields)}
       <br />
       <List
         itemLayout='horizontal'
