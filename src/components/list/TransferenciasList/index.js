@@ -6,6 +6,9 @@ import { EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
+import moment from 'moment';
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = () => {
   const token = useStoreState((state) => state.user.token.access_token);
@@ -90,7 +93,9 @@ const Index = () => {
                   </p>
                 </Link>
               }
-              description={item.fecha_solicitud}
+              description={moment(new Date(item.fecha_solicitud)).format(
+                formatoFecha
+              )}
             />
             {
               <span

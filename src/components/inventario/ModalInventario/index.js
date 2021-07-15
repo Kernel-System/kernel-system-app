@@ -4,54 +4,32 @@ import { useEffect, useState } from 'react';
 
 const { Option } = Select;
 
-const Index = ({ visible, inventario, alm, hideModal }) => {
+const Index = ({ visible, inventario, hideModal }) => {
   const [producto, setProducto] = useState('');
   const [cantidad, setCantidad] = useState(1);
   const [series, setSeries] = useState([]);
 
-  const onSetDato = (dato, setDato) => {
-    console.log(dato);
-    setDato(dato);
-  };
-
   useEffect(() => {
-    if (alm === 'Todo') {
-      onSetDato(
-        inventario?.map((dato) => dato.cantidad)?.reduce((a, b) => a + b, 0),
-        setCantidad
+    if (inventario && inventario.length) {
+      setCantidad(
+        inventario.map((dato) => dato.cantidad).reduce((a, b) => a + b, 0)
       );
-      onSetDato(
-        inventario?.map((inv) => {
+      setSeries(
+        inventario.map((inv, indx) => {
           return {
-            descripcion: inv.codigo_producto.descripcion,
+            key: indx,
+            imagen: inv.codigo_producto.imagenes?.length
+              ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${inv.codigo_producto.imagenes[0].directus_files_id}`
+              : '',
             series: inv.series_inventario,
-            almacen: inv.clave_almacen,
+            almacen: inv.clave_almacen.clave,
+            sucursal: inv.clave_almacen.clave_sucursal,
             cantidad: inv.cantidad,
             id: inv.id,
           };
-        }),
-        setSeries
+        })
       );
-      onSetDato(inventario[0]?.codigo_producto?.titulo, setProducto);
-    } else {
-      onSetDato(inventario?.cantidad, setCantidad);
-      onSetDato(
-        [
-          {
-            descripcion: inventario?.codigo_producto?.descripcion,
-            imagen:
-              inventario?.codigo_producto?.imagenes?.length !== 0
-                ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${inventario?.codigo_producto?.imagenes[0].directus_files_id}`
-                : '',
-            series: inventario?.series_inventario,
-            almacen: inventario?.clave_almacen,
-            cantidad: inventario?.cantidad,
-            id: inventario?.id,
-          },
-        ],
-        setSeries
-      );
-      onSetDato(inventario?.codigo_producto?.titulo, setProducto);
+      setProducto(inventario[0]?.codigo_producto?.titulo);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventario]);
@@ -63,18 +41,16 @@ const Index = ({ visible, inventario, alm, hideModal }) => {
       width: 50,
     },
     {
-      title: 'Descripción',
-      dataIndex: 'descripcion',
-    },
-    {
       title: 'Almacén',
       dataIndex: 'almacen',
-      width: 100,
+    },
+    {
+      title: 'Sucursal',
+      dataIndex: 'sucursal',
     },
     {
       title: 'Cantidad',
       dataIndex: 'cantidad',
-      width: 100,
     },
     {
       title: 'Series',
@@ -97,7 +73,7 @@ const Index = ({ visible, inventario, alm, hideModal }) => {
             </Select>
           );
         } else {
-          return null;
+          return 'Producto sin series';
         }
       },
     },
@@ -106,33 +82,30 @@ const Index = ({ visible, inventario, alm, hideModal }) => {
   return (
     <>
       <Modal
-        title={`Producto: ${producto}`}
+        title={`${producto}`}
         centered
         visible={visible}
         onCancel={hideModal}
         width={'85%'}
         footer={null}
       >
+        <TextLabel
+          title='Descripción'
+          subtitle={
+            inventario.length && inventario[0].codigo_producto?.descripcion
+          }
+        />
         <TextLabel title='Cantidad Total' subtitle={cantidad} />
-        <TextLabel title='Productos con series' />
+        <TextLabel title='Inventario' />
         <Table
-          columnWidth='10px'
           bordered
-          scroll={{ x: 1000, y: 600 }}
           dataSource={series}
           columns={columns}
           rowClassName='editable-row'
-          /*pagination={{
-          onChange: cancel,
-        }}*/
         />
       </Modal>
     </>
   );
 };
-
-//        <BoughtProductsListWithSeries products={series} />
-
-//
 
 export default Index;

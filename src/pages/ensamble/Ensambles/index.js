@@ -6,7 +6,7 @@ import { useStoreState } from 'easy-peasy';
 import { useQuery } from 'react-query';
 import { getUserRole } from 'api/auth';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Index = () => {
   const token = useStoreState((state) => state.user.token.access_token);
@@ -25,14 +25,12 @@ const Index = () => {
   return (
     <div>
       <Title level={3}>Órdenes de Ensamble</Title>
-      <Text>Ordenar por Estado:</Text>
-      <br />
       <EnsambleList putToken={putToken} />
       <br />
       <Link to='/ensambles/nuevo'>
         <Button
           type='primary'
-          size='large'
+          size='default'
           icon={<PlusOutlined />}
           disabled={!ChangeVisible() ? true : false}
         >

@@ -1,11 +1,17 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { List, Input, Button, Row, Col, Typography } from 'antd';
+import { List, Input, Button, Row, Col, Typography, Grid } from 'antd';
 import { EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { useStoreState } from 'easy-peasy';
+import { pairOfFiltersHeader } from 'utils/gridUtils';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
+import moment from 'moment';
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
+
+const { useBreakpoint } = Grid;
 const { Text } = Typography;
 
 const Index = ({ onClickItem }) => {
@@ -54,44 +60,39 @@ const Index = ({ onClickItem }) => {
     return result;
   });
 
+  const screen = useBreakpoint();
+
+  const fields = [
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Filtrar por Nombre:
+    </Text>,
+    <Input.Search
+      onChange={onSearchChange}
+      placeholder='Buscar por nombre de cliente'
+      value={searchValue}
+    />,
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Ordenar por:
+    </Text>,
+    <SortSelect
+      onChange={handleSort}
+      value={sortValue}
+      recentText='Más reciente'
+      oldestText='Más antiguo'
+    />,
+  ];
+
   return (
     <>
-      <Row gutter={[16, 12]}>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Filtrar por Nombre:
-          </Text>
-        </Col>
-        <Col xs={24} lg={12}>
-          <Input.Search
-            onChange={onSearchChange}
-            placeholder='Buscar por nombre de cliente'
-            value={searchValue}
-          />
-        </Col>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Ordenar por:
-          </Text>
-        </Col>
-        <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <SortSelect
-            onChange={handleSort}
-            value={sortValue}
-            recentText='Más reciente'
-            oldestText='Más antiguo'
-          />
-        </Col>
-      </Row>
-      <br />
+      {pairOfFiltersHeader(screen, fields)}
       <List
         itemLayout='horizontal'
         size='default'
@@ -124,7 +125,7 @@ const Index = ({ onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {`Folio : ${item.folio}`}
+                    {`Folio ${item.folio} - ${item.concepto}`}
                   </p>
                 }
                 description={`${item.nombre_cliente} - ${item.empresa}`}
@@ -136,7 +137,10 @@ const Index = ({ onClickItem }) => {
                     opacity: 0.8,
                   }}
                 >
-                  Fecha: <b>{item.fecha_creacion}</b>
+                  Vigencia:{' '}
+                  <b>
+                    {moment(new Date(item.fecha_vigencia)).format(formatoFecha)}
+                  </b>
                 </span>
               }
             </List.Item>

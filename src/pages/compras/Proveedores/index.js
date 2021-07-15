@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Modal, message } from 'antd';
+import { Button, Modal, message, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
@@ -73,16 +73,18 @@ const Index = (props) => {
         onConfirmDelete={onConfirmDelete}
       ></ListaProveedores>
       <br />
-      <Link to='/proveedores/nuevo'>
-        <Button type='primary' icon={<PlusOutlined />}>
-          Añadir Nuevo Proveedor
-        </Button>
-      </Link>
-      <CsvReader
-        hideMessage
-        onSuccess={importarProveedores}
-        text='Importar desde archivo .csv'
-      ></CsvReader>
+      <Space>
+        <Link to='/proveedores/nuevo'>
+          <Button type='primary' icon={<PlusOutlined />}>
+            Añadir Nuevo Proveedor
+          </Button>
+        </Link>
+        <CsvReader
+          hideMessage
+          onSuccess={importarProveedores}
+          text='Importar desde archivo .csv'
+        ></CsvReader>
+      </Space>
       <Modal
         title={listElement.razon_social}
         visible={isModalVisible}

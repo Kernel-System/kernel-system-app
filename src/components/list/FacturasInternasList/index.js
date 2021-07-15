@@ -2,11 +2,11 @@ import './styles.css';
 import { useState } from 'react';
 import { useStoreState } from 'easy-peasy';
 import Header from 'components/UI/Heading';
-import { Popconfirm, List, Typography, Button, Select } from 'antd';
+import { Popconfirm, List, Typography, Button, Select, Grid } from 'antd';
 import { DeleteFilled, EyeFilled } from '@ant-design/icons';
-import { Row, Col } from 'antd';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/ventas/facturas_internas';
+import { pairOfFiltersHeader } from 'utils/gridUtils';
 import {
   tiposDeComprobante,
   usosCfdi,
@@ -15,8 +15,9 @@ import {
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 
-const formatoFecha = 'DD MMMM YYYY, h:mm:ss a';
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
+const { useBreakpoint } = Grid;
 const { Text } = Typography;
 const { Option } = Select;
 
@@ -80,52 +81,54 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
   const [clientes, setClientes] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
+  const screen = useBreakpoint();
+
+  const fields = [
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Buscar por cliente:
+    </Text>,
+    <Select
+      allowClear
+      value={searchValue}
+      showSearch
+      style={{ width: '100%' }}
+      placeholder='Buscar por cliente'
+      autoClearSearchValue={false}
+      onSearch={onSearch}
+      onChange={onChange}
+      filterOption={(input, option) => {
+        return option.children.toLowerCase().includes(input.toLowerCase());
+      }}
+    >
+      {clientes.map((proveedor, index) => (
+        <Option key={index} value={proveedor.rfc}>
+          {proveedor.razon_social}
+        </Option>
+      ))}
+    </Select>,
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Ordenar por:
+    </Text>,
+    <SortSelect
+      onChange={handleSort}
+      value={sortValue}
+      recentText='Más reciente'
+      oldestText='Más antiguo'
+    />,
+  ];
+
   return (
     <>
       <Header title='Facturas internas' />
-      <Row gutter={[16, 12]}>
-        <Col xs={24} lg={12}>
-          <Select
-            allowClear
-            value={searchValue}
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Buscar por cliente'
-            autoClearSearchValue={false}
-            onSearch={onSearch}
-            onChange={onChange}
-            filterOption={(input, option) => {
-              return option.children
-                .toLowerCase()
-                .includes(input.toLowerCase());
-            }}
-          >
-            {clientes.map((proveedor, index) => (
-              <Option key={index} value={proveedor.rfc}>
-                {proveedor.razon_social}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Ordenar por:
-          </Text>
-        </Col>
-        <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <SortSelect
-            onChange={handleSort}
-            value={sortValue}
-            recentText='Más reciente'
-            oldestText='Más antiguo'
-          />
-        </Col>
-      </Row>
-      <br />
+      {pairOfFiltersHeader(screen, fields)}
       <List
         itemLayout='horizontal'
         size='default'

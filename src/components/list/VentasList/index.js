@@ -1,13 +1,20 @@
-import { EyeFilled } from '@ant-design/icons';
-import { Button, Col, List, Row, Typography, Select, Badge } from 'antd';
+import './styles.css';
+import { EyeFilled, PlusOutlined } from '@ant-design/icons';
+import { Button, Col, List, Row, Typography, Select, Grid, Badge } from 'antd';
+import { Link } from 'react-router-dom';
 import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
+import { contentCol } from 'utils/gridUtils';
 import { WarningTwoTone } from '@ant-design/icons';
-import './styles.css';
+import moment from 'moment';
+
 const { Option } = Select;
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = ({ onClickItem }) => {
   const [sucursales, setSucursales] = useState([]);
@@ -62,10 +69,11 @@ const Index = ({ onClickItem }) => {
   const [searchValue, setSearchValue] = useState('Todo');
   const [listToShow, setListToShow] = useState([]);
 
-  //
+  const screen = useBreakpoint();
+
   return (
     <>
-      <Row gutter={[16, 12]}>
+      <Row gutter={[10, 12]} style={{ marginBottom: 10 }}>
         <Col>
           <Text
             style={{
@@ -75,7 +83,7 @@ const Index = ({ onClickItem }) => {
             Filtrar por Sucursal:
           </Text>
         </Col>
-        <Col xs={24} lg={12}>
+        <Col {...contentCol(screen, 'auto')}>
           <Select
             style={{ width: '100%' }}
             placeholder='Seleccionar una Sucursal'
@@ -97,7 +105,6 @@ const Index = ({ onClickItem }) => {
           </Select>
         </Col>
       </Row>
-      <br />
       <List
         itemLayout='horizontal'
         size='default'
@@ -164,7 +171,9 @@ const Index = ({ onClickItem }) => {
                       }`}
                     </p>
                   }
-                  description={`Fecha de venta: ${item.fecha_venta}`}
+                  description={`Fecha de venta: ${moment(
+                    new Date(item.fecha_venta)
+                  ).format(formatoFecha)}`}
                 />
                 {
                   <span
@@ -181,6 +190,11 @@ const Index = ({ onClickItem }) => {
           );
         }}
       />
+      <Link to='/venta'>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
+          Añadir nueva venta
+        </Button>
+      </Link>
     </>
   );
 };

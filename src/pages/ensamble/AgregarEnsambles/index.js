@@ -17,6 +17,7 @@ import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -218,7 +219,7 @@ const Index = () => {
     console.log('Success:', list);
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
@@ -319,10 +320,23 @@ const Index = () => {
           }}
         >
           {almacenes.map((almacen) => (
-            <Option
-              value={almacen.clave}
-              key={almacen.clave}
-            >{`${almacen.clave} : ${almacen.clave_sucursal} `}</Option>
+            <Option value={almacen.clave} key={almacen.clave}>
+              <b
+                style={{
+                  opacity: 0.6,
+                }}
+              >
+                {almacen.clave}
+              </b>
+              : de sucursal{' '}
+              <b
+                style={{
+                  opacity: 0.6,
+                }}
+              >
+                {almacen.clave_sucursal}
+              </b>
+            </Option>
           ))}
         </Select>
       </Form.Item>

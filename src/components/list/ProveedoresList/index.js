@@ -1,11 +1,24 @@
 import './styles.css';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Select } from 'antd';
+import {
+  Popconfirm,
+  List,
+  Button,
+  Row,
+  Col,
+  Select,
+  Grid,
+  Typography,
+} from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/compras/proveedores';
 import { regimenesFiscales } from 'utils/facturas/catalogo';
+import { contentCol } from 'utils/gridUtils';
+
 const { Option } = Select;
+const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
   const [searchValue, setSearchValue] = useState(null);
@@ -39,30 +52,46 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
   });
   const [listToShow, setListToShow] = useState([]);
 
+  const screen = useBreakpoint();
+
   return (
     <>
-      <Select
-        allowClear
-        value={searchValue}
-        showSearch
-        style={{ width: '100%' }}
-        placeholder='Buscar por proveedor'
-        autoClearSearchValue={false}
-        onSearch={onSearch}
-        onChange={onChange}
-        filterOption={(input, option) => {
-          return option.children.toLowerCase().includes(input.toLowerCase());
-        }}
-      >
-        {list
-          ? list.map((proveedor, index) => (
-              <Option key={index} value={proveedor.rfc}>
-                {proveedor.razon_social}
-              </Option>
-            ))
-          : []}
-      </Select>
-      <br />
+      <Row gutter={[10, 12]}>
+        <Col>
+          <Text
+            style={{
+              verticalAlign: 'sub',
+            }}
+          >
+            Buscar por proveedor:
+          </Text>
+        </Col>
+        <Col {...contentCol(screen, 'auto')}>
+          <Select
+            allowClear
+            value={searchValue}
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Buscar por proveedor'
+            autoClearSearchValue={false}
+            onSearch={onSearch}
+            onChange={onChange}
+            filterOption={(input, option) => {
+              return option.children
+                .toLowerCase()
+                .includes(input.toLowerCase());
+            }}
+          >
+            {list
+              ? list.map((proveedor, index) => (
+                  <Option key={index} value={proveedor.rfc}>
+                    {proveedor.razon_social}
+                  </Option>
+                ))
+              : []}
+          </Select>
+        </Col>
+      </Row>
       <List
         itemLayout='horizontal'
         size='default'

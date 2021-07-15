@@ -1,3 +1,4 @@
+import './styles.css';
 import { InboxOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -976,90 +977,97 @@ const Index = ({ tipo }) => {
           </Row>
         </div>
       ) : null}
-      {tipo !== 'agregar' ? (
-        <div>
-          <TextLabel
-            title='Imágenes'
-            subtitle='Da clic sobre la imágen para eliminarla.'
-          />
-          <Image.PreviewGroup style={{ width: '100%' }}>
-            {dato.imagenes.map((imagen) => {
-              return (
-                <Image
-                  width={100}
-                  key={imagen.directus_files_id}
-                  style={{ marginRight: '5px' }}
-                  preview={false}
-                  onClick={() => {
-                    http
-                      .delete(
-                        `/items/productos_directus_files/${imagen.id}`,
-                        putToken
-                      )
-                      .then(() => {
+      <div>
+        <TextLabel
+          title='Imágenes'
+          subtitle={
+            tipo === 'mostrar' || tipo === 'agregar'
+              ? undefined
+              : 'Presione Shift + Clic sobre la imágen para eliminarla.'
+          }
+        />
+        <Image.PreviewGroup style={{ width: '100%' }}>
+          {dato.imagenes?.length
+            ? dato.imagenes.map((imagen) => {
+                return (
+                  <Image
+                    width={100}
+                    key={imagen.directus_files_id}
+                    style={{ marginRight: '5px' }}
+                    preview={tipo === 'mostrar'}
+                    className={tipo !== 'mostrar' ? 'img-hover' : undefined}
+                    onClick={(e) => {
+                      if (tipo !== 'mostrar' && e.shiftKey) {
                         http
                           .delete(
-                            `/files/${imagen.directus_files_id}`,
+                            `/items/productos_directus_files/${imagen.id}`,
                             putToken
                           )
                           .then(() => {
-                            setAgregarIma(!agregarIma);
-                            message.success('Imágen eliminada con exito');
+                            http
+                              .delete(
+                                `/files/${imagen.directus_files_id}`,
+                                putToken
+                              )
+                              .then(() => {
+                                setAgregarIma(!agregarIma);
+                                message.success('Imágen eliminada con exito');
+                              });
+                          })
+                          .catch(() => {
+                            message.error('Error al eliminar la imágen :c');
                           });
-                      })
-                      .catch(() => {
-                        message.error('Error al eliminar la imágen :c');
-                      });
-                  }}
-                  src={`${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagen.directus_files_id}`}
-                  //preview={false}
-                />
-              );
-            })}
-          </Image.PreviewGroup>
-          {tipo !== 'mostrar' ? (
-            <Dragger
-              action={`${process.env.REACT_APP_DIRECTUS_API_URL}/files`}
-              headers={{
-                Authorization: `Bearer ${token}`,
-                'X-Requested-With': null,
-              }}
-              name='file'
-              listType='picture-card'
-              onChange={(info) => {
-                if (info?.file?.response?.data?.id !== undefined) {
-                  http
-                    .post(
-                      `/items/productos_directus_files`,
-                      {
-                        productos_codigo: dato.codigo,
-                        directus_files_id: info?.file?.response?.data?.id,
-                      },
-                      putToken
-                    )
-                    .then((result) => {
-                      setAgregarIma(!agregarIma);
-                      message.success('Imagen subida con exito');
-                    })
-                    .catch(() => {
-                      message.error('Error al subir la imagen :c');
-                    });
-                }
-              }}
-              maxCount={1}
-              beforeUpload={beforeUpload}
-            >
-              <p className='ant-upload-drag-icon'>
-                <InboxOutlined />
-              </p>
-              <p className='ant-upload-text'>Haz clic o arrastre el archivo</p>
-            </Dragger>
-          ) : null}
+                      }
+                    }}
+                    src={`${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${imagen.directus_files_id}`}
+                  />
+                );
+              })
+            : null}
+        </Image.PreviewGroup>
+      </div>
+      {tipo !== 'mostrar' ? (
+        <>
+          <Dragger
+            action={`${process.env.REACT_APP_DIRECTUS_API_URL}/files`}
+            headers={{
+              Authorization: `Bearer ${token}`,
+              'X-Requested-With': null,
+            }}
+            showUploadList={tipo === 'agregar'}
+            name='file'
+            listType='picture-card'
+            onChange={(info) => {
+              if (info?.file?.response?.data?.id !== undefined) {
+                http
+                  .post(
+                    `/items/productos_directus_files`,
+                    {
+                      productos_codigo: dato.codigo,
+                      directus_files_id: info?.file?.response?.data?.id,
+                    },
+                    putToken
+                  )
+                  .then((result) => {
+                    setAgregarIma(!agregarIma);
+                    message.success('Imagen subida con exito');
+                  })
+                  .catch(() => {
+                    message.error('Error al subir la imagen :c');
+                  });
+              }
+            }}
+            maxCount={1}
+            beforeUpload={beforeUpload}
+          >
+            <p className='ant-upload-drag-icon'>
+              <InboxOutlined />
+            </p>
+            <p className='ant-upload-text'>Haz clic o arrastre el archivo</p>
+          </Dragger>
           <br />
-          <br />
-        </div>
+        </>
       ) : null}
-
       <Space
         direction='horizontal'
         align='baseline'
