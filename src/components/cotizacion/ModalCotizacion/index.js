@@ -4,6 +4,9 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { useState, useEffect } from 'react';
 import logo from 'utils/Cotizacion.png';
+import moment from 'moment';
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = ({ visible, cotizacion, setVis }) => {
   const [lista, setlista] = useState([]);
@@ -460,7 +463,9 @@ const Index = ({ visible, cotizacion, setVis }) => {
             />
             <TextLabel
               title='Fecha de Creación'
-              subtitle={cotizacion.fecha_creacion}
+              subtitle={moment(new Date(cotizacion.fecha_creacion)).format(
+                formatoFecha
+              )}
             />
             <TextLabel
               title='Porcentaje de Anticipo'
@@ -475,7 +480,9 @@ const Index = ({ visible, cotizacion, setVis }) => {
             <TextLabel title='Razón Social' subtitle={cotizacion.empresa} />
             <TextLabel
               title='Fecha de Vigencia'
-              subtitle={cotizacion.fecha_vigencia}
+              subtitle={moment(new Date(cotizacion.fecha_vigencia)).format(
+                formatoFecha
+              )}
             />
             <TextLabel
               title='Días de Entrega'
@@ -490,7 +497,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
         <Table
           columnWidth='10px'
           bordered
-          scroll={{ x: 1500, y: 600 }}
+          //   scroll={{ x: 1500, y: 600 }}
           dataSource={lista}
           columns={mergedColumns}
           rowClassName='editable-row'
@@ -508,14 +515,14 @@ const Index = ({ visible, cotizacion, setVis }) => {
           <Col className='gutter-row' key='col21' span={8}>
             <TextLabel
               title='SUBTOTAL'
-              subtitle={cotizacion.total - cotizacion.iva}
+              subtitle={`$${cotizacion.total - cotizacion.iva}`}
             />
           </Col>
           <Col className='gutter-row' span={8} key='col22'>
-            <TextLabel title='IVA' subtitle={cotizacion.iva} />
+            <TextLabel title='IVA' subtitle={`$${cotizacion.iva}`} />
           </Col>
           <Col className='gutter-row' span={8} key='col23'>
-            <TextLabel title='TOTAL' subtitle={cotizacion.total} />
+            <TextLabel title='TOTAL' subtitle={`$${cotizacion.total}`} />
           </Col>
         </Row>
         <Button
