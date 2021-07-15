@@ -1,12 +1,19 @@
-import { EyeFilled } from '@ant-design/icons';
-import { Button, Col, List, Row, Typography, Select } from 'antd';
+import './styles.css';
+import { EyeFilled, PlusOutlined } from '@ant-design/icons';
+import { Button, Col, List, Row, Typography, Select, Grid, Badge } from 'antd';
+import { Link } from 'react-router-dom';
 import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
 import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
-import './styles.css';
+import { contentCol } from 'utils/gridUtils';
+import moment from 'moment';
+
 const { Option } = Select;
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = ({ onClickItem }) => {
   const [sucursales, setSucursales] = useState([]);
@@ -61,10 +68,11 @@ const Index = ({ onClickItem }) => {
   const [searchValue, setSearchValue] = useState('Todo');
   const [listToShow, setListToShow] = useState([]);
 
-  //
+  const screen = useBreakpoint();
+
   return (
     <>
-      <Row gutter={[16, 12]}>
+      <Row gutter={[10, 12]} style={{ marginBottom: 10 }}>
         <Col>
           <Text
             style={{
@@ -74,7 +82,7 @@ const Index = ({ onClickItem }) => {
             Filtrar por Sucursal:
           </Text>
         </Col>
-        <Col xs={24} lg={12}>
+        <Col {...contentCol(screen, 'auto')}>
           <Select
             style={{ width: '100%' }}
             placeholder='Seleccionar una Sucursal'
@@ -96,7 +104,6 @@ const Index = ({ onClickItem }) => {
           </Select>
         </Col>
       </Row>
-      <br />
       <List
         itemLayout='horizontal'
         size='default'
@@ -129,10 +136,12 @@ const Index = ({ onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {`No. Venta ${item.no_venta}`}
+                    {`Cliente: ${item.no_venta}`}
                   </p>
                 }
-                description={`Fecha de venta: ${item.fecha_venta}`}
+                description={`Fecha de venta: ${moment(
+                  new Date(item.fecha_venta)
+                ).format(formatoFecha)}`}
               />
               {
                 <span
@@ -141,20 +150,18 @@ const Index = ({ onClickItem }) => {
                     opacity: 0.8,
                   }}
                 >
-                  Movimientos:{' '}
-                  {item?.movimientos_almacen?.length !== 0 ? (
-                    <b>{`${item.movimientos_almacen
-                      .map((dato) => dato.id)
-                      .toString()}`}</b>
-                  ) : (
-                    <b>Sin movimiento</b>
-                  )}
+                  <b>{`Total: $${item.total}`}</b>
                 </span>
               }
             </List.Item>
           );
         }}
       />
+      <Link to='/venta'>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
+          Añadir nueva venta
+        </Button>
+      </Link>
     </>
   );
 };
