@@ -75,6 +75,8 @@ const Index = () => {
   const [visible, setVisible] = useState(false);
   const [productos, setProductos] = useState([]);
   const [listToShow, setListProductsToShow] = useState([]);
+  const [empleado, setEmpleado] = useState([]);
+
   const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
   const [form] = Form.useForm();
 
@@ -103,6 +105,9 @@ const Index = () => {
       .then((result) => {
         onSetArreglo(result.data.data, setAlmacenes);
       });
+    http.get(`/users/me?fields=empleado.*`, putToken).then((result) => {
+      onSetArreglo(result.data.data, setEmpleado);
+    });
   }, []);
 
   const onSetArreglo = (lista, asignar) => {
@@ -487,6 +492,7 @@ const Index = () => {
           comentario: datos.diagnostico,
           devolucion_clientes: devolucion.id,
           clave_almacen: almacen.clave,
+          rfc_empleado: empleado.rfc,
           mostrar: true,
         },
         putToken
