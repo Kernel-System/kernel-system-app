@@ -41,7 +41,7 @@ const SolicitudesCompraList = ({ solicitudes }) => {
             ]}
           >
             <List.Item.Meta
-              title={`#${solicitud.id} - ${solicitud.id_cliente.nombre_comercial}`}
+              title={`No. ${solicitud.id} - ${solicitud.id_cliente.nombre_comercial}`}
               description={formatDateTime(solicitud.fecha_solicitud, 'long')}
             />
           </List.Item>
