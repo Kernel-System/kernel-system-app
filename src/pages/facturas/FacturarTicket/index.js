@@ -105,8 +105,8 @@ const Index = () => {
                 ExpeditionPlace:
                   result_venta.data.data.rfc_vendedor.sucursal.cp,
                 CfdiType: 'I',
-                PaymentForm: result_venta.data.data.metodo_pago,
-                PaymentMethod: result_venta.data.data.forma_pago,
+                PaymentForm: result_venta.data.data.forma_pago,
+                PaymentMethod: result_venta.data.data.metodo_pago,
                 Receiver: {
                   Rfc: 'XAXX010101000', //values.rfc,
                   Name: values.razon_social,
@@ -121,7 +121,7 @@ const Index = () => {
                     {
                       folio: result_fac.data.Folio,
                       serie: result_fac.data.Serie,
-                      tipo_de_comprobante: result_fac.data.CfdiType,
+                      tipo_de_comprobante: result_fac.data.CfdiType.toUpperCase(),
                       fecha: result_fac.data.Date,
                       condiciones_de_pago: result_fac.data.PaymentTerms,
                       lugar_expedicion: result_fac.data.ExpeditionPlace,
@@ -135,7 +135,7 @@ const Index = () => {
                       uso_cfdi: values.cfdi,
                       //total_inpuestos_translados:"",
                       //total_impuestos_retenidos:"",
-                      tipo_relacion: '',
+                      tipo_relacion: '03',
                       uuid: result_fac.data.Complement.TaxStamp.Uuid,
                       fecha_timbrado: result_fac.data.Complement.TaxStamp.Date,
                       no_certificado_sat:
@@ -150,37 +150,29 @@ const Index = () => {
                       rfc_prov_cert:
                         result_fac.data.Complement.TaxStamp.RfcProvCertif,
                       id_api: result_fac.data.Id,
+                      ventas: values.no_ticket,
                     },
                     putToken
                   )
                   .then((result_fac_int) => {
-                    http
-                      .patch(`/items/ventas/${values.no_ticket}`, {
-                        factura: result_fac_int.data.data.id,
-                      })
-                      .then(() => {
+                    httpSAT
+                      .get(`/cfdi/pdf/issued/${result_fac.data.Id}`)
+                      .then((result) => {
+                        const linkSource =
+                          'data:application/pdf;base64,' + result.data.Content;
+                        const downloadLink = document.createElement('a');
+                        const fileName = `${result_fac.data.Id}.pdf`;
+                        downloadLink.href = linkSource;
+                        downloadLink.download = fileName;
+                        downloadLink.click();
                         httpSAT
-                          .get(`/cfdi/pdf/issued/${result_fac.data.Id}`)
-                          .then((result) => {
-                            const linkSource =
-                              'data:application/pdf;base64,' +
-                              result.data.Content;
-                            const downloadLink = document.createElement('a');
-                            const fileName = `${result_fac.data.Id}.pdf`;
-                            downloadLink.href = linkSource;
-                            downloadLink.download = fileName;
-                            downloadLink.click();
-                            httpSAT
-                              .post(
-                                `/cfdi?cfdiType=${'issued'}&cfdiId=${
-                                  result_fac.data.Id
-                                }&email=${values.correo}`
-                              )
-                              .then(() => {
-                                message.success(
-                                  'Factura Registrada con éxito.'
-                                );
-                              });
+                          .post(
+                            `/cfdi?cfdiType=${'issued'}&cfdiId=${
+                              result_fac.data.Id
+                            }&email=${values.correo}`
+                          )
+                          .then(() => {
+                            message.success('Factura Registrada con éxito.');
                           });
                       });
                   });

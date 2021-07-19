@@ -140,7 +140,7 @@ const Index = () => {
             {
               folio: result.data.Folio,
               serie: result.data.Serie,
-              tipo_de_comprobante: result.data.CfdiType,
+              tipo_de_comprobante: result.data.CfdiType.toUpperCase(),
               fecha: result.data.Date,
               condiciones_de_pago: result.data.PaymentTerms,
               lugar_expedicion: result.data.ExpeditionPlace,

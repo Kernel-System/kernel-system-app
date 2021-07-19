@@ -11,7 +11,6 @@ import {
   Radio,
   Row,
   Space,
-  Spin,
   Typography,
 } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -51,7 +50,6 @@ const PuntoDeVenta = () => {
   const token = useStoreState((state) => state.user.token.access_token);
   const [puntoDeVentaProducts, setPuntoDeVentaProducts] = useState([]);
   const [nivel, setNivel] = useState(1);
-  const [spin, setSpin] = useState(false);
   const [productQuery, setProductQuery] = useState(undefined);
   const [serviceQuery, setServiceQuery] = useState(undefined);
   const [tipoComprobante, setTipoComprobante] = useState('ticket');
@@ -149,7 +147,7 @@ const PuntoDeVenta = () => {
   };
 
   const handleOk = (datos) => {
-    setSpin(true);
+    const hide = message.loading('Generando Venta...', 0);
     setIsModalVisible(false);
     if (tipoComprobante === 'factura') {
       let items = [];
@@ -160,34 +158,40 @@ const PuntoDeVenta = () => {
           Description: producto.titulo,
           Unit: producto.nombre_unidad_cfdi.substring(0, 20),
           UnitCode: producto.unidad_cfdi,
-          UnitPrice: calcPrecioVariable(producto, nivel),
+          UnitPrice: calcPrecioVariable(producto, nivel).toFixed(2),
           Quantity: producto.cantidad,
-          Subtotal: calcPrecioVariable(producto, nivel) * producto.cantidad,
-          Discount:
+          Subtotal: (
+            calcPrecioVariable(producto, nivel) * producto.cantidad
+          ).toFixed(2),
+          Discount: (
             calcPrecioVariable(producto, nivel) *
             producto.cantidad *
-            (producto.descuento / 100),
+            (producto.descuento / 100)
+          ).toFixed(2),
           Taxes: [
             {
-              Total:
+              Total: (
                 calcPrecioVariable(producto, nivel) *
                 producto.cantidad *
                 (1 - producto.descuento / 100) *
-                (producto.iva / 100),
+                (producto.iva / 100)
+              ).toFixed(2),
               Name: 'IVA',
               Rate: producto.iva / 100,
-              Base:
+              Base: (
                 calcPrecioVariable(producto, nivel) *
                 producto.cantidad *
-                (1 - producto.descuento / 100),
+                (1 - producto.descuento / 100)
+              ).toFixed(2),
               IsRetention: false,
             },
           ],
-          Total:
+          Total: (
             calcPrecioVariable(producto, nivel) *
             producto.cantidad *
             (1 - producto.descuento / 100) *
-            (1 + producto.iva / 100),
+            (1 + producto.iva / 100)
+          ).toFixed(2),
         });
       });
       httpSAT
@@ -212,7 +216,7 @@ const PuntoDeVenta = () => {
               {
                 folio: result.data.Folio,
                 serie: result.data.Serie,
-                tipo_de_comprobante: result.data.CfdiType,
+                tipo_de_comprobante: result.data.CfdiType.toUpperCase(),
                 fecha: result.data.Date,
                 condiciones_de_pago: result.data.PaymentTerms,
                 lugar_expedicion: result.data.ExpeditionPlace,
@@ -229,8 +233,8 @@ const PuntoDeVenta = () => {
                 uuid: result.data.Complement.TaxStamp.Uuid,
                 fecha_timbrado: result.data.Complement.TaxStamp.Date,
                 no_certificado_sat: result.data.Complement.TaxStamp.SatSign,
-                forma_pago: formaPago,
-                metodo_pago: metodoPago,
+                forma_pago: metodoPago,
+                metodo_pago: formaPago,
                 moneda: result.data.Currency,
                 descuento: result.data.Discount,
                 subtotal: result.data.Total,
@@ -242,23 +246,27 @@ const PuntoDeVenta = () => {
               putToken
             )
             .then((result2) => {
-              ingresarVenta(datos, {
-                folio: result.data.Folio,
-                id_int: result2.data.data.id,
-                fecha: result.data.Date,
-                id: result.data.Id,
-              });
+              ingresarVenta(
+                datos,
+                {
+                  folio: result.data.Folio,
+                  id_int: result2.data.data.id,
+                  fecha: result.data.Date,
+                  id: result.data.Id,
+                },
+                hide
+              );
             });
         })
         .catch((error) => console.log(error));
     } else {
       console.log('entre');
-      ingresarVenta(datos);
+      ingresarVenta(datos, {}, hide);
     }
     //facturas_internas
   };
 
-  const ingresarVenta = (datos, factura) => {
+  const ingresarVenta = (datos, factura, hide) => {
     //venta
     const clienteInt =
       Object.keys(cliente).length !== 0 ? { id_cliente: cliente } : {};
@@ -300,10 +308,9 @@ const PuntoDeVenta = () => {
                 product.cantidad,
             0
           ),
-          metodo_pago: formaPago,
-          forma_pago: metodoPago,
+          metodo_pago: metodoPago,
+          forma_pago: formaPago,
           comentarios: 'Venta en Tienda',
-          factura: factura?.id_int,
           rfc_vendedor: empleado.rfc,
           cantidad_recibida: datos.cantidad,
           cantidad_salida: datos.cambio,
@@ -313,6 +320,13 @@ const PuntoDeVenta = () => {
         putToken
       )
       .then((result_venta) => {
+        if (Object.keys(factura).length !== 0) {
+          http.patch(
+            `/items/facturas_internas/${factura.id_int}`,
+            { ventas: result_venta.data.data.id },
+            putToken
+          );
+        }
         let productosVenta = [];
         puntoDeVentaProducts.forEach((producto) => {
           productosVenta.push({
@@ -365,11 +379,12 @@ const PuntoDeVenta = () => {
                   GenerarTicket(
                     datos,
                     result_venta.data.data.no_venta,
-                    factura
+                    factura,
+                    hide
                   );
                 });
             } else {
-              GenerarTicket(datos, result_venta.data.data.no_venta);
+              GenerarTicket(datos, result_venta.data.data.no_venta, {}, hide);
             }
           });
       });
@@ -384,7 +399,7 @@ const PuntoDeVenta = () => {
     return formatter.format(price);
   };
 
-  const GenerarTicket = async (datos, venta, factura) => {
+  const GenerarTicket = async (datos, venta, factura, hide) => {
     let factAdd = 0;
     if (tipoComprobante === 'factura') {
       factAdd = 62;
@@ -722,13 +737,12 @@ const PuntoDeVenta = () => {
     });
     //console.log(inputRef.src);
     doc.save(`Ticket_${venta}.pdf`);
-    setSpin(false);
     if (tipoComprobante === 'factura') {
       //generar factura
       httpSAT.get(`/cfdi/pdf/issued/${factura.id}`).then((result) => {
         const linkSource = 'data:application/pdf;base64,' + result.data.Content;
         const downloadLink = document.createElement('a');
-        const fileName = 'Y-cBTZ-NI21-sO98EVHYQQ2.pdf';
+        const fileName = `${factura.id}.pdf`;
         downloadLink.href = linkSource;
         downloadLink.download = fileName;
         downloadLink.click();
@@ -739,10 +753,12 @@ const PuntoDeVenta = () => {
             }`
           )
           .then((result) => {
+            hide();
             okMessage('Creación de Ticket y Factura exitosa');
           });
       });
     } else {
+      hide();
       okMessage('Creación de Ticket exitosa');
     }
   };
@@ -864,7 +880,7 @@ const PuntoDeVenta = () => {
   };
 
   return (
-    <Spin size='large' spinning={spin}>
+    <>
       <Heading
         title='Punto de venta'
         subtitle={
@@ -1026,7 +1042,7 @@ const PuntoDeVenta = () => {
           />
         </>
       )}
-    </Spin>
+    </>
   );
 };
 
