@@ -55,6 +55,9 @@ import Productos from './pages/productos/Productos';
 import CrearOrdenCompra from './pages/ordenesCompraProv/CrearOrden';
 import OrdenesCompra from './pages/ordenesCompraProv/Ordenes';
 
+import RegistrarDevolucion from './pages/devolucion_clientes/RegistrarDevolucion';
+import Devoluciones from './pages/devolucion_clientes/RegistrarDevolucion';
+
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
 const asyncLogout = asyncComponent(() => import('pages/auth/Logout'));
@@ -181,6 +184,19 @@ const Rutas = () => {
         exact
         component={Ventas}
       />
+      {/* Devolucion a clientes */}
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/devolucion-clientes/nuevo'
+        exact
+        component={RegistrarDevolucion}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de ventas']}
+        path='/devolucion-clientes'
+        exact
+        component={Devoluciones}
+      />
       {/* Cotizacion a clientes */}
       <PrivateRoute
         allowedRoles={['encargado de ventas']}
@@ -306,15 +322,15 @@ const Rutas = () => {
         component={ModificarEnsambles}
       />
       {/* Facturar ticket */}
-      <PrivateRoute
-        //lel
-        allowedRoles={['*', 'cliente']}
-        path='/facturar-ticket'
+      <GuestRoute
+        allowedRoles='*'
+        path='/facturar-ticket2'
         exact
         component={FacturarTicket}
       />
-      <GuestRoute
-        allowedRoles='*'
+      <PrivateRoute
+        //lel
+        allowedRoles={['*']}
         path='/facturar-ticket'
         exact
         component={FacturarTicket}
