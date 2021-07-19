@@ -33,3 +33,8 @@ export const getEmployeeId = (token) =>
   http.get('/users/me?fields=empleado.rfc', {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const getEmployeeSucursal = (token) =>
+  http.get('/users/me?fields=empleado.sucursal', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
