@@ -85,7 +85,14 @@ const SolicitudCompraProductsTable = ({
         title='Descuento(%)'
         dataIndex='descuento_ofrecido'
         render={(descuento_ofrecido, record) => (
-          <>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              justifyContent: 'flex-end',
+            }}
+          >
             <InputNumber
               min={0}
               max={100}
@@ -122,7 +129,7 @@ const SolicitudCompraProductsTable = ({
               }}
             />
             <Text> %</Text>
-          </>
+          </div>
         )}
       />
       <Table.Column
@@ -130,7 +137,14 @@ const SolicitudCompraProductsTable = ({
         title='Precio Unitario'
         dataIndex='precio_ofrecido'
         render={(precio_ofrecido, record) => (
-          <>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              justifyContent: 'flex-end',
+            }}
+          >
             <Text>$ </Text>
             <InputNumber
               style={{ width: '120px' }}
@@ -166,7 +180,7 @@ const SolicitudCompraProductsTable = ({
                 });
               }}
             />
-          </>
+          </div>
         )}
       />
       <Table.Column
