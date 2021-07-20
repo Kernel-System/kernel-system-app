@@ -50,7 +50,7 @@ const Index = ({ tipo }) => {
       />
       <br />
       <Link to='/admid/cliente/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Nuevo Cliente
         </Button>
       </Link>
