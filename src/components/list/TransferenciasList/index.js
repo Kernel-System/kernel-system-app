@@ -89,13 +89,13 @@ const Index = () => {
                       margin: 0,
                     }}
                   >
-                    {`Transferencia ${item.id}`}
+                    {`Transferencia del almacén ${item.almacen_origen} al almacén ${item.almacen_destino}`}
                   </p>
                 </Link>
               }
-              description={moment(new Date(item.fecha_solicitud)).format(
-                formatoFecha
-              )}
+              description={`Solicitado el ${moment(
+                new Date(item.fecha_solicitud)
+              ).format(formatoFecha)}`}
             />
             {
               <span
