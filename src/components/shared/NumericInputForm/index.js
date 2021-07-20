@@ -9,7 +9,6 @@ const Index = ({
   required = true,
   rules,
   onBlurred = () => {},
-  valueDef = '',
   enable = false,
   formato,
   paso = 1,
@@ -34,10 +33,8 @@ const Index = ({
       >
         <InputNumber
           key={`${titulo}inputnumber`}
-          //size='large'
           placeholder={placeholder}
           style={{ width: '100%' }}
-          defaultValue={valueDef}
           disabled={enable}
           onBlur={(e) => {
             onBlurred(

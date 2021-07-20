@@ -58,7 +58,7 @@ const Index = () => {
     setMail(correo);
   };
 
-  const onFinish = (dato: any) => {
+  const onFinish = (dato) => {
     console.log(dato);
     http
       .post(
@@ -106,7 +106,7 @@ const Index = () => {
       });
   };
 
-  const onFinishChange = (dato: any) => {
+  const onFinishChange = (dato) => {
     console.log(dato);
     console.log(`/users/${cliente[0].cuenta.id}`);
     http
@@ -152,7 +152,7 @@ const Index = () => {
       .then(() => history.goBack());
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
@@ -288,7 +288,7 @@ const Index = () => {
                 <Title level={5}>Extension (Opc.)</Title>
                 <NumericInputForm
                   titulo='extension'
-                  valueDef={dato.extension}
+                  //   valueDef={dato.extension}
                   min='01'
                   max='999'
                   placeholder='Extension'
@@ -300,7 +300,7 @@ const Index = () => {
                 <InputForm
                   titulo='telefono'
                   type='number'
-                  valueDef={dato.telefono}
+                  //   valueDef={dato.telefono}
                   min='1'
                   max='10'
                   placeholder='Clave'
@@ -317,7 +317,7 @@ const Index = () => {
             <Title level={5}>Whatsapp (Opcional)</Title>
             <InputForm
               titulo='telefono_2'
-              valueDef={dato.telefono_2}
+              //   valueDef={dato.telefono_2}
               type='number'
               min='1'
               max='10'
