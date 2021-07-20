@@ -45,8 +45,8 @@ export const formatDateTime = (date, dateStyle, timeStyle) =>
     timeStyle: timeStyle || 'short',
   }).format(new Date(date));
 
-export const formatPrice = (price) =>
-  new Intl.NumberFormat('en', {
+export const formatPrice = (price, locale) =>
+  new Intl.NumberFormat(locale ?? 'en', {
     style: 'currency',
     currency: 'MXN',
     currencyDisplay: 'narrowSymbol',
