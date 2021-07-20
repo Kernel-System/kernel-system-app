@@ -540,7 +540,7 @@ const Index = ({ match }) => {
             }}
             disabled={!editar}
             name='observaciones'
-            defaultValue={dato.observaciones}
+            // defaultValue={dato.observaciones}
             autoSize={{ minRows: 2, maxRows: 5 }}
             showCount
             maxLength={100}
