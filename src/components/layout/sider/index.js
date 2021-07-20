@@ -65,6 +65,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const TicketFacturarItem2 = (
+    <Menu.Item
+      key='ticket'
+      icon={<FileDoneOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/facturar-ticket2'>Facturar Ticket de Compra</Link>
+    </Menu.Item>
+  );
+
   const VentasMenuItem = (
     <Menu.Item
       key='ventas'
@@ -270,6 +280,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
           {category.categorias_id.nombre}
         </Menu.Item>
       ))}
+      {TicketFacturarItem2}
     </>
   );
 
@@ -282,10 +293,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {ProductosMenuItem}
       {SolicitudesCompraMenuItem}
       {FacturasInternasMenuItem(true)}
+      {TicketFacturarItem}
     </>
   );
 
-  const cuentasPorCobrarMenuItems = <>{CuentasMenuItem}</>;
+  const cuentasPorCobrarMenuItems = (
+    <>
+      {CuentasMenuItem}
+      {TicketFacturarItem}
+    </>
+  );
 
   const encargadoDeAlmacenMenuItems = (
     <>
@@ -294,6 +311,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {MovimientosAlmacenMenuItem}
       {TransferenciaMenuItem}
       {ProductosCompradosMenuItem(true)}
+      {TicketFacturarItem}
     </>
   );
 
@@ -303,6 +321,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {ProveedoresMenuItem}
       {ProductosMenuItem}
       {FacturasExternasMenuItem(true)}
+      {TicketFacturarItem}
     </>
   );
 
@@ -337,9 +356,9 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {FacturasSubMenu}
             {AnunciosMenuItem}
             {SolicitudesCompraMenuItem}
+            {TicketFacturarItem}
           </>
         )}
-        {TicketFacturarItem}
       </Menu>
     </Sider>
   );

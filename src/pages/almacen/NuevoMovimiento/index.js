@@ -730,8 +730,12 @@ const Index = () => {
         producto.series.splice(cantidad - 2, value);
       }
       producto.cantidad = value;
-      setListProducts(newData);
-      setListProducts(newData);
+      let newProduct = [];
+      newData.forEach((prod) => {
+        prod.key === key ? newProduct.push(producto) : newProduct.push(prod);
+      });
+      setListProducts(newProduct);
+      setListProducts(newProduct);
       setEditingKey('');
     }
   };
