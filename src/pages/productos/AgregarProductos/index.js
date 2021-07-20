@@ -646,7 +646,7 @@ const Index = ({ tipo }) => {
               <Option value='Fijo'>Fijo</Option>
               <Option value='Mark Up'>Mark Up</Option>
               <Option value='Margen'>Margen</Option>
-              <Option value='Volumen'>Volúmen</Option>
+              <Option value='Volumen'>Volumen</Option>
               <Option value='Servicio'>Servicio</Option>
             </Select>
           </Form.Item>
