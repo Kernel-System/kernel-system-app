@@ -5,6 +5,9 @@ import 'jspdf-autotable';
 import { useState, useEffect } from 'react';
 import { NumeroALetras } from 'api/numeroTexto';
 import logo from 'utils/Cotizacion.png';
+import moment from 'moment';
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = ({ visible, orden, setVis }) => {
   const [lista, setlista] = useState([]);
@@ -107,8 +110,8 @@ const Index = ({ visible, orden, setVis }) => {
         onCell: (record) => ({
           record,
           key: record.id,
-          inputType: typeColumn(col.type),
-          dataIndex: col.dataIndex,
+          type: typeColumn(col.type),
+          //   dataIndex: col.dataIndex,
           title: col.title,
         }),
       };
@@ -529,7 +532,9 @@ const Index = ({ visible, orden, setVis }) => {
             ) : null}
             <TextLabel
               title='Fecha de Creación'
-              subtitle={orden?.fecha_creacion}
+              subtitle={moment(new Date(orden?.fecha_creacion)).format(
+                formatoFecha
+              )}
             />
           </Col>
           <Col className='gutter-row' key='col2' span={12}>
@@ -557,7 +562,7 @@ const Index = ({ visible, orden, setVis }) => {
         <Table
           columnWidth='10px'
           bordered
-          scroll={{ x: 1500, y: 600 }}
+          //   scroll={{ x: 1500, y: 600 }}
           dataSource={lista}
           columns={mergedColumns}
           rowClassName='editable-row'
