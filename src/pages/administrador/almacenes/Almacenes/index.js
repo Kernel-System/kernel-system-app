@@ -75,7 +75,7 @@ const Index = () => {
       />
       <br />
       <Link to='/admin/almacen/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Almacen
         </Button>
       </Link>
