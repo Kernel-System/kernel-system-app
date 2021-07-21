@@ -75,7 +75,7 @@ const Index = () => {
       />
       <br />
       <Link to='/admin/empleado/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Nuevo Empleado
         </Button>
       </Link>

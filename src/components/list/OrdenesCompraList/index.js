@@ -1,13 +1,19 @@
 import './styles.css';
 import { http } from 'api';
 import { useState } from 'react';
-import { List, Select, Button, Row, Col, Typography } from 'antd';
+import { List, Select, Button, Grid, Typography } from 'antd';
 import { EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { useStoreState } from 'easy-peasy';
+import { pairOfFiltersHeader } from 'utils/gridUtils';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
+import moment from 'moment';
+import { formatPrice } from 'utils/functions';
+
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 const { Text } = Typography;
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 const Index = ({ onClickItem }) => {
   const token = useStoreState((state) => state.user.token.access_token);
@@ -31,7 +37,7 @@ const Index = ({ onClickItem }) => {
   };
 
   const onSearchChange = (e) => {
-    const value = e.target.value;
+    const value = e?.target?.value;
     setSearchValue(value);
     filtrarOrdenPorRFC(data, value);
   };
@@ -68,58 +74,60 @@ const Index = ({ onClickItem }) => {
     return result;
   });
 
+  const screen = useBreakpoint();
+
+  const fields = [
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Filtrar por proveedor:
+    </Text>,
+    <Select
+      showSearch
+      style={{ width: '100%' }}
+      placeholder='Proveedor'
+      optionFilterProp='children'
+      onChange={(value, index) => {
+        onSearchChange(value, index);
+      }}
+      defaultValue='Todos'
+    >
+      <Option key={'Todos'} value={'Todos'}>
+        {'Todos'}
+      </Option>
+      {proveedores.map((proveedor) => (
+        <Option key={proveedor.rfc} value={proveedor.rfc}>
+          <b
+            style={{
+              opacity: 0.6,
+            }}
+          >
+            {proveedor.rfc}
+          </b>
+          {`: ${proveedor.razon_social}`}
+        </Option>
+      ))}
+    </Select>,
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Ordenar por:
+    </Text>,
+    <SortSelect
+      onChange={handleSort}
+      value={sortValue}
+      recentText='Más reciente'
+      oldestText='Más antiguo'
+    />,
+  ];
+
   return (
     <>
-      <Row gutter={[16, 12]}>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Filtrar por RFC:
-          </Text>
-        </Col>
-        <Col xs={24} lg={12}>
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='Proveedor'
-            optionFilterProp='children'
-            onChange={(value, index) => {
-              onSearchChange(value, index);
-            }}
-            defaultValue='Todos'
-          >
-            <Option key={'Todos'} value={'Todos'}>
-              {'Todos'}
-            </Option>
-            {proveedores.map((proveedor) => (
-              <Option key={proveedor.rfc} value={proveedor.rfc}>
-                {`${proveedor.rfc} : ${proveedor.razon_social}`}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Ordenar por:
-          </Text>
-        </Col>
-        <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <SortSelect
-            onChange={handleSort}
-            value={sortValue}
-            recentText='Más reciente'
-            oldestText='Más antiguo'
-          />
-        </Col>
-      </Row>
-      <br />
+      {pairOfFiltersHeader(screen, fields)}
       <List
         itemLayout='horizontal'
         size='default'
@@ -152,20 +160,21 @@ const Index = ({ onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {`Folio : ${item.folio}`}
+                    {`Folio ${item.folio} - ${item.rfc_proveedor.razon_social}`}
                   </p>
                 }
-                description={`Proveedor: ${item.rfc_proveedor.rfc}`}
+                description={`Creado el: ${moment(
+                  new Date(item.fecha_creacion)
+                ).format(formatoFecha)}`}
               />
               {
-                <span
+                <h3
                   style={{
                     display: 'inline',
-                    opacity: 0.8,
                   }}
                 >
-                  Fecha: <b>{item.fecha_creacion}</b>
-                </span>
+                  TOTAL: {formatPrice(item.total)}
+                </h3>
               }
             </List.Item>
           );

@@ -48,7 +48,7 @@ const Index = () => {
       />
       <br />
       <Link to='/admin/cliente/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Nuevo Cliente
         </Button>
       </Link>

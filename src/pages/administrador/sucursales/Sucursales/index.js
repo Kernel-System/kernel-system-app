@@ -79,7 +79,7 @@ const Index = () => {
       />
       <br />
       <Link to='/admin/sucursal/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Nueva Sucursal
         </Button>
       </Link>

@@ -288,7 +288,7 @@ const Rutas = () => {
         allowedRoles={['encargado de compras']}
         path='/compras/registrar'
         exact
-        component={CrearOrdenCompra}
+        component={RegistrarCompra}
       />
       {/* Ensambles */}
       <PrivateRoute

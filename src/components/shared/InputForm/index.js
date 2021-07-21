@@ -1,6 +1,6 @@
 import { Input, Form } from 'antd';
 
-const Index = ({
+const InputForm = ({
   titulo,
   mensaje,
   placeholder,
@@ -47,10 +47,8 @@ const Index = ({
       >
         <Input
           key={`${titulo}input`}
-          //size='large'
           placeholder={placeholder}
           style={{ width: '100%' }}
-          defaultValue={valueDef}
           value={value}
           onBlur={(e) => {
             onBlurred(e.target.value);
@@ -63,4 +61,4 @@ const Index = ({
   );
 };
 
-export default Index;
+export default InputForm;

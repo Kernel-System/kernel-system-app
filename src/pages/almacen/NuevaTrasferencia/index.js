@@ -161,7 +161,7 @@ const Index = ({ tipo }) => {
 
   const onAddProductos = (lista) => {
     const arreglo = [];
-    console.log(lista);
+    // console.log(lista);
     lista.forEach((producto) => {
       arreglo.push({
         key: arreglo.length.toString(),
@@ -394,7 +394,7 @@ const Index = ({ tipo }) => {
           <InputNumber
             max={record.max}
             min={1}
-            defaultValue={record.cantidad}
+            // defaultValue={record.cantidad}
             onChange={(value) => {
               onChangeCantidad(value, record.key);
             }}
@@ -445,10 +445,10 @@ const Index = ({ tipo }) => {
       <HeadingBack
         title={
           tipoMuestra === 'agregar'
-            ? `Nueva Tranferencia`
+            ? `Nueva Transferencia`
             : tipoMuestra === 'mostrar'
-            ? `Tranferencia ${match.params.id}`
-            : `Editar Tranferencia ${match.params.id}`
+            ? `Transferencia ${match.params.id}`
+            : `Editar Transferencia ${match.params.id}`
         }
       />
       <Form
@@ -466,14 +466,10 @@ const Index = ({ tipo }) => {
         onFinishFailed={onFinishFailed}
       >
         <Row key='columnas' gutter={[16, 24]}>
-          <Col
-            className='gutter-row'
-            span={breakpoint.lg ? 12 : 24}
-            style={{ marginBottom: '10px' }}
-          >
+          <Col className='gutter-row' span={breakpoint.lg ? 12 : 24}>
             <Title level={5}>Estado</Title>
             {tipoMuestra === 'mostrar' ? (
-              <Typography>{datosTransferencia.estado}</Typography>
+              <Form.Item>{datosTransferencia.estado}</Form.Item>
             ) : (
               <Form.Item
                 key='estado'
@@ -541,12 +537,12 @@ const Index = ({ tipo }) => {
             style={{ marginBottom: '10px' }}
           >
             {datosTransferencia.estado !== 'Confirmado' ? (
-              datosTransferencia.fecha_estimada !== undefined ? (
-                <div>
-                  <Title level={5}>Fecha Estimada</Title>
-                  <Typography>{datosTransferencia.fecha_estimada}</Typography>
-                </div>
-              ) : null
+              <div>
+                <Title level={5}>Fecha Estimada</Title>
+                <Form.Item>
+                  {datosTransferencia.fecha_estimada ?? 'Sin fecha estimada'}
+                </Form.Item>
+              </div>
             ) : (
               <div>
                 <Title level={5}>Fecha Estimada</Title>
@@ -652,7 +648,7 @@ const Index = ({ tipo }) => {
             }}
             bordered
             disabled={tipoMuestra === 'mostrar'}
-            scroll={{ x: 1000, y: 600 }}
+            // scroll={{ x: 1000, y: 600 }}
             dataSource={listProducts}
             columns={mergedColumns}
             rowClassName='editable-row'
@@ -670,7 +666,9 @@ const Index = ({ tipo }) => {
             type='primary'
             htmlType='submit'
           >
-            Añadir Transferencia
+            {tipoMuestra === 'agregar'
+              ? 'Añadir Transferencia'
+              : 'Confirmar cambios'}
           </Button>
         </Form.Item>
       </Form>

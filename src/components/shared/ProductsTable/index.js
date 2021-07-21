@@ -97,7 +97,7 @@ const ProductsTable = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                justifyContent: 'end',
+                justifyContent: 'flex-end',
               }}
             >
               <InputNumber
@@ -148,7 +148,7 @@ const ProductsTable = ({
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              justifyContent: 'end',
+              justifyContent: 'flex-end',
             }}
           >
             <Text>$</Text>

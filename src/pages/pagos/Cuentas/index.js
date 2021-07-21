@@ -14,7 +14,7 @@ const Index = () => {
       />
       <br />
       <Link to='/cuentas/pagos/nuevo'>
-        <Button type='primary' size='large' icon={<PlusOutlined />}>
+        <Button type='primary' size='default' icon={<PlusOutlined />}>
           Añadir Nuevo Pago
         </Button>
       </Link>

@@ -567,7 +567,7 @@ const Index = () => {
               key={record.key}
               //size='large'
               style={{ width: '100%' }}
-              defaultValue={record.precio_fijo}
+              //   defaultValue={record.precio_fijo}
               disabled={!editable}
               onBlur={(e) => {
                 changeServicio(
@@ -753,7 +753,7 @@ const Index = () => {
           onChange={(value, index) => {
             onChangeCliente(value, index);
           }}
-          defaultValue='nulo'
+          value='nulo'
         >
           <Option key='nulo' value='nulo'>
             Ninguno/a
@@ -850,7 +850,7 @@ const Index = () => {
       </Form.Item>
       <TextLabel title='Porcentaje de Anticipo' />
       <NumericInputForm
-        valueDef={parseFloat(0)}
+        // valueDef={parseFloat(0)}
         formato='porcentaje'
         titulo='porcentaje'
         placeholder='porcentaje_anticipo'
@@ -859,7 +859,7 @@ const Index = () => {
       />
       <TextLabel title='Días de Entrega' />
       <NumericInputForm
-        valueDef={parseFloat(1)}
+        // valueDef={parseFloat(1)}
         formato='dias'
         titulo='dias'
         placeholder='Días de Entrega'

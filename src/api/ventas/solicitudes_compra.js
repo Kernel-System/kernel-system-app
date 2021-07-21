@@ -1,10 +1,12 @@
 import { http } from 'api';
 
-export const getSolicitudesCompra = (page, filter, token) =>
+export const getSolicitudesCompra = (rfc, page, filter, token) =>
   http.get(
     `/items/solicitudes_compra?fields=id,estado,fecha_solicitud,id_cliente.nombre_comercial${
       filter === 'todos' ? '' : `&filter[estado][_eq]=${filter}`
-    }&page=${page}&limit=10&meta=filter_count`,
+    }${
+      rfc !== '' ? `&filter[id_cliente][rfc][_eq]=${rfc}` : ''
+    }&page=${page}&limit=10&sort=-fecha_solicitud&meta=filter_count`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

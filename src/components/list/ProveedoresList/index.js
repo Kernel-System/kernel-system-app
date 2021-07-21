@@ -10,7 +10,7 @@ import {
   Grid,
   Typography,
 } from 'antd';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, WarningTwoTone } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { getItems } from 'api/compras/proveedores';
 import { regimenesFiscales } from 'utils/facturas/catalogo';
@@ -102,51 +102,74 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
           pageSize: 10,
         }}
         dataSource={listToShow}
-        renderItem={(item) => (
-          <List.Item
-            key={item.rfc}
-            actions={[
-              <Button
-                icon={<EditFilled />}
-                onClick={() => editItem(item)}
-              ></Button>,
-              <Popconfirm
-                placement='left'
-                title='¿Está seguro de querer borrar este registro?'
-                okText='Sí'
-                cancelText='No'
-                onConfirm={() => onConfirmDelete(item)}
-              >
-                <Button danger icon={<DeleteFilled />}></Button>
-              </Popconfirm>,
-            ]}
-          >
-            <List.Item.Meta
-              title={
-                <p
-                  onClick={() => {
-                    onClickItem(item);
+        renderItem={(item) => {
+          const eliminarDesactivado =
+            item.compras?.length || item.ordenes_compra?.length;
+          return (
+            <List.Item
+              key={item.rfc}
+              actions={[
+                <Button
+                  icon={<EditFilled />}
+                  onClick={() => editItem(item)}
+                ></Button>,
+                <Popconfirm
+                  {...{
+                    icon: eliminarDesactivado ? (
+                      <WarningTwoTone twoToneColor='red' />
+                    ) : undefined,
                   }}
-                  style={{
-                    cursor: 'pointer',
-                    margin: 0,
+                  title={
+                    eliminarDesactivado
+                      ? 'Existen compras u ordenes de compras a este proveedor.'
+                      : '¿Está seguro de querer borrar este registro?'
+                  }
+                  okText={eliminarDesactivado ? 'OK' : 'Sí'}
+                  cancelText='Cancelar'
+                  cancelButtonProps={{
+                    style: {
+                      display: eliminarDesactivado ? 'none' : 'initial',
+                    },
                   }}
+                  onConfirm={() =>
+                    eliminarDesactivado ? null : onConfirmDelete(item)
+                  }
                 >
-                  {item.razon_social}
-                </p>
-              }
-              description={item.rfc}
-            />
-            <b
-              style={{
-                display: 'inline',
-                opacity: 0.8,
-              }}
+                  <Button
+                    danger
+                    icon={<DeleteFilled />}
+                    disabled={eliminarDesactivado}
+                  ></Button>
+                </Popconfirm>,
+              ]}
             >
-              {regimenesFiscales[item.regimen_fiscal]}
-            </b>
-          </List.Item>
-        )}
+              <List.Item.Meta
+                title={
+                  <p
+                    onClick={() => {
+                      onClickItem(item);
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    {item.razon_social}
+                  </p>
+                }
+                description={item.rfc}
+              />
+              <b
+                style={{
+                  display: 'inline',
+                  opacity: 0.8,
+                }}
+              >
+                {regimenesFiscales[item.regimen_fiscal]}
+              </b>
+            </List.Item>
+          );
+        }}
       />
     </>
   );

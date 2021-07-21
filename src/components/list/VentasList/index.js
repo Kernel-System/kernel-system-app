@@ -105,6 +105,7 @@ const Index = ({ onClickItem }) => {
           </Select>
         </Col>
       </Row>
+      <br />
       <List
         itemLayout='horizontal'
         size='default'
@@ -132,7 +133,7 @@ const Index = ({ onClickItem }) => {
                 if (producto.cantidad !== producto.cantidad_entregada) {
                   return (
                     <b key={indx}>
-                      <WarningTwoTone twoToneColor='orange' /> Falta entrega de
+                      <WarningTwoTone twoToneColor='orange' /> Falta entregar
                       producto
                       <WarningTwoTone twoToneColor='orange' />
                     </b>
@@ -162,13 +163,7 @@ const Index = ({ onClickItem }) => {
                         margin: 0,
                       }}
                     >
-                      {`No. Venta ${item.no_venta} - Movimiento(s): ${
-                        item?.movimientos_almacen?.length !== 0
-                          ? `${item.movimientos_almacen
-                              .map((dato) => dato.id)
-                              .toString()}`
-                          : 'Sin movimiento'
-                      }`}
+                      {`No. Venta ${item.no_venta} - Sucursal ${item.rfc_vendedor?.sucursal}`}
                     </p>
                   }
                   description={`Fecha de venta: ${moment(
@@ -176,14 +171,14 @@ const Index = ({ onClickItem }) => {
                   ).format(formatoFecha)}`}
                 />
                 {
-                  <span
+                  <h3
                     style={{
                       display: 'inline',
-                      opacity: 0.8,
+                      //   opacity: 0.8,
                     }}
                   >
-                    <b>{`TOTAL: $${item.total}`}</b>
-                  </span>
+                    {`TOTAL: $${item.total}`}
+                  </h3>
                 }
               </List.Item>
             </Badge.Ribbon>

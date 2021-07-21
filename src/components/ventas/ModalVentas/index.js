@@ -20,6 +20,7 @@ const Index = ({ visible, venta, hideModal }) => {
     venta?.movimientos_almacen?.forEach((movimiento) => {
       movimiento?.productos_movimiento.forEach((producto) => {
         productosIngresar.push({
+          key: producto.id,
           id: producto.id,
           descripcion: producto.titulo,
           codigo: producto.codigo,
@@ -31,6 +32,7 @@ const Index = ({ visible, venta, hideModal }) => {
     });
     venta?.productos_venta?.forEach((producto) => {
       productosVentas.push({
+        key: producto.id,
         id: producto.id,
         descripcion: producto.descripcion,
         codigo: producto.codigo,
@@ -195,7 +197,7 @@ const Index = ({ visible, venta, hideModal }) => {
           key='1'
           columnWidth='10px'
           bordered
-          scroll={{ x: 1000, y: 600 }}
+          //   scroll={{ x: 1000, y: 600 }}
           dataSource={productosVentas}
           columns={columnsVentas}
           rowClassName='editable-row'
@@ -210,7 +212,7 @@ const Index = ({ visible, venta, hideModal }) => {
               key='2'
               columnWidth='10px'
               bordered
-              scroll={{ x: 1000, y: 600 }}
+              //   scroll={{ x: 1000, y: 600 }}
               dataSource={productos}
               columns={columns}
               rowClassName='editable-row'

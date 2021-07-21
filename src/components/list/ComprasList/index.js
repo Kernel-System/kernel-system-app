@@ -11,6 +11,7 @@ import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 import 'moment/locale/es-mx';
 import locale from 'antd/es/date-picker/locale/es_ES';
+import { formatPrice } from 'utils/functions';
 
 const { useBreakpoint } = Grid;
 const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
@@ -156,15 +157,16 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                   icon={<EditFilled />}
                   onClick={() => editItem(item)}
                 ></Button>,
-                <Popconfirm
-                  placement='left'
-                  title='¿Está seguro de querer borrar este registro?'
-                  okText='Sí'
-                  cancelText='No'
-                  onConfirm={() => onConfirmDelete(item)}
-                >
-                  <Button danger icon={<DeleteFilled />}></Button>
-                </Popconfirm>,
+                // <Popconfirm
+                //   placement='left'
+                //   title='¿Está seguro de querer borrar este registro?'
+                //   okText='Sí'
+                //   cancelText='No'
+                //   onConfirm={() => onConfirmDelete(item)}
+                //   visible={false}
+                // >
+                //   <Button  danger icon={<DeleteFilled />}></Button>
+                // </Popconfirm>,
               ]}
             >
               <List.Item.Meta
@@ -199,7 +201,7 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                     display: 'inline',
                   }}
                 >
-                  TOTAL: ${item.total}
+                  TOTAL: {formatPrice(item.total)}
                 </h3>
               }
             </List.Item>

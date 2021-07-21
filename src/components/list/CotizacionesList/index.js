@@ -32,15 +32,19 @@ const Index = ({ onClickItem }) => {
   const onSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
-    filtrarClientePorRFC(data, value);
+    filtrarPorCliente(data, value);
   };
 
-  const filtrarClientePorRFC = async (clientes, value) => {
+  const filtrarPorCliente = async (clientes, value) => {
     if (value === '') {
       setListToShow(clientes);
     } else if (clientes)
       setListToShow(
-        clientes.filter((item) => item.nombre_cliente.includes(value))
+        clientes.filter(
+          (item) =>
+            item.nombre_cliente.toUpperCase().includes(value.toUpperCase()) ||
+            item.empresa.toUpperCase().includes(value.toUpperCase())
+        )
       );
   };
 
@@ -56,7 +60,7 @@ const Index = ({ onClickItem }) => {
   const { data } = useQuery('cotizaciones', async () => {
     const result = await fetchItems();
     setListToShow(result);
-    filtrarClientePorRFC(result, searchValue);
+    filtrarPorCliente(result, searchValue);
     return result;
   });
 
@@ -68,11 +72,11 @@ const Index = ({ onClickItem }) => {
         verticalAlign: 'sub',
       }}
     >
-      Filtrar por Nombre:
+      Filtrar por cliente:
     </Text>,
     <Input.Search
       onChange={onSearchChange}
-      placeholder='Buscar por nombre de cliente'
+      placeholder='Buscar por cliente'
       value={searchValue}
     />,
     <Text

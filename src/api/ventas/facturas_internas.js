@@ -25,7 +25,9 @@ export const insertItems = (values, token) => {
 
 export const getItems = (sort, token) => {
   return http.get(
-    `/items/facturas_internas?&sort[]=${sort === 'recent' ? '-' : '+'}fecha`,
+    `/items/facturas_internas?fields=*, cfdis_relacionados.uuid &sort[]=${
+      sort === 'recent' ? '-' : '+'
+    }fecha`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

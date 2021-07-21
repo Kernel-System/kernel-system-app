@@ -57,8 +57,10 @@ const SolicitudDeCompra = () => {
   );
   const servicesData = services.data?.data?.data;
 
-  const solicitud = useQuery(['solicitud-de-compra', id], () =>
-    getSolicitudCompra(id, token)
+  const solicitud = useQuery(
+    ['solicitud-de-compra', id],
+    () => getSolicitudCompra(id, token),
+    { cacheTime: 0 }
   );
   const solicitudData = solicitud.data?.data?.data;
 
@@ -179,6 +181,10 @@ const SolicitudDeCompra = () => {
           2,
           () => {
             setLoading(false);
+            queryClient.invalidateQueries([
+              'punto-de-venta-products',
+              productQuery,
+            ]);
             history.push('/empleado/solicitudes-de-compra');
           }
         );

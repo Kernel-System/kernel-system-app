@@ -176,7 +176,8 @@ const Index = () => {
     setList(JSON.parse(JSON.stringify(rows)));
   };
 
-  const onFinish = () => {
+  const onFinish = (values) => {
+    //   console.log({values})
     http
       .post(
         '/items/ordenes_ensamble',
@@ -185,10 +186,10 @@ const Index = () => {
           fecha_inicio_ensamble: null,
           fecha_fin_ensamble: null,
           estado: 'Ordenado',
-          descripcion: list.descripcion,
-          observaciones: list.observaciones,
-          codigo_ensamble: list.codigo_ensamble,
-          rfc_empleado_ensamble: list.rfc_empleado_ensamble,
+          descripcion: values.descripcion,
+          observaciones: values.observaciones,
+          codigo_ensamble: values.codigo_ensamble,
+          rfc_empleado_ensamble: values.rfc_empleado_ensamble,
           rfc_empleado_orden: creador.rfc,
           clave_almacen: almacen,
         },
@@ -270,7 +271,7 @@ const Index = () => {
       </Form.Item>
       <Title level={5}>Empleado de Ensamble</Title>
       <Form.Item
-        name='ensamblador asignado'
+        name='rfc_empleado_ensamble'
         rules={[
           {
             required: true,
