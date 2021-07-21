@@ -328,8 +328,8 @@ const Index = ({ visible, cotizacion, setVis }) => {
       },
       columnStyles: {
         0: { cellWidth: 15, halign: 'left' },
-        1: { halign: 'left' },
-        2: { cellWidth: 60, halign: 'left' },
+        1: { halign: 'left', cellWidth: 60 },
+        2: { halign: 'left' },
         3: { halign: 'right' },
         4: { halign: 'right' },
         5: { halign: 'right' },
@@ -379,11 +379,12 @@ const Index = ({ visible, cotizacion, setVis }) => {
           }),
         ],
         [],
+        [],
       ],
       didParseCell: (data) => {
         //console.log(data);
         if (data.row.index !== 0) data.cell.styles.fillColor = [255, 255, 255];
-        if (data.row.index === cotizacion?.productos_cotizados.length + 6) {
+        if (data.row.index === cotizacion?.productos_cotizados.length + 7) {
           data.cell.styles.fillColor = [255, 255, 128]; //128
         }
       },

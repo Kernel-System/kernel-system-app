@@ -125,55 +125,62 @@ const Index = () => {
   };
 
   const onFinish = (datos) => {
-    let infoCliente =
-      cliente !== undefined
-        ? {
-            nombre_cliente: cliente.nombre_comercial,
-            telefono_cliente: cliente.telefono,
-            email_cliente: cliente.cuenta.email,
-            empresa: cliente.razon_social,
-            id_cliente: cliente.id,
-          }
-        : {
-            nombre_cliente: datos.nombre,
-            telefono_cliente: datos.telefono,
-            email_cliente: datos.correo,
-            empresa: datos.empresa,
-          };
-    const contizacion = {
-      total: total,
-      iva: iva,
-      porcentaje_anticipo: datos.porcentaje,
-      fecha_vigencia: date,
-      dias_entrega: datos.dias,
-      concepto: datos.concepto,
-      nota: datos.nota,
-      rfc_empleado: empleado.rfc,
-      ...infoCliente,
-    };
-    http
-      .post('/items/cotizaciones/', contizacion, putToken)
-      .then((resul_cot) => {
-        let productos = [];
-        listProducts.forEach((producto) => {
-          productos.push({
-            clave: producto.clave,
-            cantidad: producto.cantidad,
-            descripcion: producto.titulo,
-            clave_unidad: producto.clave_unidad,
-            descuento: producto.descuento,
-            precio_unitario: producto.precio_unitario,
-            folio_cotizacion: resul_cot.data.data.folio,
-            iva: producto.iva,
-            total: producto.total,
+    const hide = message.loading('Generando cotización...', 0);
+    if (listProducts.length !== 0) {
+      let infoCliente =
+        cliente !== undefined
+          ? {
+              nombre_cliente: cliente.nombre_comercial,
+              telefono_cliente: cliente.telefono,
+              email_cliente: cliente.cuenta.email,
+              empresa: cliente.razon_social,
+              id_cliente: cliente.id,
+            }
+          : {
+              nombre_cliente: datos.nombre,
+              telefono_cliente: datos.telefono,
+              email_cliente: datos.correo,
+              empresa: datos.empresa,
+            };
+      const contizacion = {
+        total: total,
+        iva: iva,
+        porcentaje_anticipo: datos.porcentaje,
+        fecha_vigencia: date,
+        dias_entrega: datos.dias,
+        concepto: datos.concepto,
+        nota: datos.nota,
+        rfc_empleado: empleado.rfc,
+        ...infoCliente,
+      };
+      http
+        .post('/items/cotizaciones/', contizacion, putToken)
+        .then((resul_cot) => {
+          let productos = [];
+          listProducts.forEach((producto) => {
+            productos.push({
+              clave: producto.clave,
+              cantidad: producto.cantidad,
+              descripcion: producto.titulo,
+              clave_unidad: producto.clave_unidad,
+              descuento: producto.descuento,
+              precio_unitario: producto.precio_unitario,
+              folio_cotizacion: resul_cot.data.data.folio,
+              iva: producto.iva,
+              total: producto.total,
+            });
           });
+          http
+            .post('/items/productos_cotizados', productos, putToken)
+            .then(() => {
+              hide();
+              Mensaje();
+            });
         });
-        http
-          .post('/items/productos_cotizados', productos, putToken)
-          .then(() => {
-            Mensaje();
-          });
-      });
+    } else {
+      hide();
+      message.warn('Falta introducir productos.');
+    }
   };
 
   const Mensaje = () => {
@@ -447,6 +454,17 @@ const Index = () => {
     }
   };
 
+  const onSetTotal = (arreglo) => {
+    setTotal(
+      arreglo.reduce((acu, element) => acu + element.total, 0).toFixed(2)
+    );
+    setIva(
+      arreglo
+        .reduce((acu, element) => acu + (element.total * element.iva) / 100, 0)
+        .toFixed(2)
+    );
+  };
+
   const handleDelete = (key) => {
     const dataSource = [...listProducts];
     setListProducts(dataSource.filter((item) => item.key !== key));
@@ -688,7 +706,7 @@ const Index = () => {
             : '',
         cantidad: 1,
       });
-    else lista[dato] = { ...lista[dato], cantidad: lista[dato].cantidad + 1 };
+    onSetTotal(lista);
     setListProducts(lista);
   };
   //#endregion
@@ -888,7 +906,7 @@ const Index = () => {
         justify='center'
       >
         <Col className='gutter-row' span={8}>
-          <TextLabel title='SUBTOTAL' subtitle={total - iva} />
+          <TextLabel title='SUBTOTAL' subtitle={(total - iva).toFixed(2)} />
         </Col>
         <Col className='gutter-row' span={8}>
           <TextLabel title='IVA' subtitle={iva} />
