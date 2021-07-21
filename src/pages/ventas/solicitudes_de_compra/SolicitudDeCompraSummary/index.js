@@ -26,13 +26,11 @@ const SolicitudDeCompraSummary = ({ products }) => {
                   products.reduce(
                     (total, product) =>
                       total +
-                      (product.iva !== 0
-                        ? (product.precio_ofrecido * product.cantidad -
-                            product.precio_ofrecido *
-                              product.cantidad *
-                              toPercent(product.descuento_ofrecido)) *
-                          toPercent(product.iva)
-                        : 0),
+                      (product.precio_ofrecido * product.cantidad -
+                        product.precio_ofrecido *
+                          product.cantidad *
+                          toPercent(product.descuento_ofrecido)) *
+                        toPercent(product.iva),
                     0
                   )
                 )
@@ -48,11 +46,10 @@ const SolicitudDeCompraSummary = ({ products }) => {
                   products.reduce(
                     (total, product) =>
                       total +
-                      (product.descuento_ofrecido !== 0
-                        ? product.precio_ofrecido *
-                          product.cantidad *
-                          toPercent(product.descuento_ofrecido)
-                        : 0),
+                      product.precio_ofrecido *
+                        product.cantidad *
+                        toPercent(product.descuento_ofrecido),
+
                     0
                   )
                 )
