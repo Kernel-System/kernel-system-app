@@ -220,12 +220,22 @@ const SolicitudCompraProductsTable = ({
               }}
               onBlur={({ target: { value } }) => {
                 let newValue;
-                if (value > calcCantidad(record.codigo_producto)) {
-                  newValue = calcCantidad(record.codigo_producto);
-                } else if (value <= 0 || value === '') {
-                  newValue = 1;
+                if (record.codigo_producto.tipo_de_venta === 'Servicio') {
+                  if (value > 999) {
+                    newValue = 999;
+                  } else if (value <= 0 || value === '') {
+                    newValue = 1;
+                  } else {
+                    newValue = Math.ceil(value);
+                  }
                 } else {
-                  newValue = Math.ceil(value);
+                  if (value > calcCantidad(record.codigo_producto)) {
+                    newValue = calcCantidad(record.codigo_producto);
+                  } else if (value <= 0 || value === '') {
+                    newValue = 1;
+                  } else {
+                    newValue = Math.ceil(value);
+                  }
                 }
                 setValueToItem({
                   campo: 'cantidad',

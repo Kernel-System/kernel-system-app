@@ -14,6 +14,6 @@ export const getUserOrdersYears = (id, token) =>
 
 export const getUserOrder = (id, token) =>
   http.get(
-    `/items/solicitudes_compra/${id}?fields=id,estado,fecha_solicitud,total,id_cliente.telefono,productos_solicitados.iva,productos_solicitados.precio_ofrecido,productos_solicitados.descuento_ofrecido,productos_solicitados.id,productos_solicitados.cantidad,productos_solicitados.codigo_producto.titulo,productos_solicitados.codigo_producto.codigo,productos_solicitados.codigo_producto.imagenes.directus_files_id`,
+    `/items/solicitudes_compra/${id}?fields=id,estado,fecha_solicitud,total,comentarios,id_cliente.telefono,productos_solicitados.iva,productos_solicitados.precio_ofrecido,productos_solicitados.descuento_ofrecido,productos_solicitados.id,productos_solicitados.cantidad,productos_solicitados.codigo_producto.titulo,productos_solicitados.codigo_producto.codigo,productos_solicitados.codigo_producto.imagenes.directus_files_id`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
