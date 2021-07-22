@@ -79,23 +79,27 @@ const Index = () => {
                 UnitCode: producto.clave_unidad, //
                 UnitPrice: producto.precio_unitario,
                 Quantity: producto.cantidad,
-                Subtotal: producto.precio_unitario * producto.cantidad,
-                Discount: producto.descuento,
+                Subtotal: (
+                  producto.precio_unitario * producto.cantidad
+                ).toFixed(2),
+                Discount: producto.descuento.toFixed(2),
                 Taxes: [
                   {
-                    Total: producto.iva,
+                    Total: producto.iva.toFixed(2),
                     Name: 'IVA',
                     Rate: 0.16,
-                    Base:
+                    Base: (
                       producto.precio_unitario * producto.cantidad -
-                      producto.descuento,
+                      producto.descuento
+                    ).toFixed(2),
                     IsRetention: false,
                   },
                 ],
-                Total:
+                Total: (
                   producto.precio_unitario * producto.cantidad -
                   producto.descuento +
-                  producto.iva,
+                  producto.iva
+                ).toFixed(2),
               });
             });
             httpSAT

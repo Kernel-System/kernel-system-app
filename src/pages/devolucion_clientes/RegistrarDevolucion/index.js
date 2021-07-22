@@ -106,6 +106,7 @@ const Index = () => {
         onSetArreglo(result.data.data, setAlmacenes);
       });
     http.get(`/users/me?fields=empleado.*`, putToken).then((result) => {
+      console.log(result.data.data);
       onSetArreglo(result.data.data, setEmpleado);
     });
   }, []);
@@ -201,11 +202,18 @@ const Index = () => {
             putToken
           )
           .then(() => {
+            console.log(productosCambiar);
             productosCambiar.forEach((producto, index) => {
               http
                 .patch(
                   `/items/productos_venta/${producto.id}`,
-                  producto,
+                  {
+                    cantidad: producto.cantidad,
+                    descuento: producto.descuento,
+                    importe: producto.importe,
+                    iva: producto.iva,
+                    precio_unitario: producto.precio_unitario,
+                  },
                   putToken
                 )
                 .then(() => {
@@ -439,7 +447,7 @@ const Index = () => {
           comentario: datos.diagnostico,
           devolucion_clientes: devolucion,
           clave_almacen: almacen.clave,
-          rfc_empleado: empleado.rfc,
+          rfc_empleado: empleado[0].rfc,
           mostrar: true,
         },
         putToken
@@ -498,7 +506,7 @@ const Index = () => {
   };
 
   const GenerarTicket = async (datos, no_venta, factura, hide) => {
-    if (Object.keys(factura).length === 'factura') {
+    if (Object.keys(factura).length === 0) {
       http
         .get(
           `/items/ventas/${no_venta}=?fields=*, id_cliente.rfc,productos_venta.*`,
@@ -508,9 +516,9 @@ const Index = () => {
           const newVenta = result_venta.data.data;
           const doc = new jsPDF('p', 'mm', [
             80,
-            100 + listProducts.length * 12 + 62,
+            100 + listProducts.length * 12,
           ]);
-          const address = almacen.clave_sucursal.clave;
+          const address = almacen.clave_sucursal;
           var currentdate = new Date();
           doc.autoTable({
             margin: { top: 5, left: 5, right: 5 },
@@ -600,7 +608,7 @@ const Index = () => {
               producto.codigo,
               producto.cantidad,
               producto.descripcion,
-              formatPrice(producto.descuento).toFixed(2),
+              formatPrice(producto.descuento.toFixed(2)),
               formatPrice(
                 (
                   producto.precio_unitario * producto.cantidad +

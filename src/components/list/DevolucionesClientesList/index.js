@@ -16,6 +16,7 @@ const Index = ({ onClickItem, seeItem }) => {
       Authorization: `Bearer ${token}`,
     },
   };
+
   const getItems = async () => {
     const { data } = await http.get(
       '/items/info_devoluciones_clientes?fields=*, devolucion_inventario.*,devolucion_inventario.devolucion_inventario_series.*,id_movimiento_almacen.*,id_movimiento_almacen.productos_movimiento.*,id_movimiento_almacen.rfc_empleado.*',

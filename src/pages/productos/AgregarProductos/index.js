@@ -292,7 +292,11 @@ const Index = ({ tipo }) => {
         putToken
       )
       .then((resul) => {
-        if (valor.id === window.undefined)
+        if (
+          valor.id === window.undefined &&
+          valor.tipo_de_venta !== 'Servicio' &&
+          valor.tipo_de_venta !== 'Fijo'
+        )
           http
             .post(
               `/items/precios_variables`,
@@ -306,7 +310,7 @@ const Index = ({ tipo }) => {
               console.log(resul3);
               Mensaje();
             });
-        else
+        else if (valor.id !== window.undefined)
           http
             .patch(
               `/items/precios_variables/${valor.id}`,
@@ -320,6 +324,7 @@ const Index = ({ tipo }) => {
               console.log(resul3);
               Mensaje();
             });
+        else Mensaje();
       })
       .catch((error) => {
         if (
