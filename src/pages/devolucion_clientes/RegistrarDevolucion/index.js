@@ -201,7 +201,7 @@ const Index = () => {
             putToken
           )
           .then(() => {
-            productosCambiar.forEach((producto) => {
+            productosCambiar.forEach((producto, index) => {
               http
                 .patch(
                   `/items/productos_venta/${producto.id}`,
@@ -209,7 +209,9 @@ const Index = () => {
                   putToken
                 )
                 .then(() => {
-                  agregarInventarioDevolucion(datos, {}, hide);
+                  if (productosCambiar.length - 1 === index) {
+                    agregarInventarioDevolucion(datos, {}, hide);
+                  }
                 });
             });
           });
@@ -379,49 +381,33 @@ const Index = () => {
       .then((result_info) => {
         listProducts.forEach((producto, index) => {
           http
-            .get(
-              `/items/devolucion_inventario?filter[codigo_producto][_in]=${producto.codigo}&filter[clave_almacen][_in]=${almacen.clave}`,
+            .post(
+              `/items/devolucion_inventario`,
+              {
+                cantidad: producto.cantidad_regresar,
+                clave_almacen: almacen.clave,
+                codigo_producto: producto.codigo,
+                info_devolucion_clientes: result_info.data.data.id,
+              },
               putToken
             )
-            .then((result_dev_int) => {
-              if (result_dev_int.data.data.length === 0) {
+            .then((result_dev_int1) => {
+              if (
+                producto.series !== undefined &&
+                producto?.series?.length !== 0
+              ) {
+                let series = [];
+                producto.series.forEach((serie) => {
+                  series.push({
+                    serie: serie,
+                    devolucion_inventario: result_dev_int1.data.data.id,
+                    info_devolucion: result_info.data.data.id,
+                  });
+                });
                 http
-                  .post(
-                    `/items/devolucion_inventario`,
-                    {
-                      cantidad: producto.cantidad_regresar,
-                      clave_almacen: almacen.clave,
-                      codigo_producto: producto.codigo,
-                    },
-                    putToken
-                  )
-                  .then((result_dev_int1) => {
-                    if (producto.series !== undefined) {
-                      let series = [];
-                      producto.series.forEach((serie) => {
-                        series.push({
-                          serie: serie,
-                          devolucion_inventario: result_dev_int1.data.data.id,
-                          info_devolucion: result_info.data.data.id,
-                        });
-                      });
-                      http
-                        .post(
-                          `/items/devolucion_inventario_series`,
-                          series,
-                          putToken
-                        )
-                        .then(() => {
-                          if (listProducts.length - 1 === index) {
-                            agregarMovimientoAlmacen(
-                              datos,
-                              factura,
-                              result_info.data.data.id,
-                              hide
-                            );
-                          }
-                        });
-                    } else if (listProducts.length - 1 === index) {
+                  .post(`/items/devolucion_inventario_series`, series, putToken)
+                  .then(() => {
+                    if (listProducts.length - 1 === index) {
                       agregarMovimientoAlmacen(
                         datos,
                         factura,
@@ -430,52 +416,13 @@ const Index = () => {
                       );
                     }
                   });
-              } else {
-                http
-                  .patch(
-                    `/items/devolucion_inventario/${result_dev_int.data.data.id}`,
-                    {
-                      cantidad:
-                        result_dev_int.data.data.cantidad +
-                        producto.cantidad_regresar,
-                    },
-                    putToken
-                  )
-                  .then((result_dev_int2) => {
-                    if (producto.series !== undefined) {
-                      let series = [];
-                      producto.series.forEach((serie) => {
-                        series.push({
-                          serie: serie,
-                          devolucion_inventario: result_dev_int2.data.data.id,
-                          info_devolucion: result_info.data.data.id,
-                        });
-                      });
-                      http
-                        .push(
-                          `/items/devolucion_inventario_series`,
-                          series,
-                          putToken
-                        )
-                        .then(() => {
-                          if (listProducts.length - 1 === index) {
-                            agregarMovimientoAlmacen(
-                              datos,
-                              factura,
-                              result_info.data.data.id,
-                              hide
-                            );
-                          }
-                        });
-                    } else if (listProducts.length - 1 === index) {
-                      agregarMovimientoAlmacen(
-                        datos,
-                        factura,
-                        result_info.data.data.id,
-                        hide
-                      );
-                    }
-                  });
+              } else if (listProducts.length - 1 === index) {
+                agregarMovimientoAlmacen(
+                  datos,
+                  factura,
+                  result_info.data.data.id,
+                  hide
+                );
               }
             });
         });
@@ -490,7 +437,7 @@ const Index = () => {
           fecha: obtenerFechaActual(),
           concepto: 'Devolución a cliente',
           comentario: datos.diagnostico,
-          devolucion_clientes: devolucion.id,
+          devolucion_clientes: devolucion,
           clave_almacen: almacen.clave,
           rfc_empleado: empleado.rfc,
           mostrar: true,
@@ -1098,7 +1045,7 @@ const Index = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <HeadingBack title='Orden de Compra' />
+        <HeadingBack title='Registrar Devolución' />
         <TextLabel title='Almacenes' />
         {rol !== 'encargado de ventas' ? (
           <Form.Item
