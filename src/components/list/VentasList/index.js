@@ -18,6 +18,9 @@ const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = ({ onClickItem }) => {
   const [sucursales, setSucursales] = useState([]);
+  const [color, setColor] = useState(true);
+  const [texto, setTexto] = useState(true);
+
   const token = useStoreState((state) => state.user.token.access_token);
   const putToken = {
     headers: {
@@ -119,29 +122,35 @@ const Index = ({ onClickItem }) => {
         renderItem={(item) => {
           return (
             <Badge.Ribbon
-              color={item.productos_venta.map((producto, indx) => {
-                if (producto.cantidad !== producto.cantidad_entregada) {
-                  return 'red';
-                } else if (indx === item.productos_venta.length - 1) {
-                  return 'blue';
-                }
-              })}
+              color={
+                item.productos_venta.map((producto, indx) => {
+                  if (producto.cantidad !== producto.cantidad_entregada) {
+                    return 'red';
+                  } else if (indx === item.productos_venta.length - 1) {
+                    return 'blue';
+                  }
+                })[0]
+              }
               style={{
                 top: -12,
               }}
-              text={item.productos_venta.map((producto, indx) => {
-                if (producto.cantidad !== producto.cantidad_entregada) {
-                  return (
-                    <b key={indx}>
-                      <WarningTwoTone twoToneColor='orange' /> Falta entregar
-                      producto
-                      <WarningTwoTone twoToneColor='orange' />
-                    </b>
-                  );
-                } else if (indx === item.productos_venta.length - 1) {
-                  return <b key={indx}>{'Producto entregado correctamente'}</b>;
-                }
-              })}
+              text={
+                item.productos_venta.map((producto, indx) => {
+                  if (producto.cantidad !== producto.cantidad_entregada) {
+                    return (
+                      <b key={indx}>
+                        <WarningTwoTone twoToneColor='orange' /> Falta entregar
+                        producto
+                        <WarningTwoTone twoToneColor='orange' />
+                      </b>
+                    );
+                  } else if (indx === item.productos_venta.length - 1) {
+                    return (
+                      <b key={indx}>{'Producto entregado correctamente'}</b>
+                    );
+                  }
+                })[0]
+              }
             >
               <List.Item
                 key={item.no_venta}

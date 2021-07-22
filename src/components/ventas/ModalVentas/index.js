@@ -178,8 +178,14 @@ const Index = ({ visible, venta, hideModal }) => {
             <TextLabel title='Total' subtitle={`$ ${venta.total}`} />
           </Col>
         </Row>
-        {venta.factura !== null ? (
-          <TextLabel title='Factura' subtitle={`${venta.factura}`} />
+        {venta?.factura?.length !== 0 && venta?.factura !== undefined ? (
+          <TextLabel title='Factura' subtitle={`${venta.factura.toString()}`} />
+        ) : null}
+        {venta.facturas_globales !== null ? (
+          <TextLabel
+            title='Factura Global'
+            subtitle={`${venta.facturas_globales}`}
+          />
         ) : null}
         {venta?.id_cliente !== null ? (
           <TextLabel title='Cliente' subtitle={`${venta?.id_cliente?.rfc}`} />
