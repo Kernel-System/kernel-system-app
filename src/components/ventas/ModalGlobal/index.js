@@ -21,7 +21,7 @@ const Index = ({ visible, global, hideModal }) => {
       serie: global?.factura?.serie,
       folio: global?.factura?.folio,
       fecha: global?.factura?.fecha,
-      ventas: global?.factura?.ventas,
+      ventas: global?.factura?.ventas_globales,
       id_fac: global?.factura?.id_api,
     };
     onSetDato(facturasIngresar, setFacturas);
@@ -50,16 +50,14 @@ const Index = ({ visible, global, hideModal }) => {
         width={'85%'}
         footer={null}
       >
-        <Alert
-          message='La Factura global se genera solo los viernes a las 10 a.m.'
-          type='info'
-        />
         <Row gutter={[16, 16]}>
           <Col span={breakpoint.lg ? 6 : 24}>
             <TextLabel title='Subtotal' subtitle={`$ ${global.subtotal}`} />
+            <TextLabel title='Sucursal' subtitle={`${global?.sucursal}`} />
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
             <TextLabel title='Descuento' subtitle={`$ ${global.descuento}`} />
+            <TextLabel title='Factura' subtitle={`${facturas?.id}`} />
           </Col>
           <Col span={breakpoint.lg ? 6 : 24}>
             <TextLabel title='IVA' subtitle={`$ ${global.iva}`} />
@@ -68,17 +66,15 @@ const Index = ({ visible, global, hideModal }) => {
             <TextLabel title='Total' subtitle={`$ ${global.total}`} />
           </Col>
         </Row>
-        <TextLabel title='Sucursal' subtitle={`${global?.sucursal}`} />
-        <TextLabel title='Facturas' subtitle={`${facturas?.id}`} />
         <Row gutter={[16, 16]}>
           <Col span={breakpoint.lg ? 8 : 24}>
-            <TextLabel title='Serie' subtitle={`$ ${facturas?.serie}`} />
+            <TextLabel title='Serie' subtitle={`${facturas?.serie}`} />
           </Col>
           <Col span={breakpoint.lg ? 8 : 24}>
-            <TextLabel title='Folio' subtitle={`$ ${facturas?.folio}`} />
+            <TextLabel title='Folio' subtitle={`${facturas?.folio}`} />
           </Col>
           <Col span={breakpoint.lg ? 8 : 24}>
-            <TextLabel title='Fecha' subtitle={`$ ${global?.fecha}`} />
+            <TextLabel title='Fecha' subtitle={`${global?.fecha}`} />
           </Col>
         </Row>
         <TextLabel title='Ventas' />
