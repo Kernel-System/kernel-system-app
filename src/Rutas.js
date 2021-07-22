@@ -56,7 +56,7 @@ import CrearOrdenCompra from './pages/ordenesCompraProv/CrearOrden';
 import OrdenesCompra from './pages/ordenesCompraProv/Ordenes';
 
 import RegistrarDevolucion from './pages/devolucion_clientes/RegistrarDevolucion';
-import Devoluciones from './pages/devolucion_clientes/RegistrarDevolucion';
+import Devoluciones from './pages/devolucion_clientes/Devoluciones';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 

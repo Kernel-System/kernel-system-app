@@ -536,14 +536,22 @@ const Index = ({ visible, cotizacion, setVis }) => {
           <Col className='gutter-row' key='col21' span={8}>
             <TextLabel
               title='SUBTOTAL'
-              subtitle={`$${cotizacion.total - cotizacion.iva}`}
+              subtitle={`${formatPrice(
+                (cotizacion.total - cotizacion.iva).toFixed(2)
+              )}`}
             />
           </Col>
           <Col className='gutter-row' span={8} key='col22'>
-            <TextLabel title='IVA' subtitle={`$${cotizacion.iva}`} />
+            <TextLabel
+              title='IVA'
+              subtitle={`${formatPrice(cotizacion.iva)}`}
+            />
           </Col>
           <Col className='gutter-row' span={8} key='col23'>
-            <TextLabel title='TOTAL' subtitle={`$${cotizacion.total}`} />
+            <TextLabel
+              title='TOTAL'
+              subtitle={`${formatPrice(cotizacion.total)}`}
+            />
           </Col>
         </Row>
         <Button

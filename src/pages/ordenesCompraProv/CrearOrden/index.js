@@ -504,6 +504,14 @@ const Index = () => {
 
   //#endregion
 
+  const formatPrice = (price) => {
+    var formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+    return formatter.format(price);
+  };
+
   return (
     <Form
       name='basic'
@@ -604,13 +612,16 @@ const Index = () => {
         justify='center'
       >
         <Col className='gutter-row' span={8}>
-          <TextLabel title='SUBTOTAL' subtitle={(total - iva).toFixed(2)} />
+          <TextLabel
+            title='SUBTOTAL'
+            subtitle={formatPrice((total - iva).toFixed(2))}
+          />
         </Col>
         <Col className='gutter-row' span={8}>
-          <TextLabel title='IVA' subtitle={iva.toFixed(2)} />
+          <TextLabel title='IVA' subtitle={formatPrice(iva.toFixed(2))} />
         </Col>
         <Col className='gutter-row' span={8}>
-          <TextLabel title='TOTAL' subtitle={total.toFixed(2)} />
+          <TextLabel title='TOTAL' subtitle={formatPrice(total.toFixed(2))} />
         </Col>
       </Row>
       <Form.Item>

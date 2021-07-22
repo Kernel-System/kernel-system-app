@@ -578,13 +578,16 @@ const Index = ({ visible, orden, setVis }) => {
           justify='center'
         >
           <Col className='gutter-row' key='col21' span={8}>
-            <TextLabel title='SUBTOTAL' subtitle={orden.total - orden.iva} />
+            <TextLabel
+              title='SUBTOTAL'
+              subtitle={formatPrice(orden.total - orden.iva)}
+            />
           </Col>
           <Col className='gutter-row' span={8} key='col22'>
-            <TextLabel title='IVA' subtitle={orden.iva} />
+            <TextLabel title='IVA' subtitle={formatPrice(orden.iva)} />
           </Col>
           <Col className='gutter-row' span={8} key='col23'>
-            <TextLabel title='TOTAL' subtitle={orden.total} />
+            <TextLabel title='TOTAL' subtitle={formatPrice(orden.total)} />
           </Col>
         </Row>
         <Button

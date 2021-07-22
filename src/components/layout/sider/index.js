@@ -15,6 +15,7 @@ import {
   StockOutlined,
   FileDoneOutlined,
   RedEnvelopeOutlined,
+  ExportOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -195,6 +196,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const DevolucionesClientesMenuItem = (
+    <Menu.Item
+      key='devolucion-clientes'
+      icon={<ExportOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/devolucion-clientes'>Devoluciones a Clientes</Link>
+    </Menu.Item>
+  );
+
   const OrdenesComprasMenuItem = (showIcon) => (
     <Menu.Item
       key='ordenes-compra'
@@ -235,6 +246,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const FacturasGlobalesMenuItem = (showIcon) => (
+    <Menu.Item
+      key='facturas-internas'
+      icon={showIcon ? <FileTextOutlined /> : undefined}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/facturas-globales'>Facturas globales</Link>
+    </Menu.Item>
+  );
+
   const ComprasSubMenu = (
     <Menu.SubMenu key='subCompras' icon={<ShoppingOutlined />} title='Compras'>
       {ComprasMenuItem()}
@@ -251,6 +272,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     >
       {FacturasExternasMenuItem()}
       {FacturasInternasMenuItem()}
+      {role === 'administrador' && <>{FacturasGlobalesMenuItem()} </>}
     </Menu.SubMenu>
   );
 
@@ -289,6 +311,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {VentaMenuItem}
       {CotizacionMenuItem}
       {VentasMenuItem}
+      {DevolucionesClientesMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
       {SolicitudesCompraMenuItem}
@@ -345,6 +368,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {VentaMenuItem}
             {CotizacionMenuItem}
             {VentasMenuItem}
+            {DevolucionesClientesMenuItem}
             {InventarioMenuItem}
             {EnsamblesMenuItem}
             {ProductosMenuItem}
