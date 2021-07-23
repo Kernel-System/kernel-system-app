@@ -9,7 +9,7 @@ import { pairOfFiltersHeader } from 'utils/gridUtils';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 
-const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
+const formatoFecha = 'DD MMMM YYYY';
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -142,9 +142,7 @@ const Index = ({ onClickItem }) => {
                   }}
                 >
                   Vigencia:{' '}
-                  <b>
-                    {moment(new Date(item.fecha_vigencia)).format(formatoFecha)}
-                  </b>
+                  <b>{moment(item.fecha_vigencia).format(formatoFecha)}</b>
                 </span>
               }
             </List.Item>
