@@ -1,17 +1,19 @@
 import './styles.css';
 import { useState } from 'react';
 import { http } from 'api';
-import { List, Select, Typography, Row, Col, Button } from 'antd';
+import { List, Select, Typography, Button, Grid } from 'antd';
 import { useQuery } from 'react-query';
 import { conceptosMovimientos } from 'utils/almacen';
 import { EyeFilled } from '@ant-design/icons';
 import { useStoreState } from 'easy-peasy';
+import { pairOfFiltersHeader } from 'utils/gridUtils';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 
-const formatoFecha = 'DD MMMM YYYY, h:mm:ss a';
+const { useBreakpoint } = Grid;
 const { Option } = Select;
 const { Text } = Typography;
+const formatoFecha = 'DD MMMM YYYY, h:mm:ss a';
 
 const Index = ({ onClickItem, seeItem }) => {
   const token = useStoreState((state) => state.user.token.access_token);
@@ -60,57 +62,51 @@ const Index = ({ onClickItem, seeItem }) => {
     return result;
   });
 
+  const screen = useBreakpoint();
+
+  const fields = [
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Filtrar por Concepto:
+    </Text>,
+    <Select
+      style={{ width: '100%' }}
+      placeholder='Seleccionar un Puesto'
+      optionFilterProp='children'
+      defaultValue='Todo'
+      onChange={onSearchChange}
+      filterOption={(input, option) => {
+        return option.children.toLowerCase().includes(input.toLowerCase());
+      }}
+    >
+      <Option value='Todo'>Todo</Option>
+      {Object.keys(conceptosMovimientos).map((concepto, indx) => (
+        <Option key={indx} value={concepto}>
+          {concepto}
+        </Option>
+      ))}
+    </Select>,
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Ordenar por:
+    </Text>,
+    <SortSelect
+      onChange={handleSort}
+      value={sortValue}
+      recentText='Más reciente'
+      oldestText='Más antiguo'
+    />,
+  ];
+
   return (
     <>
-      <Row gutter={[16, 12]}>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Filtrar por Concepto:
-          </Text>
-        </Col>
-        <Col xs={24} lg={12}>
-          <Select
-            style={{ width: '100%' }}
-            placeholder='Seleccionar un Puesto'
-            optionFilterProp='children'
-            defaultValue='Todo'
-            onChange={onSearchChange}
-            filterOption={(input, option) => {
-              return option.children
-                .toLowerCase()
-                .includes(input.toLowerCase());
-            }}
-          >
-            <Option value='Todo'>Todo</Option>
-            {Object.keys(conceptosMovimientos).map((concepto, indx) => (
-              <Option key={indx} value={concepto}>
-                {concepto}
-              </Option>
-            ))}
-          </Select>
-        </Col>
-        <Col>
-          <Text
-            style={{
-              verticalAlign: 'sub',
-            }}
-          >
-            Ordenar por:
-          </Text>
-        </Col>
-        <Col flex={1} style={{ paddingLeft: 0, paddingRight: 0 }}>
-          <SortSelect
-            onChange={handleSort}
-            value={sortValue}
-            recentText='Más reciente'
-            oldestText='Más antiguo'
-          />
-        </Col>
-      </Row>
+      {pairOfFiltersHeader(screen, fields)}
       <List
         itemLayout='horizontal'
         size='default'

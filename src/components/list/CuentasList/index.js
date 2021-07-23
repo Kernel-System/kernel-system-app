@@ -1,10 +1,14 @@
-import { Input, List, Select } from 'antd';
+import { Input, List, Select, Grid, Typography } from 'antd';
 import { http } from 'api';
 import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { pairOfFiltersHeader } from 'utils/gridUtils';
 import './styles.css';
+
 const { Option } = Select;
+const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const Index = ({ onConfirmDelete, onClickItem }) => {
   const [tipo, setTipo] = useState('facturas_internas');
@@ -67,33 +71,54 @@ const Index = ({ onConfirmDelete, onClickItem }) => {
   const [searchValue, setSearchValue] = useState('');
   const [listToShow, setListToShow] = useState([]);
 
+  const screen = useBreakpoint();
+
+  const fields = [
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Filtrar tipo:
+    </Text>,
+    <Select
+      style={{ width: '100%' }}
+      optionFilterProp='children'
+      defaultValue='Facturas Internas'
+      onChange={onTypeChange}
+      filterOption={(input, option) =>
+        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      }
+    >
+      <Option value='facturas_internas' key='facturas_internas'>
+        Facturas Internas
+      </Option>
+      <Option value='facturas_externas' key='facturas_externas'>
+        Facturas Externas
+      </Option>
+    </Select>,
+    <Text
+      style={{
+        verticalAlign: 'sub',
+      }}
+    >
+      Buscar:
+    </Text>,
+    <Input.Search
+      onChange={onSearchChange}
+      placeholder={
+        tipo === 'facturas_internas'
+          ? 'Buscar por RFC Emisor'
+          : 'Buscar por Folio'
+      }
+      value={searchValue}
+    />,
+  ];
+
   return (
     <>
-      <Select
-        style={{ width: '100%' }}
-        optionFilterProp='children'
-        defaultValue='Facturas Internas'
-        onChange={onTypeChange}
-        filterOption={(input, option) =>
-          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-        }
-      >
-        <Option value='facturas_internas' key='facturas_internas'>
-          Facturas Internas
-        </Option>
-        <Option value='facturas_externas' key='facturas_externas'>
-          Facturas Externas
-        </Option>
-      </Select>
-      <Input.Search
-        onChange={onSearchChange}
-        placeholder={
-          tipo === 'facturas_internas'
-            ? 'Buscar por RFC Emisor'
-            : 'Buscar por Folio'
-        }
-        value={searchValue}
-      />
+      {pairOfFiltersHeader(screen, fields, 1, 3)}
+
       <br />
       <List
         itemLayout='horizontal'

@@ -102,7 +102,7 @@ const Index = ({ match }) => {
       case 'Ordenado':
         estado = {
           estado: 'En ensamble',
-          fecha_inicio_ensamble: obtenerFecha(),
+          fecha_inicio_ensamble: moment().format('YYYY-MM-DDTHH:mm:ss'),
           observaciones: list[0].observaciones,
         };
         break;
@@ -115,7 +115,7 @@ const Index = ({ match }) => {
       case 'Ensamblado':
         estado = {
           estado: 'Ingresado en almacén',
-          fecha_fin_ensamble: obtenerFecha(),
+          fecha_fin_ensamble: moment().format('YYYY-MM-DDTHH:mm:ss'),
           observaciones: list[0].observaciones,
         };
         break;
@@ -156,7 +156,7 @@ const Index = ({ match }) => {
                     `/items/movimientos_almacen/`,
                     {
                       fecha: estado.fecha_inicio_ensamble,
-                      concepto: 'Componentes de ensamble',
+                      concepto: 'Componentes para ensamble',
                       comentario: list[0].comentario,
                       folio_ensamble: list[0].folio,
                       rfc_empleado: list[0].rfc_empleado_orden,
@@ -503,9 +503,9 @@ const Index = ({ match }) => {
           <Col className='gutter-row' span={12}>
             <TextLabel
               title='Fecha de Fin de ensamble'
-              subtitle={moment(new Date(dato.fecha_fin_ensamble)).format(
+              subtitle={dato.fecha_fin_ensamble ? moment(new Date(dato.fecha_fin_ensamble)).format(
                 formatoFecha
-              )}
+              ) : "Sin terminar"}
             />
           </Col>
         </Row>
