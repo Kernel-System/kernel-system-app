@@ -371,7 +371,7 @@ export const categoriasProductos = {
   62: 'Adaptador de Video',
   63: 'Adaptador Audio',
   64: 'Adaptador PC',
-  65: 'Repetidopres',
+  65: 'Repetidores',
   66: 'Router',
   67: 'Switches',
   68: 'Access Point',

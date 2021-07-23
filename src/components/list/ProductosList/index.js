@@ -14,7 +14,10 @@ import { Link } from 'react-router-dom';
 
 const Index = ({ putToken, onConfirmDelete }) => {
   const fetchProducts = async () => {
-    const { data } = await http.get('/items/productos', putToken);
+    const { data } = await http.get(
+      '/items/productos?fields=*, categorias.*',
+      putToken
+    );
     console.log(data.data);
     return data.data;
   };
@@ -127,8 +130,12 @@ const Index = ({ putToken, onConfirmDelete }) => {
                 }
                 description={`${item.descripcion}`}
               />
-              {item.categorias.map((cat) => {
-                return <Tag key={cat}>{categoriasProductos[cat]}</Tag>;
+              {item.categorias.map(({ categorias_id }) => {
+                return (
+                  <Tag key={categorias_id}>
+                    {categoriasProductos[categorias_id]}
+                  </Tag>
+                );
               })}
             </List.Item>
           );

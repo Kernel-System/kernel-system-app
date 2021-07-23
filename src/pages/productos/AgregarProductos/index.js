@@ -184,7 +184,7 @@ const Index = ({ tipo }) => {
   };
 
   const onFinish = (datos) => {
-    console.log(datos);
+    // console.log({datos});
     http
       .post(
         '/items/productos/',
@@ -265,7 +265,6 @@ const Index = ({ tipo }) => {
       .patch(
         `/items/productos/${datos.codigo}`,
         {
-          codigo: datos.codigo,
           titulo: datos.titulo,
           iva: datos.iva,
           sku: datos.sku,
@@ -292,7 +291,11 @@ const Index = ({ tipo }) => {
         putToken
       )
       .then((resul) => {
-        if (valor.id === window.undefined)
+        if (
+          valor.id === window.undefined &&
+          valor.tipo_de_venta !== 'Servicio' &&
+          valor.tipo_de_venta !== 'Fijo'
+        )
           http
             .post(
               `/items/precios_variables`,
@@ -306,7 +309,7 @@ const Index = ({ tipo }) => {
               console.log(resul3);
               Mensaje();
             });
-        else
+        else if (valor.id !== window.undefined)
           http
             .patch(
               `/items/precios_variables/${valor.id}`,
@@ -320,6 +323,7 @@ const Index = ({ tipo }) => {
               console.log(resul3);
               Mensaje();
             });
+        else Mensaje();
       })
       .catch((error) => {
         if (
@@ -328,6 +332,35 @@ const Index = ({ tipo }) => {
           message.error('Codigo ya existente');
         } else message.error('Un error ha ocurrido');
       });
+
+    const categoriasIniciales = list[0].categorias;
+    const ids = categoriasIniciales.map((cat) => cat.id);
+    console.log({ ids });
+    if (ids.length) {
+      http.patch(
+        `/items/productos_categorias`,
+        {
+          keys: ids,
+          data: {
+            categorias_id: null,
+            productos_codigo: null,
+          },
+        },
+        putToken
+      );
+    }
+    console.log(datos.categorias);
+    const categoriasNuevas = datos.categorias?.map((cat) => ({
+      productos_codigo: datos.codigo,
+      categorias_id: categoriasProductos[cat]
+        ? cat
+        : Object.keys(categoriasProductos).find(
+            (key) => categoriasProductos[key] === cat
+          ),
+    }));
+    console.log({ categoriasNuevas });
+    if (categoriasNuevas?.length)
+      http.post(`/items/productos_categorias`, categoriasNuevas, putToken);
   };
 
   const [nombreUnidad, setNombreUnidad] = useState(''); //  nombre_unidad_cfdi;
@@ -337,9 +370,13 @@ const Index = ({ tipo }) => {
   };
 
   const beforeUpload = (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isJpgOrPng =
+      file.type === 'image/jpeg' ||
+      file.type === 'image/jpg' ||
+      file.type === 'image/png' ||
+      file.type === 'image/jfif';
     if (!isJpgOrPng) {
-      message.error('Solo puede subir imágenes en formato JPG/PNG');
+      message.error('Solo puede subir imágenes en formato JPG/PNG/jfif');
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
@@ -383,6 +420,9 @@ const Index = ({ tipo }) => {
         precio_1: valor.precio_1,
         precio_2: valor.precio_2,
         precio_3: valor.precio_3,
+        categorias: dato.categorias?.map(
+          (cat) => categoriasProductos[cat.categorias_id]
+        ),
       }}
       onFinish={tipo === 'agregar' ? onFinish : onFinishChange}
       onFinishFailed={onFinishFailed}
@@ -495,7 +535,7 @@ const Index = ({ tipo }) => {
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
               //defaultValue={'MXM'}
-              defaultValue={tipo === 'agregar' ? dato.moneda : 'MXM'}
+              value={tipo === 'agregar' ? dato.moneda : 'MXM'}
             >
               {Object.keys(tiposDeMoneda).map((item) => {
                 return (
@@ -627,7 +667,7 @@ const Index = ({ tipo }) => {
               disabled={tipo === 'mostrar'}
               placeholder='Tipo de venta'
               optionFilterProp='children'
-              defaultValue={tipo !== 'agregar' ? dato.tipo_de_venta : 'Fijo'}
+              value={tipo !== 'agregar' ? dato.tipo_de_venta : 'Fijo'}
               onChange={(value) => {
                 setValor({
                   tipo_de_venta: value,
@@ -720,8 +760,15 @@ const Index = ({ tipo }) => {
             </Col>
           </Row>
           <TextLabel title='Categorias' />
-
-          {tipo === 'agregar' ? (
+          {tipo === 'mostrar' ? (
+            dato.categorias.map(({ categorias_id }) => {
+              return (
+                <Tag key={categorias_id} style={{ marginBottom: '34px' }}>
+                  {categoriasProductos[categorias_id]}
+                </Tag>
+              );
+            })
+          ) : (
             <Form.Item
               name='categorias'
               rules={[
@@ -733,10 +780,8 @@ const Index = ({ tipo }) => {
             >
               <Select
                 mode='multiple'
-                disabled={tipo !== 'agregar'}
                 placeholder='Agrega Etiquetas de Categoria'
-                //value={selectedItems}
-                //onChange={handleChangeItems}
+                // onChange={handleChangeCategorias}
                 style={{ width: '100%' }}
               >
                 {Object.keys(categoriasProductos).map((item) => {
@@ -748,14 +793,6 @@ const Index = ({ tipo }) => {
                 })}
               </Select>
             </Form.Item>
-          ) : (
-            dato.categorias.map((categoria) => {
-              return (
-                <Tag key={categoria.id} style={{ marginBottom: '34px' }}>
-                  {categoriasProductos[categoria.id]}
-                </Tag>
-              );
-            })
           )}
           <TextLabel title='Máximo de Producto' />
           <NumericInputForm
@@ -1050,10 +1087,10 @@ const Index = ({ tipo }) => {
                   )
                   .then((result) => {
                     setAgregarIma(!agregarIma);
-                    message.success('Imagen subida con exito');
+                    message.success('Imagen subida con éxito');
                   })
                   .catch(() => {
-                    message.error('Error al subir la imagen :c');
+                    message.error('Error al subir la imagen');
                   });
               }
             }}
