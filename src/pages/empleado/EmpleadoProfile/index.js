@@ -8,18 +8,20 @@ import { useStoreState } from 'easy-peasy';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { capitalize } from 'utils/functions';
+import { isLastDayOfMonth } from 'date-fns';
 
 const EmpleadoProfile = () => {
   const token = useStoreState((state) => state.user.token.access_token);
   const user = useQuery('employee', () => getUserData(token));
   const role = useStoreState((state) => state.user.role);
-  const date = new Date();
+  const date = Date.now();
+
   return (
     <>
       {role === 'administrador' ? (
         <HeadingBack
           title='Mi perfil'
-          subtitle={`${date.getDay() === 5 ? 'FACTURACIÓN GLOBAL HOY' : ''}`}
+          subtitle={`${isLastDayOfMonth(date) ? 'FACTURACIÓN GLOBAL HOY' : ''}`}
           extra={capitalize(role)}
           actions={[
             <Link to='/empleado/perfil' key='1'>

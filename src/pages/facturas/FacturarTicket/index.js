@@ -65,10 +65,13 @@ const Index = () => {
     if (entrar)
       http
         .get(
-          `/items/ventas/${values.no_ticket}?fields=*,productos_venta.*,rfc_vendedor.*,rfc_vendedor.sucursal.*`
+          `/items/ventas/${values.no_ticket}?fields=*,productos_venta.*,rfc_vendedor.*,rfc_vendedor.sucursal.*,factura.id_api`
         )
         .then((result_venta) => {
-          if (result_venta.data.data.factura === null) {
+          if (
+            result_venta.data.data.factura.length === 0 &&
+            result_venta.data.data.facturas_globales === null
+          ) {
             let items = [];
             result_venta.data.data.productos_venta.forEach((producto) => {
               items.push({
@@ -181,7 +184,20 @@ const Index = () => {
                       });
                   });
               });
-          } else message.info('Ticket ya registrado');
+          } else if (result_venta.data.data.facturas_globales === null) {
+            httpSAT
+              .get(`/cfdi/pdf/issued/${result_venta.factura[0].id_api}`)
+              .then((result) => {
+                const linkSource =
+                  'data:application/pdf;base64,' + result.data.Content;
+                const downloadLink = document.createElement('a');
+                const fileName = `${result_venta.factura[0].id_api}.pdf`;
+                downloadLink.href = linkSource;
+                downloadLink.download = fileName;
+                downloadLink.click();
+                message.info('Ticket ya registrado');
+              });
+          } else message.info('Tiempo de facturación del Ticket finalizado.');
         })
         .catch(() => {
           message.info('Venta no existente.');
@@ -217,7 +233,7 @@ const Index = () => {
       />
       <br />
       <Alert
-        message='La venta debe ser registrada antes de la 10 p.m. del día viernes de la semana correspondiente.'
+        message='La venta debe ser registrada antes de las 10 p.m. del fin de mes de la compra correspondiente.'
         type='info'
       />
       <br />

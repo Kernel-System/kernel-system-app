@@ -40,8 +40,16 @@ const Index = () => {
             venta.factura.length === 0 && venta.facturas_globales === null
         );
         let sucursales = {};
+        let forma_01 = 0;
+        let forma_02 = 0;
+
         if (ventas.length !== 0) {
           ventas.forEach((venta) => {
+            if (venta.forma_pago === '01') {
+              forma_01 = forma_01 + 1;
+            } else {
+              forma_02 = forma_02 + 1;
+            }
             let sucursal = [];
             if (
               sucursales[`${venta?.rfc_vendedor.sucursal?.clave}`]?.ventas !==
@@ -69,7 +77,7 @@ const Index = () => {
               Currency: 'MXN',
               ExpeditionPlace: sucursales[sucursal].cp,
               CfdiType: 'I',
-              PaymentForm: '01',
+              PaymentForm: forma_01 >= forma_02 ? '01' : '02',
               PaymentMethod: 'PUE',
               Receiver: {
                 Rfc: 'XAXX010101000',

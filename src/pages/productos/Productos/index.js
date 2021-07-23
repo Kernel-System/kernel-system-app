@@ -4,7 +4,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
 import Header from 'components/UI/Heading';
-import CsvReader from 'components/shared/CsvReader';
 import ProductosList from 'components/list/ProductosList';
 import { useStoreState } from 'easy-peasy';
 
@@ -15,23 +14,8 @@ const Index = () => {
       Authorization: `Bearer ${token}`,
     },
   };
-  const insertItems = (items) => {
-    return http.post('/items/productos', items, putToken);
-  };
-
-  const importarProductos = (datos) => {
-    const hide = message.loading('Importando productos..', 0);
-    insertMutation.mutate(datos, { onSuccess: hide });
-  };
 
   const queryClient = useQueryClient();
-
-  const insertMutation = useMutation((formData) => insertItems(formData), {
-    onSuccess: () => {
-      message.success('Productos importados exitosamente');
-      queryClient.invalidateQueries('productos');
-    },
-  });
 
   const deleteItem = async (values) => {
     return http.delete('/items/productos/' + values.codigo, putToken);
@@ -60,11 +44,6 @@ const Index = () => {
             Añadir Nuevo Producto
           </Button>
         </Link>
-        <CsvReader
-          hideMessage
-          onSuccess={importarProductos}
-          text='Importar desde archivo .csv'
-        />
       </Space>
     </>
   );
