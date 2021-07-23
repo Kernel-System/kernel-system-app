@@ -7,7 +7,8 @@ import { NumeroALetras } from 'api/numeroTexto';
 import logo from 'utils/Cotizacion.png';
 import moment from 'moment';
 
-const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
+const formatoFechaHora = 'DD MMMM YYYY, hh:mm:ss a';
+const formatoFecha = 'DD MMMM YYYY';
 
 const Index = ({ visible, cotizacion, setVis }) => {
   const [lista, setlista] = useState([]);
@@ -485,7 +486,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
             <TextLabel
               title='Fecha de Creación'
               subtitle={moment(new Date(cotizacion.fecha_creacion)).format(
-                formatoFecha
+                formatoFechaHora
               )}
             />
             <TextLabel
@@ -501,9 +502,7 @@ const Index = ({ visible, cotizacion, setVis }) => {
             <TextLabel title='Razón Social' subtitle={cotizacion.empresa} />
             <TextLabel
               title='Fecha de Vigencia'
-              subtitle={moment(new Date(cotizacion.fecha_vigencia)).format(
-                formatoFecha
-              )}
+              subtitle={moment(cotizacion.fecha_vigencia).format(formatoFecha)}
             />
             <TextLabel
               title='Días de Entrega'
