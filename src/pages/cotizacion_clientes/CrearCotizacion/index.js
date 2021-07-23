@@ -29,6 +29,8 @@ import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
+import moment from 'moment';
+
 const { Search, TextArea } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -142,19 +144,21 @@ const Index = () => {
               email_cliente: datos.correo,
               empresa: datos.empresa,
             };
-      const contizacion = {
+      const cotizacion = {
         total: total,
         iva: iva,
         porcentaje_anticipo: datos.porcentaje,
-        fecha_vigencia: date,
+        fecha_vigencia: moment(datos.fecha_vigencia).format('YYYY-MM-DD'),
+        fecha_creacion: moment().format('YYYY-MM-DDTHH:mm:ss'),
         dias_entrega: datos.dias,
         concepto: datos.concepto,
         nota: datos.nota,
         rfc_empleado: empleado.rfc,
         ...infoCliente,
       };
+      console.log({ cotizacion });
       http
-        .post('/items/cotizaciones/', contizacion, putToken)
+        .post('/items/cotizaciones/', cotizacion, putToken)
         .then((resul_cot) => {
           let productos = [];
           listProducts.forEach((producto) => {
@@ -730,7 +734,7 @@ const Index = () => {
         titulo='concepto'
         //valueDef={dato.unidad_de_medida}
         mensaje='Asigna un concepto.'
-        placeholder='Concepto.'
+        placeholder='Concepto'
         //required={false}
         max={100}
       />
@@ -756,7 +760,7 @@ const Index = () => {
           value='nulo'
         >
           <Option key='nulo' value='nulo'>
-            Ninguno/a
+            Prospecto
           </Option>
           {clientes.map((cliente) => (
             <Option key={cliente.id} value={cliente.id}>
@@ -772,7 +776,7 @@ const Index = () => {
             titulo='nombre'
             //valueDef={dato.unidad_de_medida}
             mensaje='Asigna un nombre.'
-            placeholder='Nombre del cliente.'
+            placeholder='Nombre del cliente'
             //required={false}
             max={100}
           />
@@ -782,7 +786,7 @@ const Index = () => {
             type='number'
             rules={{ pattern: '[0-9]{10}', message: '10 digitos numericos' }}
             //valueDef={dato.unidad_de_medida}
-            placeholder='Teléfono.'
+            placeholder='Teléfono'
             //required={false}
             max={10}
           />
@@ -792,7 +796,7 @@ const Index = () => {
             type='email'
             //valueDef={dato.unidad_de_medida}
             mensaje='Asigna un correo.'
-            placeholder='Correo Electrónico.'
+            placeholder='Correo Electrónico'
             //required={false}
             max={100}
           />
@@ -801,7 +805,7 @@ const Index = () => {
             titulo='empresa'
             //valueDef={dato.unidad_de_medida}
             mensaje='Asigna una razón social.'
-            placeholder='Razón Social.'
+            placeholder='Razón Social'
             //required={false}
             max={100}
           />
@@ -844,8 +848,7 @@ const Index = () => {
       >
         <DatePicker
           style={{ width: '100%' }}
-          onChange={onChangeTime}
-          placeholder='Selecciona la fecha de entreg de vigencia'
+          placeholder='Selecciona la fecha de vigencia de entrega'
         />
       </Form.Item>
       <TextLabel title='Porcentaje de Anticipo' />
