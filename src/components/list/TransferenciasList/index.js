@@ -1,22 +1,70 @@
 import './styles.css';
 import { http } from 'api';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { List, Button, Input, Space } from 'antd';
 import { EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
+import { getUserRole, getEmployeeSucursal } from 'api/auth';
 import moment from 'moment';
 
 const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const Index = () => {
   const token = useStoreState((state) => state.user.token.access_token);
+  const rol = useQuery(['rol_empleado'], () => getUserRole(token))?.data?.data
+    ?.data.role.name;
+  const sucursal = useQuery(['sucursal_empleado'], () =>
+    getEmployeeSucursal(token)
+  )?.data?.data?.data?.empleado[0]?.sucursal;
   const putToken = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
+  const [almacenes, setAlmacenes] = useState([]);
+  const [almacen, setAlmacen] = useState();
+  useEffect(() => {
+    http
+      .get(`/users/me?fields=empleado.sucursal,empleado.almacen`, putToken)
+      .then((result_sucursal) => {
+        onSetDato(result_sucursal.data.data.empleado[0].almacen, setAlmacen);
+        http
+          .get(
+            `/items/sucursales/${result_sucursal.data.data.empleado[0].sucursal}?fields=almacenes`,
+            putToken
+          )
+          .then((result) => {
+            onSetDato(result.data.data.almacenes, setAlmacenes);
+          });
+      });
+  }, []);
+
+  const onSetDato = (lista, setDato) => {
+    setDato(lista);
+  };
+
+  const onSetDisabled = (item) => {
+    if (rol === 'administrador') {
+      if (
+        item.estado === 'Confirmado' //&& item.movimientos_almacen.length !== 0
+      ) {
+        return !almacenes.includes(item.almacen_origen);
+      } else if (item.estado === 'Pendiente' || item.estado === 'Tranferido') {
+        return !almacenes.includes(item.almacen_destino);
+      } else return true;
+    } else {
+      if (
+        item.estado === 'Confirmado' //&& item.movimientos_almacen.length !== 0
+      ) {
+        return !(item.almacen_origen === almacen);
+      } else if (item.estado === 'Pendiente' || item.estado === 'Tranferido') {
+        return !(item.almacen_destino === almacen);
+      } else return true;
+    }
+  };
+
   const fetchTransferencia = async () => {
     const { data } = await http.get(
       '/items/solicitudes_transferencia',
@@ -74,7 +122,10 @@ const Index = () => {
                 <Button icon={<EyeFilled />}></Button>
               </Link>,
               <Space>
-                <Link to={`/transferencia/editar/${item.id}`}>
+                <Link
+                  to={`/transferencia/editar/${item.id}`}
+                  disabled={onSetDisabled(item)}
+                >
                   <Button icon={<EditFilled />} />
                 </Link>
               </Space>,

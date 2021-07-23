@@ -93,6 +93,7 @@ const Index = () => {
   const [concepto, setConcepto] = useState('Compra');
   const [compraIndex, setCompraIndex] = useState();
   const [ventaIndex, setVentaIndex] = useState();
+  const [transferenciaIndex, setTransferenciaIndex] = useState();
 
   const [ocultarAgregar1, setOcultarAgregar1] = useState(true);
   const [ocultarAgregar2, setOcultarAgregar2] = useState(true);
@@ -139,15 +140,7 @@ const Index = () => {
       });
     http
       .get(
-        `/items/solicitudes_transferencia/?fields=id,almacen_origen,almacen_destino`,
-        putToken
-      )
-      .then((result) => {
-        onSetArreglo(result.data.data, setTransferencias);
-      });
-    http
-      .get(
-        `/items/solicitudes_transferencia/?fields=id,almacen_origen,almacen_destino`,
+        `/items/solicitudes_transferencia/?fields=id,almacen_origen,almacen_destino,estado,productos_transferencia.*`,
         putToken
       )
       .then((result) => {
@@ -846,6 +839,32 @@ const Index = () => {
       });
     setListProducts(lista);
   };
+
+  const addTransferenciaProducts = (index) => {
+    const productos_comprados = [];
+    if (index !== undefined && index !== '') {
+      transferencias[index].productos_transferencia.forEach(
+        (producto, index) => {
+          const producto_catalogo = producto.codigo;
+          const nuevoProducto = {
+            key: index,
+            expand: true,
+            titulo: producto.titulo,
+            id: producto.id,
+            clave: producto.clave,
+            clave_unidad: producto.clave_unidad,
+            series: [],
+            productimage: '',
+            max: producto.cantidad,
+            cantidad: 1,
+            codigo: producto_catalogo.codigo,
+          };
+          productos_comprados.push(nuevoProducto);
+        }
+      );
+      setListProducts(productos_comprados);
+    }
+  };
   //#endregion
 
   const totalProductosPendientes = (productos) => {
@@ -875,45 +894,48 @@ const Index = () => {
 
   const camposGenerales = (
     <>
-      <Form.Item
-        label='Clave de Almacén'
-        name='almacen'
-        rules={[
-          {
-            required: true,
-            message: `Seleccione un almacen.`,
-          },
-        ]}
-      >
-        <Select
-          showSearch
-          style={{ width: '100%' }}
-          placeholder='Almacén'
-          onChange={(value) => {
-            onSetAlmacen(value);
-          }}
+      {concepto !== 'Entrada por transferencia' &&
+      concepto !== 'Salida por transferencia' ? (
+        <Form.Item
+          label='Clave de Almacén'
+          name='almacen'
+          rules={[
+            {
+              required: true,
+              message: `Seleccione un almacen.`,
+            },
+          ]}
         >
-          {almacenes.map((almacen) => (
-            <Option value={almacen.clave} key={almacen.clave}>
-              <b
-                style={{
-                  opacity: 0.6,
-                }}
-              >
-                {almacen.clave}
-              </b>
-              : de sucursal{' '}
-              <b
-                style={{
-                  opacity: 0.6,
-                }}
-              >
-                {almacen.clave_sucursal}
-              </b>
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
+          <Select
+            showSearch
+            style={{ width: '100%' }}
+            placeholder='Almacén'
+            onChange={(value) => {
+              onSetAlmacen(value);
+            }}
+          >
+            {almacenes.map((almacen) => (
+              <Option value={almacen.clave} key={almacen.clave}>
+                <b
+                  style={{
+                    opacity: 0.6,
+                  }}
+                >
+                  {almacen.clave}
+                </b>
+                : de sucursal{' '}
+                <b
+                  style={{
+                    opacity: 0.6,
+                  }}
+                >
+                  {almacen.clave_sucursal}
+                </b>
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      ) : null}
       <Form.Item
         label='Concepto'
         name='concepto'
@@ -932,6 +954,7 @@ const Index = () => {
           onChange={(value) => {
             setTipo('sin_factura');
             setFactura('');
+            setTransferenciaIndex('');
             setConcepto(value);
           }}
         >
@@ -1198,21 +1221,76 @@ const Index = () => {
             style={{ width: '100%' }}
             placeholder='Justifica un movimiento por transferencia'
             initialvalues=''
+            onChange={(value, all) => {
+              const almacen = all.almacen;
+              onSetAlmacen(almacen);
+              setTransferenciaIndex(all.index);
+              addTransferenciaProducts(all.index);
+            }}
           >
             <Option key='' value=''>
               Ninguna
             </Option>
-            {transferencias.map((transferencia) => {
-              return (
-                <Option key={transferencia.id} value={transferencia.id}>
-                  {`${transferencia.id} : ${transferencia.almacen_origen} a ${transferencia.almacen_destino}`}
-                </Option>
-              );
+            {transferencias.map((transferencia, index) => {
+              return transferencia.estado === 'Confirmado' ||
+                transferencia.estado === 'Recibido' ||
+                transferencia.estado === 'Recibido con Detalles' ? (
+                empleado.puesto === 'd5432f92-7a74-4372-907c-9868507e0fd5' ? (
+                  transferencia.estado === 'Confirmado' &&
+                  concepto === 'Salida por transferencia' ? (
+                    <Option
+                      key={transferencia.id}
+                      value={transferencia.id}
+                      index={index}
+                      almacen={transferencia.almacen_origen}
+                    >
+                      {`${transferencia.id} : Del almacén No. ${transferencia.almacen_origen} al almacén No. ${transferencia.almacen_destino}`}
+                    </Option>
+                  ) : (transferencia.estado === 'Recibido' ||
+                      transferencia.estado === 'Recibido con Detalles') &&
+                    concepto === 'Entrada por transferencia' ? (
+                    <Option
+                      key={transferencia.id}
+                      value={transferencia.id}
+                      index={index}
+                      almacen={transferencia.almacen_destino}
+                    >
+                      {`${transferencia.id} : Del almacén No. ${transferencia.almacen_origen} al almacén No. ${transferencia.almacen_destino}`}
+                    </Option>
+                  ) : null
+                ) : transferencia.almacen_origen === almacen &&
+                  transferencia.estado === 'Confirmado' &&
+                  concepto === 'Salida por transferencia' ? (
+                  <Option
+                    key={transferencia.id}
+                    value={transferencia.id}
+                    index={index}
+                    almacen={transferencia.almacen_origen}
+                  >
+                    {`${transferencia.id} : Del almacén No. ${transferencia.almacen_origen} al almacén No. ${transferencia.almacen_destino}`}
+                  </Option>
+                ) : transferencia.almacen_destino === almacen &&
+                  (transferencia.estado === 'Recibido' ||
+                    transferencia.estado === 'Recibido con Detalles') &&
+                  concepto === 'Entrada por transferencia' ? (
+                  <Option
+                    key={transferencia.id}
+                    value={transferencia.id}
+                    index={index}
+                    almacen={transferencia.almacen_destino}
+                  >
+                    {`${transferencia.id} : Del almacén No. ${transferencia.almacen_origen} al almacén No. ${transferencia.almacen_destino}`}
+                  </Option>
+                ) : null
+              ) : null;
             })}
           </Select>
         </Form.Item>
       ) : null}
-      {concepto !== 'Compra' && concepto !== 'Venta' ? (
+      {concepto !== 'Compra' &&
+      concepto !== 'Venta' &&
+      concepto !== 'Entrada por transferencia' &&
+      concepto !== 'Salida por transferencia' ? (
         <Row gutter={16} key='Facturas'>
           <Col xs={24} lg={12} key={1}>
             <Form.Item label='Tipo de Factura' name='tipo'>
@@ -1278,7 +1356,7 @@ const Index = () => {
       >
         <HeadingBack title='Movimiento de Almacén' />
         <TextLabel title='Datos generales' />
-        {itemsToGrid(camposGenerales.props.children, 'auto', 2, 16)}
+        {camposGenerales}
 
         <TextLabel title='Justificación' />
         <Text type='secondary' style={{ display: 'block', marginBottom: 10 }}>
@@ -1318,6 +1396,16 @@ const Index = () => {
                 </Link>
               ) : null}
             </>
+          ) : concepto === 'Entrada por transferencia' ||
+            concepto === 'Salida por transferencia' ? (
+            <Button
+              type='default'
+              onClick={() => addTransferenciaProducts(transferenciaIndex)}
+              //disabled={ocultarAgregar3}
+            >
+              <CaretDownFilled />
+              {'Agregar todos los productos de la transferencia'}
+            </Button>
           ) : (
             <Search
               placeholder='Buscar por producto de catálogo'
