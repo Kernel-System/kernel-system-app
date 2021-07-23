@@ -30,26 +30,27 @@ const Index = ({ onClickItem }) => {
 
   const fetchItems = async () => {
     const { data } = await http.get(
-      '/items/facturas_globales?fields=*,factura.*,factura.ventas.*',
+      '/items/facturas_globales?fields=*,factura.*,factura.ventas_globales.*',
       putToken
     );
+    console.log(data.data);
     return data.data;
   };
 
   const { data } = useQuery('facturas_globales', async () => {
     const result = await fetchItems();
     setListToShow(result);
-    filtrarVentasPorNumeroVenta(result, searchValue);
+    filtrarVentasPorSucursal(result, searchValue);
     return result;
   });
 
   const onSearchChange = (e) => {
     const value = e;
     setSearchValue(value);
-    filtrarVentasPorNumeroVenta(data, value);
+    filtrarVentasPorSucursal(data, value);
   };
 
-  const filtrarVentasPorNumeroVenta = async (fac_global, value) => {
+  const filtrarVentasPorSucursal = async (fac_global, value) => {
     if (value === 'Todo') {
       setListToShow(fac_global);
     } else if (fac_global)
@@ -127,7 +128,7 @@ const Index = ({ onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {`No. Venta ${item.id}`}
+                    {`No. Fac. Global ${item.id}`}
                   </p>
                 }
                 description={`Fecha: ${item.fecha}`}
@@ -139,7 +140,7 @@ const Index = ({ onClickItem }) => {
                     opacity: 0.8,
                   }}
                 >
-                  Sucural: {<b>{`${item.sucursal}`}</b>}
+                  Sucursal: {<b>{`${item.sucursal}`}</b>}
                 </span>
               }
             </List.Item>

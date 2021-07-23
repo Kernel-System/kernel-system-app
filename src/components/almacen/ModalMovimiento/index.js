@@ -1,11 +1,9 @@
-import { Divider, Modal, Typography } from 'antd';
+import { Modal } from 'antd';
 import { http } from 'api';
 import BoughtProductsListWithSeries from 'components/shared/BoughtProductsListWithSeries';
-import TextLabel from 'components/UI/TextLabel';
 import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import Descripciones from 'components/descriptions/MovimientoDescription';
-import moment from 'moment';
 
 const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
 

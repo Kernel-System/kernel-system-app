@@ -11,6 +11,7 @@ const Summary = ({
   nivel,
   type,
 }) => {
+  console.log(products);
   return (
     <Card>
       <Space direction='vertical' style={{ width: '100%' }} size='middle'>
@@ -22,7 +23,10 @@ const Summary = ({
                   products.reduce((total, product) => {
                     return (
                       total +
-                      calcPrecioVariable(product, nivel) * product.cantidad
+                      (product.tipo_de_venta === 'Servicio'
+                        ? product.precio_fijo
+                        : calcPrecioVariable(product, nivel)) *
+                        product.cantidad
                     );
                   }, 0)
                 )
@@ -37,14 +41,16 @@ const Summary = ({
                   products.reduce(
                     (total, product) =>
                       total +
-                      (product.iva !== 0
-                        ? (calcPrecioVariable(product, nivel) *
-                            product.cantidad -
-                            calcPrecioVariable(product, nivel) *
-                              product.cantidad *
-                              toPercent(product.descuento)) *
-                          toPercent(product.iva)
-                        : 0),
+                      ((product.tipo_de_venta === 'Servicio'
+                        ? product.precio_fijo
+                        : calcPrecioVariable(product, nivel)) *
+                        product.cantidad -
+                        (product.tipo_de_venta === 'Servicio'
+                          ? product.precio_fijo
+                          : calcPrecioVariable(product, nivel)) *
+                          product.cantidad *
+                          toPercent(product.descuento)) *
+                        toPercent(product.iva),
                     0
                   )
                 )
@@ -60,11 +66,9 @@ const Summary = ({
                   products.reduce(
                     (total, product) =>
                       total +
-                      (product.descuento !== 0
-                        ? calcPrecioVariable(product, nivel) *
-                          product.cantidad *
-                          toPercent(product.descuento)
-                        : 0),
+                      calcPrecioVariable(product, nivel) *
+                        product.cantidad *
+                        toPercent(product.descuento),
                     0
                   )
                 )
@@ -89,7 +93,9 @@ const Summary = ({
                 products.reduce(
                   (total, product) =>
                     total +
-                    calcPrecioVariable(product, nivel) *
+                    (product.tipo_de_venta === 'Servicio'
+                      ? product.precio_fijo
+                      : calcPrecioVariable(product, nivel)) *
                       toPercent(100 - product.descuento) *
                       toPercent(100 + product.iva) *
                       product.cantidad,

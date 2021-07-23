@@ -157,7 +157,7 @@ const ProductsTable = ({
               min={0}
               type='number'
               precision={2}
-              value={calcPrecioVariable(record, nivel)}
+              value={record.precio_fijo}
               onStep={(_, { type }) => {
                 if (type === 'up') {
                   addOneToItem('precio_fijo', record.codigo);
@@ -228,12 +228,22 @@ const ProductsTable = ({
             required
             onBlur={({ target: { value } }) => {
               let newValue;
-              if (value > calcCantidad(record)) {
-                newValue = calcCantidad(record);
-              } else if (value <= 0 || value === '') {
-                newValue = 1;
+              if (record.tipo_de_venta === 'Servicio') {
+                if (value > 999) {
+                  newValue = 999;
+                } else if (value <= 0 || value === '') {
+                  newValue = 1;
+                } else {
+                  newValue = Math.ceil(value);
+                }
               } else {
-                newValue = Math.ceil(value);
+                if (value > calcCantidad(record)) {
+                  newValue = calcCantidad(record);
+                } else if (value <= 0 || value === '') {
+                  newValue = 1;
+                } else {
+                  newValue = Math.ceil(value);
+                }
               }
               setValueToItem(
                 type === 'venta'
@@ -245,8 +255,7 @@ const ProductsTable = ({
                   : {
                       id: record.codigo,
                       cantidad: newValue,
-                    },
-                value
+                    }
               );
             }}
           />
@@ -260,7 +269,11 @@ const ProductsTable = ({
       render={(_, record) => (
         <>
           <Text strong>
-            {formatPrice(calcPrecioVariable(record, nivel) * record.cantidad)}
+            {formatPrice(
+              (record.tipo_de_venta === 'Servicio'
+                ? record.precio_fijo
+                : calcPrecioVariable(record, nivel)) * record.cantidad
+            )}
           </Text>
         </>
       )}
@@ -283,7 +296,9 @@ const ProductsTable = ({
             >
               -
               {formatPrice(
-                calcPrecioVariable(record, nivel) *
+                (record.tipo_de_venta === 'Servicio'
+                  ? record.precio_fijo
+                  : calcPrecioVariable(record, nivel)) *
                   toPercent(record.descuento) *
                   record.cantidad
               )}{' '}
@@ -301,7 +316,9 @@ const ProductsTable = ({
           >
             +
             {formatPrice(
-              calcPrecioVariable(record, nivel) *
+              (record.tipo_de_venta === 'Servicio'
+                ? record.precio_fijo
+                : calcPrecioVariable(record, nivel)) *
                 toPercent(100 - record.descuento) *
                 toPercent(record.iva) *
                 record.cantidad
@@ -310,7 +327,9 @@ const ProductsTable = ({
           </Text>
           <Text strong>
             {formatPrice(
-              calcPrecioVariable(record, nivel) *
+              (record.tipo_de_venta === 'Servicio'
+                ? record.precio_fijo
+                : calcPrecioVariable(record, nivel)) *
                 toPercent(100 - record.descuento) *
                 toPercent(100 + record.iva) *
                 record.cantidad

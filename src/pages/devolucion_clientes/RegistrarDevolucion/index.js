@@ -106,6 +106,7 @@ const Index = () => {
         onSetArreglo(result.data.data, setAlmacenes);
       });
     http.get(`/users/me?fields=empleado.*`, putToken).then((result) => {
+      console.log(result.data.data);
       onSetArreglo(result.data.data, setEmpleado);
     });
   }, []);
@@ -201,15 +202,24 @@ const Index = () => {
             putToken
           )
           .then(() => {
-            productosCambiar.forEach((producto) => {
+            console.log(productosCambiar);
+            productosCambiar.forEach((producto, index) => {
               http
                 .patch(
                   `/items/productos_venta/${producto.id}`,
-                  producto,
+                  {
+                    cantidad: producto.cantidad,
+                    descuento: producto.descuento,
+                    importe: producto.importe,
+                    iva: producto.iva,
+                    precio_unitario: producto.precio_unitario,
+                  },
                   putToken
                 )
                 .then(() => {
-                  agregarInventarioDevolucion(datos, {}, hide);
+                  if (productosCambiar.length - 1 === index) {
+                    agregarInventarioDevolucion(datos, {}, hide);
+                  }
                 });
             });
           });
@@ -379,49 +389,33 @@ const Index = () => {
       .then((result_info) => {
         listProducts.forEach((producto, index) => {
           http
-            .get(
-              `/items/devolucion_inventario?filter[codigo_producto][_in]=${producto.codigo}&filter[clave_almacen][_in]=${almacen.clave}`,
+            .post(
+              `/items/devolucion_inventario`,
+              {
+                cantidad: producto.cantidad_regresar,
+                clave_almacen: almacen.clave,
+                codigo_producto: producto.codigo,
+                info_devolucion_clientes: result_info.data.data.id,
+              },
               putToken
             )
-            .then((result_dev_int) => {
-              if (result_dev_int.data.data.length === 0) {
+            .then((result_dev_int1) => {
+              if (
+                producto.series !== undefined &&
+                producto?.series?.length !== 0
+              ) {
+                let series = [];
+                producto.series.forEach((serie) => {
+                  series.push({
+                    serie: serie,
+                    devolucion_inventario: result_dev_int1.data.data.id,
+                    info_devolucion: result_info.data.data.id,
+                  });
+                });
                 http
-                  .post(
-                    `/items/devolucion_inventario`,
-                    {
-                      cantidad: producto.cantidad_regresar,
-                      clave_almacen: almacen.clave,
-                      codigo_producto: producto.codigo,
-                    },
-                    putToken
-                  )
-                  .then((result_dev_int1) => {
-                    if (producto.series !== undefined) {
-                      let series = [];
-                      producto.series.forEach((serie) => {
-                        series.push({
-                          serie: serie,
-                          devolucion_inventario: result_dev_int1.data.data.id,
-                          info_devolucion: result_info.data.data.id,
-                        });
-                      });
-                      http
-                        .post(
-                          `/items/devolucion_inventario_series`,
-                          series,
-                          putToken
-                        )
-                        .then(() => {
-                          if (listProducts.length - 1 === index) {
-                            agregarMovimientoAlmacen(
-                              datos,
-                              factura,
-                              result_info.data.data.id,
-                              hide
-                            );
-                          }
-                        });
-                    } else if (listProducts.length - 1 === index) {
+                  .post(`/items/devolucion_inventario_series`, series, putToken)
+                  .then(() => {
+                    if (listProducts.length - 1 === index) {
                       agregarMovimientoAlmacen(
                         datos,
                         factura,
@@ -430,52 +424,13 @@ const Index = () => {
                       );
                     }
                   });
-              } else {
-                http
-                  .patch(
-                    `/items/devolucion_inventario/${result_dev_int.data.data.id}`,
-                    {
-                      cantidad:
-                        result_dev_int.data.data.cantidad +
-                        producto.cantidad_regresar,
-                    },
-                    putToken
-                  )
-                  .then((result_dev_int2) => {
-                    if (producto.series !== undefined) {
-                      let series = [];
-                      producto.series.forEach((serie) => {
-                        series.push({
-                          serie: serie,
-                          devolucion_inventario: result_dev_int2.data.data.id,
-                          info_devolucion: result_info.data.data.id,
-                        });
-                      });
-                      http
-                        .push(
-                          `/items/devolucion_inventario_series`,
-                          series,
-                          putToken
-                        )
-                        .then(() => {
-                          if (listProducts.length - 1 === index) {
-                            agregarMovimientoAlmacen(
-                              datos,
-                              factura,
-                              result_info.data.data.id,
-                              hide
-                            );
-                          }
-                        });
-                    } else if (listProducts.length - 1 === index) {
-                      agregarMovimientoAlmacen(
-                        datos,
-                        factura,
-                        result_info.data.data.id,
-                        hide
-                      );
-                    }
-                  });
+              } else if (listProducts.length - 1 === index) {
+                agregarMovimientoAlmacen(
+                  datos,
+                  factura,
+                  result_info.data.data.id,
+                  hide
+                );
               }
             });
         });
@@ -490,9 +445,9 @@ const Index = () => {
           fecha: obtenerFechaActual(),
           concepto: 'Devolución a cliente',
           comentario: datos.diagnostico,
-          devolucion_clientes: devolucion.id,
+          devolucion_clientes: devolucion,
           clave_almacen: almacen.clave,
-          rfc_empleado: empleado.rfc,
+          rfc_empleado: empleado[0].rfc,
           mostrar: true,
         },
         putToken
@@ -551,7 +506,7 @@ const Index = () => {
   };
 
   const GenerarTicket = async (datos, no_venta, factura, hide) => {
-    if (Object.keys(factura).length === 'factura') {
+    if (Object.keys(factura).length === 0) {
       http
         .get(
           `/items/ventas/${no_venta}=?fields=*, id_cliente.rfc,productos_venta.*`,
@@ -561,9 +516,9 @@ const Index = () => {
           const newVenta = result_venta.data.data;
           const doc = new jsPDF('p', 'mm', [
             80,
-            100 + listProducts.length * 12 + 62,
+            100 + listProducts.length * 12,
           ]);
-          const address = almacen.clave_sucursal.clave;
+          const address = almacen.clave_sucursal;
           var currentdate = new Date();
           doc.autoTable({
             margin: { top: 5, left: 5, right: 5 },
@@ -653,7 +608,7 @@ const Index = () => {
               producto.codigo,
               producto.cantidad,
               producto.descripcion,
-              formatPrice(producto.descuento).toFixed(2),
+              formatPrice(producto.descuento.toFixed(2)),
               formatPrice(
                 (
                   producto.precio_unitario * producto.cantidad +
@@ -1098,7 +1053,7 @@ const Index = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <HeadingBack title='Orden de Compra' />
+        <HeadingBack title='Registrar Devolución' />
         <TextLabel title='Almacenes' />
         {rol !== 'encargado de ventas' ? (
           <Form.Item

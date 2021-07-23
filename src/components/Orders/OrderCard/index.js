@@ -74,18 +74,11 @@ const OrderCard = ({ details }) => {
           </Collapse>
         </Col>
         <Col xs={24} md={5}>
-          <Space direction='vertical' style={{ width: '100%' }}>
-            <Link to={`/solicitudes-de-compra/${details.id}?tipo=recoger`}>
-              <Button block type='primary'>
-                Ver detalles
-              </Button>
-            </Link>
-            {details.estado === 'aprobada' && (
-              <Link to='/facturacion?id=1'>
-                <Button block>Solicitar factura</Button>
-              </Link>
-            )}
-          </Space>
+          <Link to={`/solicitudes-de-compra/${details.id}?tipo=recoger`}>
+            <Button block type='primary'>
+              Ver detalles
+            </Button>
+          </Link>
         </Col>
       </Row>
     </Card>

@@ -845,9 +845,7 @@ const PuntoDeVenta = () => {
           ? {
               ...product,
               [campo]:
-                campo === 'precios_variables' || campo === 'precio_fijo'
-                  ? parseFloat(valor)
-                  : parseInt(valor),
+                campo === 'precio_fijo' ? parseFloat(valor) : parseInt(valor),
             }
           : product
       )
@@ -993,7 +991,7 @@ const PuntoDeVenta = () => {
                 >
                   <Space direction='vertical'>
                     <Radio value={'01'}>Pago en efectivo</Radio>
-                    <Radio value={'04'}>
+                    <Radio value={'04'} disabled={true}>
                       Pago con tarjeta de débito o crédito
                     </Radio>
                   </Space>

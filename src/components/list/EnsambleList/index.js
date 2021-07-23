@@ -43,6 +43,7 @@ const Index = ({ putToken }) => {
     const result = await fetchProducts();
     setListToShow(result);
     filtrarEnsamblesPorEstado(result, searchValue);
+    console.log(result);
     return result;
   });
   const [listToShow, setListToShow] = useState([]);

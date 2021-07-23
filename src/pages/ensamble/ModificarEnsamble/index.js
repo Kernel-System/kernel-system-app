@@ -128,8 +128,7 @@ const Index = ({ match }) => {
     }
     if (list[0].estado !== 'Ensamblado') {
       http
-        .patch(`/items/ordenes_ensamble/${match.params.id}`, {
-          estado,
+        .patch(`/items/ordenes_ensamble/${match.params.id}`, estado, {
           putToken,
         })
         .then((result_ensamble) => {
@@ -145,8 +144,7 @@ const Index = ({ match }) => {
           });
           if (list[0].estado === 'Ordenado')
             http
-              .post('/items/series_componentes_ensamble', {
-                series,
+              .post('/items/series_componentes_ensamble', series, {
                 putToken,
               })
               .then((result2) => {
@@ -156,7 +154,7 @@ const Index = ({ match }) => {
                     `/items/movimientos_almacen/`,
                     {
                       fecha: estado.fecha_inicio_ensamble,
-                      concepto: 'Componentes para ensamble',
+                      concepto: 'Componente para ensamble',
                       comentario: list[0].comentario,
                       folio_ensamble: list[0].folio,
                       rfc_empleado: list[0].rfc_empleado_orden,
@@ -176,12 +174,12 @@ const Index = ({ match }) => {
                         clave_unidad: componente.clave_unidad,
                         descripcion: componente.descripcion,
                         id_movimiento: result.data.data.id,
+                        titulo: componente.descripcion,
                       });
                     });
                     console.log(componentes);
                     http
-                      .post(`/items/productos_movimiento/`, {
-                        componentes,
+                      .post(`/items/productos_movimiento/`, componentes, {
                         putToken,
                       })
                       .then((result_com) => {
@@ -248,6 +246,7 @@ const Index = ({ match }) => {
                     clave_unidad: producto.data.data.unidad_cfdi,
                     descripcion: producto.data.data.descripcion,
                     id_movimiento: result.data.data.id,
+                    titulo: producto.data.data.descripcion,
                   },
                   putToken
                 )
@@ -429,10 +428,13 @@ const Index = ({ match }) => {
 
   const onFinishChange = () => {
     http
-      .patch(`/items/ordenes_ensamble/${match.params.id}`, {
-        observaciones: list[0].observaciones,
-        putToken,
-      })
+      .patch(
+        `/items/ordenes_ensamble/${match.params.id}`,
+        {
+          observaciones: list[0].observaciones,
+        },
+        putToken
+      )
       .then((resul) => {
         console.log(resul);
         actualizarSeries();
@@ -503,9 +505,13 @@ const Index = ({ match }) => {
           <Col className='gutter-row' span={12}>
             <TextLabel
               title='Fecha de Fin de ensamble'
-              subtitle={dato.fecha_fin_ensamble ? moment(new Date(dato.fecha_fin_ensamble)).format(
-                formatoFecha
-              ) : "Sin terminar"}
+              subtitle={
+                dato.fecha_fin_ensamble
+                  ? moment(new Date(dato.fecha_fin_ensamble)).format(
+                      formatoFecha
+                    )
+                  : 'Sin terminar'
+              }
             />
           </Col>
         </Row>

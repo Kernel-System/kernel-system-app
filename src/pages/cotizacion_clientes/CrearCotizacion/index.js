@@ -258,6 +258,7 @@ const Index = () => {
   };
 
   const setPrecioTotalInicial = (item, unitario = false) => {
+    console.log(item);
     if (item.tipo_de_venta === 'Fijo') {
       if (unitario) return item.precio_fijo;
       return setPrecio(item.precio_fijo, item.descuento, 1, item.iva);
@@ -490,6 +491,14 @@ const Index = () => {
       default:
         return 'text';
     }
+  };
+
+  const formatPrice = (price) => {
+    var formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+    return formatter.format(price);
   };
 
   const columns = [
@@ -751,7 +760,7 @@ const Index = () => {
       >
         <Select
           showSearch
-          style={{ width: '50%' }}
+          style={{ width: '100%' }}
           placeholder='Concepto'
           optionFilterProp='children'
           onChange={(value, index) => {
@@ -909,13 +918,16 @@ const Index = () => {
         justify='center'
       >
         <Col className='gutter-row' span={8}>
-          <TextLabel title='SUBTOTAL' subtitle={(total - iva).toFixed(2)} />
+          <TextLabel
+            title='SUBTOTAL'
+            subtitle={formatPrice((total - iva).toFixed(2))}
+          />
         </Col>
         <Col className='gutter-row' span={8}>
-          <TextLabel title='IVA' subtitle={iva} />
+          <TextLabel title='IVA' subtitle={formatPrice(iva)} />
         </Col>
         <Col className='gutter-row' span={8}>
-          <TextLabel title='TOTAL' subtitle={total} />
+          <TextLabel title='TOTAL' subtitle={formatPrice(total)} />
         </Col>
       </Row>
       <Form.Item>
