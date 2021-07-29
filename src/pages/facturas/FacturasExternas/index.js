@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { Button, Modal, message, Space } from 'antd';
-import { Link } from 'react-router-dom';
-import { useMutation, useQueryClient } from 'react-query';
-import LectorFacturas from 'components/shared/facturas/LectorFacturas';
-import ListaFacturas from 'components/list/FacturasExternasList';
-import Descripciones from 'components/descriptions/FacturaDescriptions';
-import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import { Button, message, Modal, Space } from 'antd';
+import { httpSAT } from 'api';
 import * as CRUD from 'api/compras/facturas_externas';
+import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import Descripciones from 'components/descriptions/FacturaDescriptions';
+import ListaFacturas from 'components/list/FacturasExternasList';
+import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import { useStoreState } from 'easy-peasy';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from 'react-query';
+import { Link } from 'react-router-dom';
 
 const Index = (props) => {
   const token = useStoreState((state) => state.user.token.access_token);
@@ -141,6 +142,18 @@ const Index = (props) => {
     }
   );
 
+  const descargarFactura = (id) => {
+    httpSAT.get(`/cfdi/pdf/issued/${id}`).then((result_pdf) => {
+      const linkSource =
+        'data:application/pdf;base64,' + result_pdf.data.Content;
+      const downloadLink = document.createElement('a');
+      const fileName = `${id}.pdf`;
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    });
+  };
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
 
@@ -150,7 +163,7 @@ const Index = (props) => {
         onClickItem={showModal}
         seeItem={showModal}
         onConfirmDelete={onConfirmDelete}
-      ></ListaFacturas>
+      />
       <br />
       <Space>
         <Link to='/compras/registrar'>
@@ -165,7 +178,18 @@ const Index = (props) => {
       <Modal
         title={listElement.nombre_emisor}
         visible={isModalVisible}
-        footer={null}
+        footer={
+          listElement.id_api ? (
+            <Button
+              type='link'
+              onClick={() => {
+                descargarFactura(listElement.id_api);
+              }}
+            >
+              Descargar Factura
+            </Button>
+          ) : null
+        }
         onCancel={handleCancel}
         width='70%'
       >

@@ -1,4 +1,4 @@
-import { Modal, Button, Row, Col } from 'antd';
+import { Button, Col, Modal, Row } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 import TextLabel from '../../UI/TextLabel';
 
@@ -16,7 +16,7 @@ const Index = ({ visible, sucursal, setVis }) => {
       case '39de2a37-7c23-4ca1-9c83-ee7263a7adc7':
         return 'Cuentas por cobrar';
       case '3afe4f4d-7125-45d5-ba57-402221ef956d':
-        return 'Encargado de ensamble';
+        return 'encargado de ensambles';
       case 'd5432f92-7a74-4372-907c-9868507e0fd5':
         return 'Administrator';
       default:

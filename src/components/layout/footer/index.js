@@ -27,7 +27,7 @@ const Index = () => {
               </RouterLink>
             </Col>
             <Col xs={24} sm={12}>
-              <RouterLink to='/facturacion' style={{ display: 'block' }}>
+              <RouterLink to='/facturar-ticket2' style={{ display: 'block' }}>
                 Facturación
               </RouterLink>
             </Col>

@@ -2,20 +2,20 @@ import {
   AppstoreOutlined,
   ContainerOutlined,
   DollarOutlined,
+  ExportOutlined,
+  FileDoneOutlined,
   FileTextOutlined,
   ImportOutlined,
   PictureOutlined,
+  ReconciliationOutlined,
+  RedEnvelopeOutlined,
   ShopOutlined,
   ShoppingOutlined,
+  SnippetsOutlined,
+  StockOutlined,
   SwapOutlined,
   TeamOutlined,
   ToolOutlined,
-  SnippetsOutlined,
-  ReconciliationOutlined,
-  StockOutlined,
-  FileDoneOutlined,
-  RedEnvelopeOutlined,
-  ExportOutlined,
   RollbackOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
@@ -200,7 +200,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const ComprasMenuItem = (showIcon) => (
     <Menu.Item
       key='compras'
-      icon={!showIcon ?? <ShoppingOutlined />}
+      icon={showIcon && <ShoppingOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/compras'>Compras</Link>
@@ -220,7 +220,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const OrdenesComprasMenuItem = (showIcon) => (
     <Menu.Item
       key='ordenes-compra'
-      icon={!showIcon ?? <RedEnvelopeOutlined />}
+      icon={showIcon && <RedEnvelopeOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/ordenes-compra'>Ordenes de Compra</Link>
@@ -230,7 +230,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const ProductosCompradosMenuItem = (showIcon) => (
     <Menu.Item
       key='productos-comprados'
-      icon={!showIcon ?? <ShoppingOutlined />}
+      icon={showIcon && <ShoppingOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/productos-comprados'>Productos Comprados</Link>
@@ -259,7 +259,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const FacturasGlobalesMenuItem = (showIcon) => (
     <Menu.Item
-      key='facturas-internas'
+      key='facturas-globales'
       icon={showIcon ? <FileTextOutlined /> : undefined}
       onClick={!collapsed && ToggleCollapsed}
     >
@@ -377,6 +377,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
         {role === 'cuentas por cobrar' && cuentasPorCobrarMenuItems}
         {role === 'encargado de almacen' && encargadoDeAlmacenMenuItems}
         {role === 'encargado de compras' && encargadoDeComprasMenuItems}
+        {role === 'encargado de ensambles' && EnsamblesMenuItem}
         {role === 'administrador' && (
           <>
             {VentaMenuItem}

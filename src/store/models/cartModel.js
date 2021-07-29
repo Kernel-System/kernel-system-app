@@ -6,16 +6,16 @@ export const cartModel = {
   cartItemsCount: computed((state) => state.cartItems.length),
 
   addCartItem: action((state, payload) => {
-    const existingItem = state.cartItems.find((item) => item.id === payload.id);
+    const existingItem = state.cartItems.find((item) => item.id === payload);
 
     const existingItemId = state.cartItems.findIndex(
-      (item) => item.id === payload.id
+      (item) => item.id === payload
     );
 
     if (existingItem) {
-      state.cartItems[existingItemId].cantidad += payload.cantidad;
+      state.cartItems[existingItemId].cantidad += 1;
     } else {
-      state.cartItems.push(payload);
+      state.cartItems.push({ id: payload, cantidad: 1 });
     }
   }),
 

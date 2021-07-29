@@ -16,10 +16,10 @@ import ShowProduct from 'components/ensamble/ShowProduct';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
 import { useStoreState } from 'easy-peasy';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router';
-import moment from 'moment';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -62,7 +62,7 @@ const Index = ({ match }) => {
       if (rol === 'encargado de almacen' || rol === 'administrador')
         return true;
       else return false;
-    else if (rol === 'encargado de ensamble') return true;
+    else if (rol === 'encargado de ensambles') return true;
     else return false;
   };
 
@@ -225,7 +225,7 @@ const Index = ({ match }) => {
             .post(
               `/items/movimientos_almacen/`,
               {
-                fecha: obtenerFecha(),
+                fecha: moment().format('YYYY-MM-DDTHH:mm:ss'),
                 concepto: 'Producto ensamblado',
                 comentario: list[0].comentario,
                 folio_ensamble: list[0].folio,
@@ -577,7 +577,7 @@ const Index = ({ match }) => {
           </Button>
         </Form.Item>
 
-        {rol !== 'encargado de ensamble' && dato.estado === 'En ensamble' ? (
+        {rol !== 'encargado de ensambles' && dato.estado === 'En ensamble' ? (
           editar ? (
             <Space direction='horizontal' align='baseline'>
               <Form.Item name='boton'>
