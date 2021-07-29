@@ -1,10 +1,10 @@
-import './styles.css';
+import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
+import { Button, List, Popconfirm, Select } from 'antd';
 import { http } from 'api';
 import { useState } from 'react';
-import { Popconfirm, List, Button, Select } from 'antd';
-import { DeleteFilled, EditFilled, EyeFilled } from '@ant-design/icons';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import './styles.css';
 const { Option } = Select;
 
 const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
@@ -50,7 +50,7 @@ const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
       case '39de2a37-7c23-4ca1-9c83-ee7263a7adc7':
         return 'Cuentas por cobrar';
       case '3afe4f4d-7125-45d5-ba57-402221ef956d':
-        return 'Encargado de ensamble';
+        return 'Encargado de ensambles';
       case 'd5432f92-7a74-4372-907c-9868507e0fd5':
         return 'Administrator';
       default:
@@ -101,7 +101,7 @@ const Index = ({ onConfirmDelete, onClickItem, putToken }) => {
           value='3afe4f4d-7125-45d5-ba57-402221ef956d'
           key='3afe4f4d-7125-45d5-ba57-402221ef956d'
         >
-          Encargado de ensamble
+          Encargado de ensambles
         </Option>
         <Option
           value='d5432f92-7a74-4372-907c-9868507e0fd5'

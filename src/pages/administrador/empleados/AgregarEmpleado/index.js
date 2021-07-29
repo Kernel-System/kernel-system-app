@@ -335,7 +335,7 @@ const Index = () => {
               value='3afe4f4d-7125-45d5-ba57-402221ef956d'
               key='3afe4f4d-7125-45d5-ba57-402221ef956d'
             >
-              Encargado de ensamble
+              Encargado de ensambles
             </Option>
             <Option
               value='d5432f92-7a74-4372-907c-9868507e0fd5'
