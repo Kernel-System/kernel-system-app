@@ -58,6 +58,9 @@ import OrdenesCompra from './pages/ordenesCompraProv/Ordenes';
 import RegistrarDevolucion from './pages/devolucion_clientes/RegistrarDevolucion';
 import Devoluciones from './pages/devolucion_clientes/Devoluciones';
 
+import RMAs from 'pages/rma/RMAs';
+import RegistrarRMA from 'pages/rma/RegistrarRMA';
+
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
 const asyncLogout = asyncComponent(() => import('pages/auth/Logout'));
@@ -235,6 +238,19 @@ const Rutas = () => {
         path='/proveedores/nuevo'
         exact
         component={AñadirProveedor}
+      />
+      {/* RMAs */}
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/rmas'
+        exact
+        component={RMAs}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/rmas/registrar'
+        exact
+        component={RegistrarRMA}
       />
       {/* Facturas Externas */}
       <PrivateRoute
@@ -433,7 +449,12 @@ const Rutas = () => {
       </PrivateRoute>
       {/* Inventario */}
       <PrivateRoute
-        allowedRoles={['administrador', 'encargado de almacen']}
+        allowedRoles={[
+          'administrador',
+          'encargado de almacen',
+          'encargado de compras',
+          'encargado de ventas',
+        ]}
         path='/inventario'
         exact
         component={Inventario}

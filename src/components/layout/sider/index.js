@@ -16,6 +16,7 @@ import {
   FileDoneOutlined,
   RedEnvelopeOutlined,
   ExportOutlined,
+  RollbackOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -163,6 +164,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/proveedores'>Proveedores</Link>
+    </Menu.Item>
+  );
+
+  const RMAsMenuItem = (
+    <Menu.Item
+      key='rmas'
+      icon={<RollbackOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/rmas'>RMAs</Link>
     </Menu.Item>
   );
 
@@ -314,6 +325,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {DevolucionesClientesMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
+      {InventarioMenuItem}
       {SolicitudesCompraMenuItem}
       {FacturasInternasMenuItem(true)}
       {TicketFacturarItem}
@@ -341,8 +353,10 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const encargadoDeComprasMenuItems = (
     <>
       {ComprasSubMenu}
-      {ProveedoresMenuItem}
       {ProductosMenuItem}
+      {InventarioMenuItem}
+      {RMAsMenuItem}
+      {ProveedoresMenuItem}
       {FacturasExternasMenuItem(true)}
       {TicketFacturarItem}
     </>
@@ -377,6 +391,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {TransferenciaMenuItem}
             {ComprasSubMenu}
             {ProveedoresMenuItem}
+            {RMAsMenuItem}
             {FacturasSubMenu}
             {AnunciosMenuItem}
             {SolicitudesCompraMenuItem}
