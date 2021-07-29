@@ -1,12 +1,14 @@
 import './styles.css';
 import { useState } from 'react';
 import { http } from 'api';
-import { List, Typography, Row, Col, Button, Input } from 'antd';
+import { List, Typography, Row, Col, Button, Input, Grid } from 'antd';
 import { useQuery } from 'react-query';
 import { EyeFilled } from '@ant-design/icons';
 import { useStoreState } from 'easy-peasy';
-const { Search } = Input;
+import { contentCol } from 'utils/gridUtils';
 
+const { useBreakpoint } = Grid;
+const { Search } = Input;
 const { Text } = Typography;
 
 const Index = ({ onClickItem, seeItem }) => {
@@ -50,9 +52,11 @@ const Index = ({ onClickItem, seeItem }) => {
     return result;
   });
 
+  const screen = useBreakpoint();
+
   return (
     <>
-      <Row gutter={[16, 12]}>
+      <Row gutter={[10, 12]} style={{ marginBottom: 10 }}>
         <Col>
           <Text
             style={{
@@ -62,7 +66,7 @@ const Index = ({ onClickItem, seeItem }) => {
             Filtrar por Diagnostico:
           </Text>
         </Col>
-        <Col xs={24} lg={12}>
+        <Col {...contentCol(screen, 'auto')}>
           <Search
             placeholder='Buscar por diagnostico'
             allowClear
