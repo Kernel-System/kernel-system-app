@@ -9,35 +9,7 @@ const ProfileOverview = ({ user }) => {
         <Descriptions
           title={
             <Title level={5} style={{ marginBottom: 0 }}>
-              Información de contacto
-            </Title>
-          }
-          bordered
-          size='small'
-          column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
-          labelStyle={{ fontWeight: 500 }}
-        >
-          <Descriptions.Item label='Nombre'>
-            {user.nombre} {user.apellidos}
-          </Descriptions.Item>
-          <Descriptions.Item label='Correo electrónico'>
-            {user.correo}
-          </Descriptions.Item>
-          <Descriptions.Item label='Número telefónico'>
-            {formatPhoneNumber(user.cliente.telefono)}
-          </Descriptions.Item>
-          {user.cliente.telefono_2 && (
-            <Descriptions.Item label='Número telefónico 2'>
-              {formatPhoneNumber(user.cliente.telefono_2)}
-            </Descriptions.Item>
-          )}
-        </Descriptions>
-      </Col>
-      <Col xs={24} lg={12}>
-        <Descriptions
-          title={
-            <Title level={5} style={{ marginBottom: 0 }}>
-              Información de la empresa
+              Información de la organización
             </Title>
           }
           bordered
@@ -52,6 +24,31 @@ const ProfileOverview = ({ user }) => {
             {user.cliente.razon_social}
           </Descriptions.Item>
           <Descriptions.Item label='RFC'>{user.cliente.rfc}</Descriptions.Item>
+        </Descriptions>
+      </Col>
+      <Col xs={24} lg={12}>
+        <Descriptions
+          title={
+            <Title level={5} style={{ marginBottom: 0 }}>
+              Información de contacto
+            </Title>
+          }
+          bordered
+          size='small'
+          column={{ xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }}
+          labelStyle={{ fontWeight: 500 }}
+        >
+          <Descriptions.Item label='Correo electrónico'>
+            {user.correo}
+          </Descriptions.Item>
+          <Descriptions.Item label='Número telefónico'>
+            {formatPhoneNumber(user.cliente.telefono)}
+          </Descriptions.Item>
+          {user.cliente.telefono_2 && (
+            <Descriptions.Item label='Número telefónico 2'>
+              {formatPhoneNumber(user.cliente.telefono_2)}
+            </Descriptions.Item>
+          )}
         </Descriptions>
       </Col>
     </>

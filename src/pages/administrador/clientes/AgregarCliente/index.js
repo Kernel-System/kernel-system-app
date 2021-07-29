@@ -293,6 +293,7 @@ const Index = () => {
                   max='999'
                   placeholder='Extension'
                   mensaje='Asigna una extension.'
+                  required={false}
                 />
               </Col>
               <Col className='gutter-row' span={16}>

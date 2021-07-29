@@ -1,5 +1,5 @@
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { Button, Form, InputNumber, Space, Tag, Typography } from 'antd';
+import { Button, Form, Space, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { formatDate, formatPrice, toPercent } from 'utils/functions';
 import { calcCantidad, calcPrecioVariable } from 'utils/productos';
@@ -66,15 +66,7 @@ const ProductOverview = ({ product, addToCart, isAuth, nivel, cartItems }) => {
         </Button>
       ) : isAuth ? (
         <Space>
-          <Form
-            name='addToCartForm'
-            layout='inline'
-            initialValues={{ cantidad: 1 }}
-            onFinish={addToCart}
-          >
-            <Form.Item name='cantidad'>
-              <InputNumber min={1} max={calcCantidad(product)} keyboard />
-            </Form.Item>
+          <Form name='addToCartForm' layout='inline' onFinish={addToCart}>
             <Form.Item>
               <Button
                 type='primary'

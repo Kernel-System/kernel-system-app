@@ -8,7 +8,7 @@ export const getProductTitleCodePairs = (token) =>
 
 export const getHomeProducts = () =>
   http.get(
-    '/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true'
+    '/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true&limit=12'
   );
 
 export const getProduct = (id) =>
