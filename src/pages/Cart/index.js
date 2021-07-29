@@ -177,7 +177,9 @@ const Cart = () => {
                     <Radio value={0}>
                       Recoger en una sucursal Kernel System
                     </Radio>
-                    <Radio value={1}>A domicilio</Radio>
+                    <Radio disabled value={1}>
+                      A domicilio
+                    </Radio>
                   </Space>
                 </Radio.Group>
               </div>
@@ -225,7 +227,9 @@ const Cart = () => {
             >
               <Space direction='vertical'>
                 <Radio value={0}>Pagar en sucursal</Radio>
-                <Radio value={1}>Pagar en linea</Radio>
+                <Radio disabled value={1}>
+                  Pagar en linea
+                </Radio>
               </Space>
             </Radio.Group>
           </Card>

@@ -1,7 +1,6 @@
-import './styles.css';
 import {
-  DeleteOutlined,
   CaretDownFilled,
+  DeleteOutlined,
   ShoppingOutlined,
 } from '@ant-design/icons';
 import {
@@ -20,16 +19,16 @@ import {
   Typography,
 } from 'antd';
 import { http } from 'api';
-import { Link } from 'react-router-dom';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
 import { useStoreState } from 'easy-peasy';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import { conceptosMovimientos } from 'utils/almacen';
-import { itemsToGrid } from 'utils/gridUtils';
-import moment from 'moment';
+import './styles.css';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -120,11 +119,11 @@ const Index = () => {
         onSetAlmacen(result.data.data.empleado[0].almacen);
       }
     });
-    http
-      .get(`/items/devoluciones_proveedores/?fields=folio`, putToken)
-      .then((result) => {
-        onSetArreglo(result.data.data, setDevolucionesProv);
-      });
+    // http
+    //   .get(`/items/devoluciones_proveedores/?fields=folio`, putToken)
+    //   .then((result) => {
+    //     onSetArreglo(result.data.data, setDevolucionesProv);
+    //   });
     http
       .get(`/items/info_devoluciones_clientes/?fields=id,diagnostico`, putToken)
       .then((result) => {
@@ -148,7 +147,7 @@ const Index = () => {
       });
     http
       .get(
-        `/items/compras/?fields=*,proveedor.rfc, productos_comprados.*, productos_comprados.producto_catalogo.*`,
+        `/items/compras/?fields=*, productos_comprados.*, productos_comprados.producto_catalogo.*`,
         putToken
       )
       .then((result) => {
@@ -1030,7 +1029,7 @@ const Index = () => {
                         opacity: 0.6,
                       }}
                     >
-                      {compra.proveedor.rfc}
+                      {compra.proveedor}
                     </b>{' '}
                     el{' '}
                     <b
