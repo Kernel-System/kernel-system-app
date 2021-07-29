@@ -15,6 +15,7 @@ import { useQuery } from 'react-query';
 import { getItems } from 'api/compras/proveedores';
 import { regimenesFiscales } from 'utils/facturas/catalogo';
 import { contentCol } from 'utils/gridUtils';
+import { useStoreState } from 'easy-peasy';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -44,8 +45,10 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
     else setListToShow(list);
   }
 
+  const token = useStoreState((state) => state.user.token.access_token);
+
   const { data: list } = useQuery('proveedores', async () => {
-    const { data } = await getItems();
+    const { data } = await getItems(token);
     const proveedores = data.data;
     setListToShow(proveedores);
     return proveedores;
