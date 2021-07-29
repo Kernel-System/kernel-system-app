@@ -59,7 +59,7 @@ const Index = () => {
       .then((result) => {
         onSetAlmacenes(result.data.data);
       });
-  }, [sucursal]);
+  }, [sucursal, putToken]);
 
   const onSetEmpleado = (lista) => {
     const newLista = JSON.parse(JSON.stringify(lista));

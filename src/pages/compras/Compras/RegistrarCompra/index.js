@@ -3,7 +3,7 @@ import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import CompraForm from 'components/forms/CompraForm';
 import Header from 'components/UI/HeadingBack';
 import { message } from 'antd';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { insertItems as insertProveedor } from 'api/compras/proveedores';
 import { insertItems as insertFactura } from 'api/compras/facturas_externas';
 import { insertItems as insertCompra } from 'api/compras';
