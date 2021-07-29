@@ -9,13 +9,14 @@ import { insertItems as insertFactura } from 'api/compras/facturas_externas';
 import { insertItems as insertCompra } from 'api/compras';
 import { filtrarPorUUID } from 'api/compras/facturas_externas';
 import { getProductCodes } from 'api/shared/products';
+import { useStoreState } from 'easy-peasy';
 
 import moment from 'moment';
-import { useStoreState } from 'easy-peasy';
 
 const Index = () => {
   const queryClient = useQueryClient();
   const rfc_empleado = useStoreState((state) => state.user.rfc);
+  const token = useStoreState((state) => state.user.token.access_token);
 
   const { data: productos_catalogo } = useQuery(
     'productos_catalogo',
@@ -105,7 +106,7 @@ const Index = () => {
 
   const insertarFactura = async (factura) => {
     let id = -1;
-    await insertFactura(factura)
+    await insertFactura(factura, token)
       .then((result) => {
         if (result.status === 200) {
           id = result.data.data.id;
@@ -123,7 +124,7 @@ const Index = () => {
 
   const insertarCompra = async (compra) => {
     let noCompra = -1;
-    await insertCompra(compra)
+    await insertCompra(compra, token)
       .then((result) => {
         if (result.status === 200) {
           noCompra = result.data.data.no_compra;
@@ -141,7 +142,7 @@ const Index = () => {
 
   const insertarProveedor = async (proveedor) => {
     let rfc = -1;
-    await insertProveedor(proveedor)
+    await insertProveedor(proveedor, token)
       .then((result) => {
         if (result.status === 200) {
           rfc = result.data.data.rfc;

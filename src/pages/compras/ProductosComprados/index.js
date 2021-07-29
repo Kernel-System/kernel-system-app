@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import ListaProductos from 'components/list/ProductosCompradosList';
 import * as CRUD from 'api/compras/productos_comprados';
 import ProductoCompradoForm from 'components/forms/ProductoCompradoForm';
+import { useStoreState } from 'easy-peasy';
 
 const ProductosComprados = () => {
   const [isModalVisible, setIsModalVisible] = useState();
@@ -40,14 +41,18 @@ const ProductosComprados = () => {
   };
 
   const queryClient = useQueryClient();
+  const token = useStoreState((state) => state.user.token.access_token);
 
-  const updateMutation = useMutation(CRUD.updateItem, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('productos_comprados').then(() => {
-        message.success('Cambios guardados exitosamente');
-      });
-    },
-  });
+  const updateMutation = useMutation(
+    (values) => CRUD.updateItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('productos_comprados').then(() => {
+          message.success('Cambios guardados exitosamente');
+        });
+      },
+    }
+  );
 
   return (
     <>

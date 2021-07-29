@@ -12,6 +12,7 @@ import moment from 'moment';
 import 'moment/locale/es-mx';
 import locale from 'antd/es/date-picker/locale/es_ES';
 import { formatPrice } from 'utils/functions';
+import { useStoreState } from 'easy-peasy';
 
 const { useBreakpoint } = Grid;
 const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
@@ -51,8 +52,10 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
     setListToShow(sortData(listToShow, value));
   }
 
+  const token = useStoreState((state) => state.user.token.access_token);
+
   const { data: list } = useQuery('compras', async () => {
-    const { data } = await getItems(compraSort);
+    const { data } = await getItems(compraSort, token);
     const datos = data.data;
     const compras = [];
     const newProveedores = [];
@@ -62,10 +65,9 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
       if (!newProveedores.some((prov) => prov.rfc_emisor === rfc_emisor))
         newProveedores.push({ rfc_emisor, nombre_emisor });
     });
-    setListToShow(compras);
-    setProveedores(newProveedores);
     const filteredresult = filtrarPorProveedor(compras, searchValue);
     setListToShow(filteredresult);
+    setProveedores(newProveedores);
     return compras;
   });
 
@@ -163,7 +165,6 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                 //   okText='Sí'
                 //   cancelText='No'
                 //   onConfirm={() => onConfirmDelete(item)}
-                //   visible={false}
                 // >
                 //   <Button  danger icon={<DeleteFilled />}></Button>
                 // </Popconfirm>,

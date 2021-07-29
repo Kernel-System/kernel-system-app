@@ -8,6 +8,7 @@ import ListaCompras from 'components/list/ComprasList';
 import * as CRUD from 'api/compras';
 import moment from 'moment';
 import 'moment/locale/es-mx';
+import { useStoreState } from 'easy-peasy';
 
 const Index = (props) => {
   const showModal = (element) => {
@@ -34,23 +35,30 @@ const Index = (props) => {
   };
 
   const queryClient = useQueryClient();
+  const token = useStoreState((state) => state.user.token.access_token);
 
-  const updateMutation = useMutation(CRUD.updateItem, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('compras')
-        .then(message.success('Cambios guardados exitosamente'));
-      queryClient.invalidateQueries('productos_comprados');
-    },
-  });
-  const deleteMutation = useMutation(CRUD.deleteItem, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('compras')
-        .then(message.success('Registro eliminado exitosamente'));
-      queryClient.invalidateQueries('productos_comprados');
-    },
-  });
+  const updateMutation = useMutation(
+    (values) => CRUD.updateItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('compras')
+          .then(message.success('Cambios guardados exitosamente'));
+        queryClient.invalidateQueries('productos_comprados');
+      },
+    }
+  );
+  const deleteMutation = useMutation(
+    (values) => CRUD.deleteItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('compras')
+          .then(message.success('Registro eliminado exitosamente'));
+        queryClient.invalidateQueries('productos_comprados');
+      },
+    }
+  );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
