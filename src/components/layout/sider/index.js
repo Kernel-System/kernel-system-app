@@ -68,7 +68,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const TicketFacturarItem2 = (
     <Menu.Item
-      key='ticket'
+      key='ticket2'
       icon={<FileDoneOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
@@ -248,7 +248,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const FacturasGlobalesMenuItem = (showIcon) => (
     <Menu.Item
-      key='facturas-internas'
+      key='facturas-globales'
       icon={showIcon ? <FileTextOutlined /> : undefined}
       onClick={!collapsed && ToggleCollapsed}
     >
