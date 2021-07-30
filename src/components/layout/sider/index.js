@@ -2,20 +2,21 @@ import {
   AppstoreOutlined,
   ContainerOutlined,
   DollarOutlined,
+  ExportOutlined,
+  FileDoneOutlined,
   FileTextOutlined,
   ImportOutlined,
   PictureOutlined,
+  ReconciliationOutlined,
+  RedEnvelopeOutlined,
   ShopOutlined,
   ShoppingOutlined,
+  SnippetsOutlined,
+  StockOutlined,
   SwapOutlined,
   TeamOutlined,
   ToolOutlined,
-  SnippetsOutlined,
-  ReconciliationOutlined,
-  StockOutlined,
-  FileDoneOutlined,
-  RedEnvelopeOutlined,
-  ExportOutlined,
+  RollbackOutlined,
 } from '@ant-design/icons';
 import { Divider, Input, Layout, Menu } from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
@@ -166,6 +167,16 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
     </Menu.Item>
   );
 
+  const RMAsMenuItem = (
+    <Menu.Item
+      key='rmas'
+      icon={<RollbackOutlined />}
+      onClick={!collapsed && ToggleCollapsed}
+    >
+      <Link to='/rmas'>RMAs</Link>
+    </Menu.Item>
+  );
+
   const AnunciosMenuItem = (
     <Menu.Item
       key='anuncios'
@@ -189,7 +200,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const ComprasMenuItem = (showIcon) => (
     <Menu.Item
       key='compras'
-      icon={!showIcon ?? <ShoppingOutlined />}
+      icon={showIcon && <ShoppingOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/compras'>Compras</Link>
@@ -209,7 +220,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const OrdenesComprasMenuItem = (showIcon) => (
     <Menu.Item
       key='ordenes-compra'
-      icon={!showIcon ?? <RedEnvelopeOutlined />}
+      icon={showIcon && <RedEnvelopeOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/ordenes-compra'>Ordenes de Compra</Link>
@@ -219,7 +230,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const ProductosCompradosMenuItem = (showIcon) => (
     <Menu.Item
       key='productos-comprados'
-      icon={!showIcon ?? <ShoppingOutlined />}
+      icon={showIcon && <ShoppingOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
       <Link to='/productos-comprados'>Productos Comprados</Link>
@@ -314,6 +325,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       {DevolucionesClientesMenuItem}
       {EnsamblesMenuItem}
       {ProductosMenuItem}
+      {InventarioMenuItem}
       {SolicitudesCompraMenuItem}
       {FacturasInternasMenuItem(true)}
       {TicketFacturarItem}
@@ -341,8 +353,10 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
   const encargadoDeComprasMenuItems = (
     <>
       {ComprasSubMenu}
-      {ProveedoresMenuItem}
       {ProductosMenuItem}
+      {InventarioMenuItem}
+      {RMAsMenuItem}
+      {ProveedoresMenuItem}
       {FacturasExternasMenuItem(true)}
       {TicketFacturarItem}
     </>
@@ -363,6 +377,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
         {role === 'cuentas por cobrar' && cuentasPorCobrarMenuItems}
         {role === 'encargado de almacen' && encargadoDeAlmacenMenuItems}
         {role === 'encargado de compras' && encargadoDeComprasMenuItems}
+        {role === 'encargado de ensambles' && EnsamblesMenuItem}
         {role === 'administrador' && (
           <>
             {VentaMenuItem}
@@ -377,6 +392,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {TransferenciaMenuItem}
             {ComprasSubMenu}
             {ProveedoresMenuItem}
+            {RMAsMenuItem}
             {FacturasSubMenu}
             {AnunciosMenuItem}
             {SolicitudesCompraMenuItem}

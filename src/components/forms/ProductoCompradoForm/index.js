@@ -1,6 +1,6 @@
 // import 'antd/dist/antd.css';
 import './styles.css';
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Form, Input, Button, DatePicker, Typography, Select } from 'antd';
 import { itemsToGrid } from 'utils/gridUtils';
 import { getProductTitleCodePairs } from 'api/shared/products';

@@ -13,7 +13,7 @@ const PrivateRoute = (props) => {
       'cuentas por cobrar',
       'encargado de almacen',
       'encargado de compras',
-      'encargado de ensamble',
+      'encargado de ensambles',
       'encargado de ventas',
     ];
   } else {

@@ -4,6 +4,7 @@ import ProveedorForm from 'components/forms/ProveedorForm';
 import Header from 'components/UI/HeadingBack';
 import { message, Typography } from 'antd';
 import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import { useStoreState } from 'easy-peasy';
 
 const { Title } = Typography;
 
@@ -18,10 +19,11 @@ const Index = () => {
         }));
     };
     const [proveedor, setProveedor] = useState({});
+    const token = useStoreState((state) => state.user.token.access_token);
 
     const insertItem = async (values) => {
         let  success = false;
-        await insertProveedor(values)
+        await insertProveedor(values, token)
             .then((result) => {
                 if (result.status === 200) {
                     onSuccess();

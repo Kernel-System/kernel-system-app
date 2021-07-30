@@ -52,7 +52,7 @@ const ProductCard = ({ product }) => {
               }`
           )}
         </Text>
-        <Paragraph ellipsis={{ rows: 2 }} style={{ minHeight: 44 }}>
+        <Paragraph ellipsis={{ rows: 2 }} style={{ minHeight: 44 }} strong>
           {product.titulo}
         </Paragraph>
         <Space>

@@ -13,6 +13,7 @@ import {
 } from 'utils/facturas/catalogo';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
+import { useStoreState } from 'easy-peasy';
 
 const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
@@ -51,8 +52,10 @@ const Index = ({ seeItem, onConfirmDelete, onClickItem }) => {
     setListToShow(sortData(listToShow, value));
   }
 
+  const token = useStoreState((state) => state.user.token.access_token);
+
   const { data: list } = useQuery('facturas_externas', async () => {
-    const { data } = await getItems(sortValue);
+    const { data } = await getItems(sortValue, token);
     const datos = data.data;
     const facturas_externas = [];
     const newProveedores = [];

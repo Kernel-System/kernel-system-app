@@ -1,28 +1,28 @@
-import {
-  Input,
-  Button,
-  Typography,
-  Row,
-  Col,
-  Form,
-  Select,
-  message,
-  DatePicker,
-  Table,
-  InputNumber,
-  Popconfirm,
-  Image,
-} from 'antd';
-
 import { DeleteOutlined } from '@ant-design/icons';
-import HeadingBack from 'components/UI/HeadingBack';
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Table,
+  Typography,
+} from 'antd';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
+import Text from 'antd/lib/typography/Text';
+import { http } from 'api';
 import InputForm from 'components/shared/InputForm';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
+import HeadingBack from 'components/UI/HeadingBack';
+import { useStoreState } from 'easy-peasy';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
-import { useStoreState } from 'easy-peasy';
-import { http } from 'api';
 import { getUserRole } from 'api/auth';
 import { useQuery } from 'react-query';
 const { Search } = Input;
@@ -219,6 +219,7 @@ const Index = ({ tipo }) => {
           .post(
             '/items/solicitudes_transferencia/',
             {
+              fecha_solicitud: moment().format('YYYY-MM-DDTHH:mm:ss'),
               estado: datos.estado,
               almacen_origen: datos.almacen_origen,
               almacen_destino: datos.almacen_destino,
@@ -368,14 +369,6 @@ const Index = ({ tipo }) => {
   };
 
   const columns = [
-    {
-      title: 'IMAGEN',
-      dataIndex: 'image',
-      width: '20px',
-      //fixed: "left",
-      render: (_, record) => <Image width={50} src={record.productimage} />,
-      editable: false,
-    },
     {
       title: 'NOMBRE',
       dataIndex: 'titulo',
@@ -534,11 +527,16 @@ const Index = ({ tipo }) => {
             span={breakpoint.lg ? 12 : 24}
             style={{ marginBottom: '10px' }}
           >
-            {datosTransferencia.estado !== 'Confirmado' ? (
+            {datosTransferencia.estado === 'Confirmado' &&
+            tipoMuestra === 'mostrar' ? (
               <div>
                 <Title level={5}>Fecha Estimada</Title>
                 <Form.Item>
-                  {datosTransferencia.fecha_estimada ?? 'Sin fecha estimada'}
+                  {datosTransferencia.fecha_estimada ? (
+                    datosTransferencia.fecha_estimada
+                  ) : (
+                    <Text>No hay una fecha asignada</Text>
+                  )}
                 </Form.Item>
               </div>
             ) : (
@@ -595,23 +593,33 @@ const Index = ({ tipo }) => {
                   </Select>
                 </Form.Item>
               ) : (
-                <Typography>{setAlmacenDestino}</Typography>
+                <Typography>{almacenDestino}</Typography>
               )
             ) : (
               <Typography>{datosTransferencia.almacen_destino}</Typography>
             )}
           </Col>
         </Row>
-        <Title level={5}>Comentario</Title>
+        {/* <Title level={5}>Folio de factura (Opcional)</Title>
+        <InputForm
+          titulo='factura'
+          enable={tipoMuestra === 'mostrar'}
+          required={false}
+          mensaje='Asignar una factura.'
+          placeholder='Factura'
+        /> */}
         {datosTransferencia.estado === 'Tranferido' ? (
-          <InputForm
-            titulo='comentario'
-            enable={datosTransferencia.estado !== 'Tranferido'}
-            required={datosTransferencia.estado === 'Tranferido'}
-            max={100}
-            mensaje='Agregar comentario.'
-            placeholder='Comentario.'
-          />
+          <>
+            <Title level={5}>Comentario</Title>
+            <InputForm
+              titulo='comentario'
+              enable={datosTransferencia.estado !== 'Tranferido'}
+              required={datosTransferencia.estado === 'Tranferido'}
+              max={100}
+              mensaje='Agregar comentario.'
+              placeholder='Comentario.'
+            />
+          </>
         ) : (
           <Typography>{datosTransferencia.comentario}</Typography>
         )}

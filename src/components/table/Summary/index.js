@@ -11,7 +11,6 @@ const Summary = ({
   nivel,
   type,
 }) => {
-  console.log(products);
   return (
     <Card>
       <Space direction='vertical' style={{ width: '100%' }} size='middle'>
@@ -110,7 +109,7 @@ const Summary = ({
         type='primary'
         block
         onClick={buttonAction}
-        disabled={!products?.length}
+        disabled={!products?.length || buttonLoading}
         loading={buttonLoading ? buttonLoading : false}
       >
         {buttonLabel}

@@ -5,8 +5,6 @@ import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import Descripciones from 'components/descriptions/MovimientoDescription';
 
-const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
-
 const Index = ({ visible, movimiento, hideModal }) => {
   const [productosConImagenes, setImagenes] = useState(
     movimiento.productos_movimiento
@@ -39,7 +37,7 @@ const Index = ({ visible, movimiento, hideModal }) => {
   const onSetImagenes = (lista) => {
     const newLista = [];
     // console.log({newLista})
-    movimiento?.productos_movimiento?.forEach((producto, index) => {
+    movimiento?.productos_movimiento?.forEach((producto) => {
       const productoConImagenes = lista.find(
         (prod) => prod.codigo === producto.codigo
       );

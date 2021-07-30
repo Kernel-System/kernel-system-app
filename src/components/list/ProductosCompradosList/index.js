@@ -6,6 +6,7 @@ import { getItems } from 'api/compras/productos_comprados';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import Header from 'components/UI/Heading';
 import ProductosCompradosData from './ProductosCompradosData';
+import { useStoreState } from 'easy-peasy';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -41,10 +42,12 @@ const ProductosCompradosList = ({ editItem, onClickItem, refreshItem }) => {
     setCodigoFilter(value);
   }
 
+  const token = useStoreState((state) => state.user.token.access_token);
+
   useQuery(
     'productos_comprados',
     async () => {
-      const { data: fetchedData } = await getItems();
+      const { data: fetchedData } = await getItems(token);
       const data = fetchedData.data;
       const productos_comprados = [];
       const newProveedores = [];

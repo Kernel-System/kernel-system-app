@@ -1,4 +1,3 @@
-import './styles.css';
 import { InboxOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -24,6 +23,7 @@ import { useStoreState } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
 import { categoriasProductos, tiposDeMoneda } from 'utils/facturas/catalogo';
+import './styles.css';
 const { TextArea, Search } = Input;
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -399,7 +399,7 @@ const Index = ({ tipo }) => {
         tiempo_surtido: dato.tiempo_surtido,
         peso: dato.peso,
         costo: dato.costo,
-        moneda: tipo !== 'agregar' ? dato.moneda : 'MXM',
+        moneda: tipo !== 'agregar' ? dato.moneda : 'MXN',
         tipo_de_venta: tipo !== 'agregar' ? dato.tipo_de_venta : 'Fijo',
         tipo_de_compra: dato.tipo_de_compra,
         costeo: dato.costeo,
@@ -535,7 +535,7 @@ const Index = ({ tipo }) => {
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
               //defaultValue={'MXM'}
-              value={tipo === 'agregar' ? dato.moneda : 'MXM'}
+              value={tipo === 'agregar' ? dato.moneda : 'MXN'}
             >
               {Object.keys(tiposDeMoneda).map((item) => {
                 return (

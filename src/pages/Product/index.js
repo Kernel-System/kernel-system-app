@@ -24,9 +24,9 @@ const Product = () => {
   );
   const relatedProductsData = relatedProducts.data?.data?.data;
 
-  const addToCart = ({ cantidad }) => {
+  const addToCart = () => {
     try {
-      addCartItem({ id, cantidad });
+      addCartItem(id);
       message.success('Producto añadido a la lista');
     } catch (error) {
       message.error('Lo sentimos, ha ocurrido un error');

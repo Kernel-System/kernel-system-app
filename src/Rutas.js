@@ -8,8 +8,8 @@ import NuevoMovimiento from 'pages/almacen/NuevoMovimiento';
 import Cart from 'pages/Cart';
 import Checkout from 'pages/Checkout';
 import Compras from 'pages/compras/Compras';
-import ProductosComprados from 'pages/compras/ProductosComprados';
 import RegistrarCompra from 'pages/compras/Compras/RegistrarCompra';
+import ProductosComprados from 'pages/compras/ProductosComprados';
 import Proveedores from 'pages/compras/Proveedores';
 import AñadirProveedor from 'pages/compras/Proveedores/AñadirProveedor';
 import EmpleadoProfile from 'pages/empleado/EmpleadoProfile';
@@ -30,9 +30,9 @@ import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
-import Ventas from 'pages/ventas/Ventas';
 import SolicitudDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudDeCompra';
 import SolicitudesDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudesDeCompra';
+import Ventas from 'pages/ventas/Ventas';
 import { Route, Switch } from 'react-router';
 import NuevoAlmacen from './pages/administrador/almacenes/AgregarAlmacen';
 import Almacen from './pages/administrador/almacenes/Almacenes';
@@ -46,17 +46,19 @@ import NuevaTrasferencia from './pages/almacen/NuevaTrasferencia';
 import Tranferencias from './pages/almacen/Transferencias';
 import CotizacionClientes from './pages/cotizacion_clientes/Cotizaciones';
 import AgregarCotizacionClientes from './pages/cotizacion_clientes/CrearCotizacion';
+import Devoluciones from './pages/devolucion_clientes/Devoluciones';
+import RegistrarDevolucion from './pages/devolucion_clientes/RegistrarDevolucion';
 import Inventario from './pages/inventarios/Inventario';
+import CrearOrdenCompra from './pages/ordenesCompraProv/CrearOrden';
+import OrdenesCompra from './pages/ordenesCompraProv/Ordenes';
 import Cuentas from './pages/pagos/Cuentas';
 import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
-import CrearOrdenCompra from './pages/ordenesCompraProv/CrearOrden';
-import OrdenesCompra from './pages/ordenesCompraProv/Ordenes';
 
-import RegistrarDevolucion from './pages/devolucion_clientes/RegistrarDevolucion';
-import Devoluciones from './pages/devolucion_clientes/Devoluciones';
+import RMAs from 'pages/rma/RMAs';
+import RegistrarRMA from 'pages/rma/RegistrarRMA';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 
@@ -164,7 +166,7 @@ const Rutas = () => {
           'cuentas por cobrar',
           'encargado de almacen',
           'encargado de compras',
-          'encargado de ensamble',
+          'encargado de ensambles',
           'encargado de ventas',
         ]}
         path='/empleado/perfil'
@@ -236,6 +238,19 @@ const Rutas = () => {
         exact
         component={AñadirProveedor}
       />
+      {/* RMAs */}
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/rmas'
+        exact
+        component={RMAs}
+      />
+      <PrivateRoute
+        allowedRoles={['encargado de compras']}
+        path='/rmas/registrar'
+        exact
+        component={RegistrarRMA}
+      />
       {/* Facturas Externas */}
       <PrivateRoute
         allowedRoles={['encargado de compras']}
@@ -265,12 +280,11 @@ const Rutas = () => {
         component={Compras}
       />
       <PrivateRoute
-        allowedRoles={['encargado de compras']}
+        allowedRoles={['encargado de compras', 'encargado de almacen']}
         path='/productos-comprados'
         exact
-      >
-        <ProductosComprados />
-      </PrivateRoute>
+        component={ProductosComprados}
+      />
       <PrivateRoute
         allowedRoles={['encargado de compras']}
         path='/ordenes-compra'
@@ -293,7 +307,7 @@ const Rutas = () => {
       {/* Ensambles */}
       <PrivateRoute
         allowedRoles={[
-          'encargado de ensamble',
+          'encargado de ensambles',
           'encargado de ventas',
           'encargado de almacen',
         ]}
@@ -303,7 +317,7 @@ const Rutas = () => {
       />
       <PrivateRoute
         allowedRoles={[
-          'encargado de ensamble',
+          'encargado de ensambles',
           'encargado de ventas',
           'encargado de almacen',
         ]}
@@ -313,7 +327,7 @@ const Rutas = () => {
       />
       <PrivateRoute
         allowedRoles={[
-          'encargado de ensamble',
+          'encargado de ensambles',
           'encargado de ventas',
           'encargado de almacen',
         ]}
@@ -434,7 +448,12 @@ const Rutas = () => {
       </PrivateRoute>
       {/* Inventario */}
       <PrivateRoute
-        allowedRoles={['administrador', 'encargado de almacen']}
+        allowedRoles={[
+          'administrador',
+          'encargado de almacen',
+          'encargado de compras',
+          'encargado de ventas',
+        ]}
         path='/inventario'
         exact
         component={Inventario}

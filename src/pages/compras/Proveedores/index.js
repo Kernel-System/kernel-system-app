@@ -9,6 +9,7 @@ import CsvReader from 'components/shared/CsvReader';
 import ListaProveedores from 'components/list/ProveedoresList';
 import { filtrarPorProveedor } from 'api/compras/facturas_externas';
 import * as CRUD from 'api/compras/proveedores';
+import { useStoreState } from 'easy-peasy';
 
 const Index = (props) => {
   const showModal = (listElemenToShow) => {
@@ -39,28 +40,38 @@ const Index = (props) => {
   };
 
   const queryClient = useQueryClient();
+  const token = useStoreState((state) => state.user.token.access_token);
 
-  const updateMutation = useMutation(CRUD.updateItem, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('proveedores')
-        .then(message.success('Cambios guardados exitosamente'));
-    },
-  });
-  const deleteMutation = useMutation(CRUD.deleteItem, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('proveedores')
-        .then(message.success('Registro eliminado exitosamente'));
-    },
-  });
-  const insertMutation = useMutation(CRUD.insertItems, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('proveedores')
-        .then(message.success('Proveedores importados exitosamente'));
-    },
-  });
+  const updateMutation = useMutation(
+    (values) => CRUD.updateItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('proveedores')
+          .then(message.success('Cambios guardados exitosamente'));
+      },
+    }
+  );
+  const deleteMutation = useMutation(
+    (values) => CRUD.deleteItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('proveedores')
+          .then(message.success('Registro eliminado exitosamente'));
+      },
+    }
+  );
+  const insertMutation = useMutation(
+    (values) => CRUD.insertItems(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('proveedores')
+          .then(message.success('Proveedores importados exitosamente'));
+      },
+    }
+  );
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
 

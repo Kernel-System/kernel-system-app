@@ -1,30 +1,18 @@
-import React from 'react';
-import './styles.css';
-import { Descriptions, Button } from 'antd';
-import {
-  tiposDeComprobante,
-  usosCfdi,
-  tiposRelacion,
-  regimenesFiscales,
-  metodosDePago,
-  formasDePago,
-} from 'utils/facturas/catalogo';
+import { Descriptions } from 'antd';
 import moment from 'moment';
-import { httpSAT } from 'api';
+import React from 'react';
+import {
+  formasDePago,
+  metodosDePago,
+  regimenesFiscales,
+  tiposDeComprobante,
+  tiposRelacion,
+  usosCfdi,
+} from 'utils/facturas/catalogo';
+import './styles.css';
 
 const formatoFecha = 'DD/MM/YYYY, hh:mm:ss a';
 const Item = Descriptions.Item;
-
-const descargarFactura = (id) => {
-  httpSAT.get(`/cfdi/pdf/issued/${id}`).then((result_pdf) => {
-    const linkSource = 'data:application/pdf;base64,' + result_pdf.data.Content;
-    const downloadLink = document.createElement('a');
-    const fileName = `${id}.pdf`;
-    downloadLink.href = linkSource;
-    downloadLink.download = fileName;
-    downloadLink.click();
-  });
-};
 
 const index = ({ factura }) => {
   return (
@@ -71,16 +59,6 @@ const index = ({ factura }) => {
               return <p key={indx}>{elem.uuid}</p>;
             })
           : 'Sin CFDIs relacionados'}
-      </Item>
-      <Item>
-        <Button
-          type='link'
-          onClick={() => {
-            descargarFactura(factura.id_api);
-          }}
-        >
-          Descargar Factura
-        </Button>
       </Item>
     </Descriptions>
   );

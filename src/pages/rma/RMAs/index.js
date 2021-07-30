@@ -3,11 +3,9 @@ import { Button, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
-import CompraForm from 'components/forms/CompraForm';
-import ListaCompras from 'components/list/ComprasList';
-import * as CRUD from 'api/compras';
-import moment from 'moment';
-import 'moment/locale/es-mx';
+import RMAForm from 'components/forms/RMAForm';
+import ListaRMAs from 'components/list/RMAList';
+import * as CRUD from 'api/compras/rmas';
 import { useStoreState } from 'easy-peasy';
 
 const Index = (props) => {
@@ -27,24 +25,22 @@ const Index = (props) => {
   const onSaveChanges = (values) => {
     const newValues = {
       ...values,
-      no_compra: listElement.no_compra,
-      fecha_compra: moment(values.fecha_compra).format('YYYY-MM-DDTHH:mm:ss'),
-      fecha_entrega: moment(values.fecha_entrega).format('YYYY-MM-DD'),
+      id: listElement.id,
     };
     updateMutation.mutate(newValues);
   };
 
-  const queryClient = useQueryClient();
   const token = useStoreState((state) => state.user.token.access_token);
+  const queryClient = useQueryClient();
 
   const updateMutation = useMutation(
     (values) => CRUD.updateItem(values, token),
     {
       onSuccess: () => {
-        queryClient
-          .invalidateQueries('compras')
-          .then(message.success('Cambios guardados exitosamente'));
-        queryClient.invalidateQueries('productos_comprados');
+        queryClient.invalidateQueries('rmas').then(() => {
+          message.success('Cambios guardados exitosamente');
+          setIsModalVisible(false);
+        });
       },
     }
   );
@@ -52,10 +48,9 @@ const Index = (props) => {
     (values) => CRUD.deleteItem(values, token),
     {
       onSuccess: () => {
-        queryClient
-          .invalidateQueries('compras')
-          .then(message.success('Registro eliminado exitosamente'));
-        queryClient.invalidateQueries('productos_comprados');
+        queryClient.invalidateQueries('rmas').then(() => {
+          message.success('Registro eliminado exitosamente');
+        });
       },
     }
   );
@@ -65,31 +60,33 @@ const Index = (props) => {
 
   return (
     <>
-      <ListaCompras
+      <ListaRMAs
         onClickItem={showModal}
         editItem={showModal}
         onConfirmDelete={onConfirmDelete}
-      ></ListaCompras>
+      ></ListaRMAs>
       <br />
 
-      <Link to='/compras/registrar'>
+      <Link to='/rmas/registrar'>
         <Button type='primary' icon={<PlusOutlined />}>
-          Registrar Compra
+          Registrar RMA
         </Button>
       </Link>
-      <Modal
-        title={listElement.nombre_proveedor}
-        visible={isModalVisible}
-        footer={null}
-        onCancel={handleCancel}
-        width='70%'
-      >
-        <CompraForm
-          datosCompra={listElement}
-          onSubmit={onSaveChanges}
-          submitText='Guardar cambios'
-        />
-      </Modal>
+      {listElement && (
+        <Modal
+          title={`Folio: ${listElement.folio}`}
+          visible={isModalVisible}
+          footer={null}
+          onCancel={handleCancel}
+          width='80%'
+        >
+          <RMAForm
+            datosRMA={listElement}
+            onSubmit={onSaveChanges}
+            submitText='Guardar cambios'
+          />
+        </Modal>
+      )}
     </>
   );
 };

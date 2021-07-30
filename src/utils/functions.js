@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const arraysMatch = function (arr1, arr2) {
   // Check if the arrays are the same length
   if (arr1.length !== arr2.length) return false;
@@ -32,6 +34,25 @@ export const capitalize = (word) => {
 
 export const toPercent = (descuento) => {
   return descuento / 100;
+};
+
+export const dateTimePickerFormat = 'DD MMMM YYYY, hh:mm:ss a';
+export const dbDateTimeFormat = 'YYYY-MM-DDTHH:mm:ss';
+export const dbDateFormat = 'YYYY-MM-DD';
+
+export const getNowDBFormat = () => {
+  return moment().format(dbDateTimeFormat);
+};
+
+export const getTodayDBFormat = () => {
+  return moment().format(dbDateFormat);
+};
+
+export const getDateTimeInDBFormat = (dateTime) => {
+  return moment(dateTime).format(dbDateTimeFormat);
+};
+export const getDateInDBFormat = (date) => {
+  return moment(date).format(dbDateFormat);
 };
 
 export const formatDate = (date, style) =>

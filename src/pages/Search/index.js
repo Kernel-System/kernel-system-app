@@ -14,11 +14,12 @@ const Search = () => {
   const { pathname } = useLocation();
   const [sortBy, setSortBy] = useState('default');
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
   const products = useQuery(
-    ['search-products', query, sortBy, pathname[1]],
+    ['search-products', query, sortBy, pathname[1], page],
     pathname[1] === 'b'
-      ? () => getProductsByName(query, sortBy)
-      : () => getProductsByCategory(query, sortBy)
+      ? () => getProductsByName(query, sortBy, page)
+      : () => getProductsByCategory(query, sortBy, page)
   );
   const productsData = products.data?.data?.data;
 
@@ -66,7 +67,12 @@ const Search = () => {
               </Col>
             ))}
           </Row>
-          <Pagination defaultCurrent={1} total={50} />
+          <Pagination
+            current={page}
+            total={products.data.data.meta.filter_count}
+            pageSize={25}
+            onChange={(page) => setPage(page)}
+          />
         </Space>
       ) : (
         <Empty description='No se encontraron resultados' />

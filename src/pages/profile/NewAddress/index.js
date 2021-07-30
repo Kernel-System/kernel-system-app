@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, message, Row } from 'antd';
+import { Alert, Button, Col, Form, Input, message, Row } from 'antd';
 import { getUserData } from 'api/profile';
 import {
   getUserDireccion,
@@ -8,6 +8,7 @@ import {
 } from 'api/profile/addresses';
 import HeadingBack from 'components/UI/HeadingBack';
 import { useStoreState } from 'easy-peasy';
+import { useQueryParams } from 'hooks/useQueryParams';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory, useLocation, useParams } from 'react-router';
@@ -27,6 +28,7 @@ import {
 const NewAddress = () => {
   const { id } = useParams();
   const { pathname } = useLocation();
+  const params = useQueryParams();
   const history = useHistory();
   const [form] = Form.useForm();
   const token = useStoreState((state) => state.user.token.access_token);
@@ -54,8 +56,16 @@ const NewAddress = () => {
         insertUserDireccion(newAddress, token)
           .then(() => {
             setLoading(false);
-            message.success('Se ha creado la dirección correctamente', 2, () =>
-              history.push('/direcciones')
+            message.success(
+              'Se ha creado la dirección correctamente',
+              2,
+              () => {
+                history.push(
+                  params.get('razon') === 'no-direccion-fiscal'
+                    ? '/lista-de-compra'
+                    : '/direcciones'
+                );
+              }
             );
           })
           .catch(() => {
@@ -95,6 +105,15 @@ const NewAddress = () => {
       />
       <Row>
         <Col xs={24} lg={12}>
+          {params.get('razon') === 'no-direccion-fiscal' && (
+            <Alert
+              type='info'
+              showIcon
+              message='Se requiere una dirección fiscal'
+              description='Para realizar sus pedidos, le solicitamos que registre una dirección fiscal.'
+              style={{ marginBottom: '1rem' }}
+            />
+          )}
           <Form
             form={form}
             name='newAddressForm'

@@ -10,3 +10,13 @@ export const conceptosMovimientos = {
   'Componente para ensamble': 'SALIDA',
   'Producto ensamblado': 'ENTRADA',
 };
+
+export const estadoProductoRMA = {
+  pendiente_enviar: 'Pendiente de enviar',
+  pendiente_resolver: 'Enviado (sin resolver)',
+  reparado: 'Reparado',
+  intercambiado: 'Intercambiado',
+  renovado: 'Producto renovado',
+  credito: 'Nota de crédito',
+  mixto: 'Cambio + nota de crédito',
+};

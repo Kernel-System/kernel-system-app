@@ -1,38 +1,35 @@
-import './styles.css';
 import { useState } from 'react';
 import Header from 'components/UI/Heading';
 import { Popconfirm, List, Typography, Button, Badge, Select } from 'antd';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { Grid } from 'antd';
 import { useQuery } from 'react-query';
-import { getItems } from 'api/compras';
+import { getItems } from 'api/compras/rmas';
 import { pairOfFiltersHeader } from 'utils/gridUtils';
 import SortSelect, { sortData } from 'components/shared/SortSelect';
 import moment from 'moment';
 import 'moment/locale/es-mx';
 import locale from 'antd/es/date-picker/locale/es_ES';
-import { formatPrice } from 'utils/functions';
 import { useStoreState } from 'easy-peasy';
 
 const { useBreakpoint } = Grid;
-const formatoCompra = 'DD MMMM YYYY, hh:mm:ss a';
-const formatoEntrega = 'DD/MM/YYYY';
+const formatoFecha = 'DD MMMM YYYY, hh:mm:ss a';
 
 const { Text } = Typography;
 const { Option } = Select;
 
-const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
+const RMAList = ({ editItem, onConfirmDelete, onClickItem }) => {
   const [searchValue, setSearchValue] = useState(undefined);
 
-  function filtrarPorProveedor(compras, rfc) {
-    if (compras && rfc) {
-      return compras.filter((item) => item.rfc_emisor === rfc);
-    } else return compras?.slice();
+  function filtrarPorProveedor(datos, rfc) {
+    if (datos && rfc) {
+      return datos.filter((item) => item.rfc === rfc);
+    } else return datos?.slice();
   }
 
   function onChange(value) {
     const filteredData = filtrarPorProveedor(list, value);
-    const sortedData = sortData(filteredData, compraSort);
+    const sortedData = sortData(filteredData, rmaSort);
     setSearchValue(value);
     setListToShow(sortedData);
   }
@@ -40,38 +37,38 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
   function onSearch(value) {
     if (list && value) {
       const filteredData = list.filter((item) =>
-        item.nombre_emisor.toUpperCase().includes(value.toUpperCase())
+        item.razon_social.toUpperCase().includes(value.toUpperCase())
       );
-      const sortedData = sortData(filteredData, compraSort);
+      const sortedData = sortData(filteredData, rmaSort);
       setListToShow(sortedData);
-    } else if (list) setListToShow(sortData(list, compraSort));
+    } else if (list) setListToShow(sortData(list, rmaSort));
   }
 
   function handleSort(value) {
-    setCompraSort(value);
+    setRmaSort(value);
     setListToShow(sortData(listToShow, value));
   }
 
   const token = useStoreState((state) => state.user.token.access_token);
 
-  const { data: list } = useQuery('compras', async () => {
-    const { data } = await getItems(compraSort, token);
+  const { data: list } = useQuery('rmas', async () => {
+    const { data } = await getItems(rmaSort, token);
     const datos = data.data;
-    const compras = [];
+    const rmas = [];
     const newProveedores = [];
-    datos.forEach(({ factura, ...elem }) => {
-      const { rfc_emisor, nombre_emisor } = factura;
-      compras.push({ ...factura, ...elem });
-      if (!newProveedores.some((prov) => prov.rfc_emisor === rfc_emisor))
-        newProveedores.push({ rfc_emisor, nombre_emisor });
+    datos.forEach(({ compra, ...elem }) => {
+      const { rfc, razon_social } = compra.proveedor;
+      rmas.push({ ...elem, rfc, razon_social, compra: compra.no_compra });
+      if (!newProveedores.some((prov) => prov.rfc === rfc))
+        newProveedores.push({ rfc, razon_social });
     });
-    const filteredresult = filtrarPorProveedor(compras, searchValue);
+    const filteredresult = filtrarPorProveedor(rmas, searchValue);
     setListToShow(filteredresult);
     setProveedores(newProveedores);
-    return compras;
+    return rmas;
   });
 
-  const [compraSort, setCompraSort] = useState('recent');
+  const [rmaSort, setRmaSort] = useState('recent');
   const [proveedores, setProveedores] = useState([]);
   const [listToShow, setListToShow] = useState([]);
 
@@ -99,8 +96,8 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
       }}
     >
       {proveedores.map((proveedor, index) => (
-        <Option key={index} value={proveedor.rfc_emisor}>
-          {proveedor.nombre_emisor}
+        <Option key={index} value={proveedor.rfc}>
+          {proveedor.razon_social}
         </Option>
       ))}
     </Select>,
@@ -113,17 +110,17 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
     </Text>,
     <SortSelect
       onChange={handleSort}
-      value={compraSort}
-      recentText='Compra más reciente'
-      oldestText='Compra más antigua'
+      value={rmaSort}
+      recentText='RMA más reciente'
+      oldestText='RMA más antiguo'
     />,
   ];
 
   return (
     <>
-      <Header title='Compras' />
+      <Header title='RMAs' />
       {pairOfFiltersHeader(screen, fields)}
-      <br />
+      {/* <br /> */}
       <List
         itemLayout='horizontal'
         size='default'
@@ -140,34 +137,25 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
             key={index}
             style={{
               top: -12,
+              display: 'none',
             }}
-            text={
-              item.fecha_entrega ? (
-                <>
-                  {'Entrega:'}{' '}
-                  <b>{moment(item.fecha_entrega).format(formatoEntrega)}</b>
-                </>
-              ) : (
-                'Sin fecha de entrega'
-              )
-            }
           >
             <List.Item
-              key={item.no_compra}
+              key={item.id}
               actions={[
                 <Button
                   icon={<EditFilled />}
                   onClick={() => editItem(item)}
                 ></Button>,
-                // <Popconfirm
-                //   placement='left'
-                //   title='¿Está seguro de querer borrar este registro?'
-                //   okText='Sí'
-                //   cancelText='No'
-                //   onConfirm={() => onConfirmDelete(item)}
-                // >
-                //   <Button  danger icon={<DeleteFilled />}></Button>
-                // </Popconfirm>,
+                <Popconfirm
+                  placement='left'
+                  title='¿Está seguro de querer borrar este registro?'
+                  okText='Sí'
+                  cancelText='No'
+                  onConfirm={() => onConfirmDelete(item)}
+                >
+                  <Button danger icon={<DeleteFilled />}></Button>
+                </Popconfirm>,
               ]}
             >
               <List.Item.Meta
@@ -181,7 +169,7 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {item.nombre_emisor}
+                    Folio {item.folio} - {item.razon_social}
                   </p>
                 }
                 description={
@@ -190,8 +178,7 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    Fecha de compra:{' '}
-                    {moment(new Date(item.fecha_compra)).format(formatoCompra)}
+                    Fecha: {moment(new Date(item.fecha)).format(formatoFecha)}
                   </p>
                 }
                 key={index}
@@ -202,7 +189,7 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
                     display: 'inline',
                   }}
                 >
-                  TOTAL: {formatPrice(item.total)}
+                  {item.estado}
                 </h3>
               }
             </List.Item>
@@ -213,4 +200,4 @@ const Index = ({ editItem, onConfirmDelete, onClickItem }) => {
   );
 };
 
-export default Index;
+export default RMAList;

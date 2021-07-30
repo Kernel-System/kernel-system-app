@@ -8,7 +8,7 @@ export const getProductTitleCodePairs = (token) =>
 
 export const getHomeProducts = () =>
   http.get(
-    '/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true'
+    '/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter[inventario][id][_nnull]=true&limit=12'
   );
 
 export const getProduct = (id) =>
@@ -32,16 +32,16 @@ export const getCartProducts = (cartItems) => {
   );
 };
 
-export const getProductsByName = (name, sortBy) =>
+export const getProductsByName = (name, sortBy, page) =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"titulo":{"_contains":"${name}"},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"titulo":{"_contains":"${name}"},"inventario":{"id":{"_nnull":true}}}]}&page=${page}&limit=25&meta=filter_count&sort=${
       sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
     }`
   );
 
-export const getProductsByCategory = (category, sortBy) =>
+export const getProductsByCategory = (category, sortBy, page) =>
   http.get(
-    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}&sort=${
+    `/items/productos?fields=codigo,titulo,costo,descuento,tipo_de_venta,precio_fijo,precios_variables.*,imagenes.directus_files_id,categorias.categorias_id.nombre&filter={"_and":[{"categorias":{"categorias_id":{"nombre":{"_contains":"${category}"}}},"inventario":{"id":{"_nnull":true}}}]}&page=${page}&limit=25&meta=filter_count&sort=${
       sortBy === 'menor' ? 'costo' : sortBy === 'mayor' ? '-costo' : 'titulo'
     }`
   );

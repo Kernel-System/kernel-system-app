@@ -4,6 +4,10 @@ import { isEmptyObject } from 'utils/functions';
 
 export const userModel = {
   token: {},
+  expirationDate: 0,
+  role: undefined,
+  rfc: undefined,
+  nivel: undefined,
 
   setUserToken: action((state, payload) => {
     state.token = payload;
@@ -21,8 +25,6 @@ export const userModel = {
     state.rfc = undefined;
   }),
 
-  expirationDate: 0,
-
   setExpirationDate: action(
     (state, payload) => (state.expirationDate = new Date().getTime() + payload)
   ),
@@ -31,10 +33,6 @@ export const userModel = {
     state.expirationDate = 0;
   }),
 
-  role: undefined,
-
-  rfc: undefined,
-
   setUserRole: action((state, payload) => {
     state.role = payload;
   }),
@@ -42,8 +40,6 @@ export const userModel = {
   removeUserRole: action((state) => {
     state.role = undefined;
   }),
-
-  nivel: undefined,
 
   setUserNivel: action((state, payload) => {
     state.nivel = payload;
@@ -56,8 +52,6 @@ export const userModel = {
   isAuth: computed((state) => {
     if (isEmptyObject(state.token)) return false;
     switch (state.role) {
-      case 'administrador':
-        return state.role !== undefined;
       case 'cliente':
         return state.nivel !== undefined;
       default:

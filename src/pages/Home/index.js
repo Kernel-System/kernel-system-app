@@ -15,7 +15,7 @@ const Home = () => {
       redirect = <Redirect to='/cuentas' />;
       break;
     case 'encargado de almacen':
-      redirect = <Redirect to='/movimiento-almacen' />;
+      redirect = <Redirect to='/inventario' />;
       break;
     case 'encargado de compras':
       redirect = <Redirect to='/compras' />;

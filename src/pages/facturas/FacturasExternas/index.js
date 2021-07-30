@@ -1,14 +1,18 @@
-import { useState } from 'react';
-import { Button, Modal, message, Space } from 'antd';
-import { Link } from 'react-router-dom';
-import { useMutation, useQueryClient } from 'react-query';
-import LectorFacturas from 'components/shared/facturas/LectorFacturas';
-import ListaFacturas from 'components/list/FacturasExternasList';
-import Descripciones from 'components/descriptions/FacturaDescriptions';
-import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import { Button, message, Modal, Space } from 'antd';
+import { httpSAT } from 'api';
 import * as CRUD from 'api/compras/facturas_externas';
+import { insertItems as insertProveedor } from 'api/compras/proveedores';
+import Descripciones from 'components/descriptions/FacturaDescriptions';
+import ListaFacturas from 'components/list/FacturasExternasList';
+import LectorFacturas from 'components/shared/facturas/LectorFacturas';
+import { useStoreState } from 'easy-peasy';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from 'react-query';
+import { Link } from 'react-router-dom';
 
 const Index = (props) => {
+  const token = useStoreState((state) => state.user.token.access_token);
+
   const onFacturaLeida = async (factura) => {
     // console.log({ factura });
     const cfdi = factura['$'];
@@ -47,6 +51,7 @@ const Index = (props) => {
       razon_social: emisor.Nombre,
       regimen_fiscal: emisor.RegimenFiscal,
     };
+
     const hide0 = message.loading('Registrando proveedor', 0);
     const rfc_proveedor = await insertarProveedor(proveedor);
 
@@ -65,7 +70,7 @@ const Index = (props) => {
 
   const insertarProveedor = async (proveedor) => {
     let rfc = -1;
-    await insertProveedor(proveedor)
+    await insertProveedor(proveedor, token)
       .then((result) => {
         if (result.status === 200) {
           rfc = result.data.data.rfc;
@@ -96,33 +101,58 @@ const Index = (props) => {
 
   const queryClient = useQueryClient();
 
-  const insertMutation = useMutation(CRUD.insertItems, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('facturas_externas')
-        .then(message.success('La factura ha sido registrada exitosamente', 2));
-    },
-    onError: (error) => {
-      if (error.response.data.errors[0].message.includes('has to be unique')) {
-        message.warn('Esta factura ya ha sido registrada previamente', 2.5);
-      } else {
-        message.error('Fallo al intentar registrar los datos de factura', 2.5);
-      }
-    },
-  });
-  const deleteMutation = useMutation(CRUD.deleteItem, {
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries('facturas_externas')
-        .then(message.success('Registro eliminado exitosamente'));
-    },
-    onError: (error) => {
-      if (error.response.status === 500)
-        message.error(
-          'Fallo al intentar eliminar la factura. Revise que no haya registros relacionados.'
-        );
-    },
-  });
+  const insertMutation = useMutation(
+    (values) => CRUD.insertItems(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('facturas_externas')
+          .then(
+            message.success('La factura ha sido registrada exitosamente', 2)
+          );
+      },
+      onError: (error) => {
+        if (
+          error.response.data.errors[0].message.includes('has to be unique')
+        ) {
+          message.warn('Esta factura ya ha sido registrada previamente', 2.5);
+        } else {
+          message.error(
+            'Fallo al intentar registrar los datos de factura',
+            2.5
+          );
+        }
+      },
+    }
+  );
+  const deleteMutation = useMutation(
+    (values) => CRUD.deleteItem(values, token),
+    {
+      onSuccess: () => {
+        queryClient
+          .invalidateQueries('facturas_externas')
+          .then(message.success('Registro eliminado exitosamente'));
+      },
+      onError: (error) => {
+        if (error.response.status === 500)
+          message.error(
+            'Fallo al intentar eliminar la factura. Revise que no haya registros relacionados.'
+          );
+      },
+    }
+  );
+
+  const descargarFactura = (id) => {
+    httpSAT.get(`/cfdi/pdf/issued/${id}`).then((result_pdf) => {
+      const linkSource =
+        'data:application/pdf;base64,' + result_pdf.data.Content;
+      const downloadLink = document.createElement('a');
+      const fileName = `${id}.pdf`;
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    });
+  };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
@@ -133,7 +163,7 @@ const Index = (props) => {
         onClickItem={showModal}
         seeItem={showModal}
         onConfirmDelete={onConfirmDelete}
-      ></ListaFacturas>
+      />
       <br />
       <Space>
         <Link to='/compras/registrar'>
@@ -148,7 +178,18 @@ const Index = (props) => {
       <Modal
         title={listElement.nombre_emisor}
         visible={isModalVisible}
-        footer={null}
+        footer={
+          listElement.id_api ? (
+            <Button
+              type='link'
+              onClick={() => {
+                descargarFactura(listElement.id_api);
+              }}
+            >
+              Descargar Factura
+            </Button>
+          ) : null
+        }
         onCancel={handleCancel}
         width='70%'
       >
