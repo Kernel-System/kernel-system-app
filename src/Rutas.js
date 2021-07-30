@@ -322,7 +322,8 @@ const Rutas = () => {
         component={ModificarEnsambles}
       />
       {/* Facturar ticket */}
-      <GuestRoute
+      <PrivateRoute
+        //lel
         allowedRoles='*'
         path='/facturar-ticket2'
         exact
@@ -330,7 +331,7 @@ const Rutas = () => {
       />
       <PrivateRoute
         //lel
-        allowedRoles={['*']}
+        allowedRoles='*'
         path='/facturar-ticket'
         exact
         component={FacturarTicket}
