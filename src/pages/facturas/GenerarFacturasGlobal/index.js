@@ -1,9 +1,10 @@
 import FacturasGlobalesList from 'components/list/FacturasGlobalesList';
 import ModalGlobal from 'components/ventas/ModalGlobal';
 import HeadingBack from 'components/UI/HeadingBack';
-import { Button, message } from 'antd';
+import { Button, message, Popconfirm } from 'antd';
 import { useStoreState } from 'easy-peasy';
 import { useState } from 'react';
+import { isLastDayOfMonth } from 'date-fns';
 import { http, httpSAT } from 'api';
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
   const [visible, setVisible] = useState(false);
   const [global, setGobal] = useState({});
   const [loading, setLoading] = useState(false);
+  const date = Date.now();
 
   const showModal = (element) => {
     setGobal(element);
@@ -238,7 +240,7 @@ const Index = () => {
                           .post(
                             `/cfdi?cfdiType=${'issued'}&cfdiId=${
                               result.data.Id
-                            }&email=${'edpg_@hotmail.com'}`
+                            }&email=${process.env.REACT_APP_CORREO}`
                           )
                           .then(() => {
                             if (final) {
@@ -261,17 +263,37 @@ const Index = () => {
       <FacturasGlobalesList onClickItem={showModal} seeItem={showModal} />
       <br />
       <ModalGlobal visible={visible} global={global} hideModal={hideModal} />
-      <Button
-        type='primary'
-        //icon={<PoweroffOutlined />}
-        loading={loading}
-        onClick={() => {
-          generarFacturaGlobal();
-          setLoading(!loading);
-        }}
-      >
-        Generar Facturas Globales
-      </Button>
+      {!isLastDayOfMonth(date) ? (
+        <Popconfirm
+          title='¿Estas seguro de generar la factura global fuera del fin de mes?'
+          onConfirm={() => {
+            generarFacturaGlobal();
+            setLoading(!loading);
+          }}
+          okText='Si'
+          cancelText='No'
+        >
+          <Button
+            type='primary'
+            //icon={<PoweroffOutlined />}
+            loading={loading}
+          >
+            Generar Facturas Globales
+          </Button>
+        </Popconfirm>
+      ) : (
+        <Button
+          type='primary'
+          //icon={<PoweroffOutlined />}
+          loading={loading}
+          onClick={() => {
+            generarFacturaGlobal();
+            setLoading(!loading);
+          }}
+        >
+          Generar Facturas Globales
+        </Button>
+      )}
     </>
   );
 };
