@@ -1,4 +1,4 @@
-import { InputNumber, Input, Typography, Space, Row, Col } from 'antd';
+import { Input, Typography, Space, Row, Col } from 'antd';
 import { useState } from 'react';
 import useBreakpoint from 'antd/lib/grid/hooks/useBreakpoint';
 const { Title } = Typography;
@@ -28,7 +28,7 @@ const Index = ({ filas, titulo, onChanged, onEdition, estado }) => {
     const arreglo = Array.from(Array(numero).keys());
     const numeros = arreglo.map((actual) => {
       return (
-        <InputNumber
+        <Input
           key={`${fila.id}${actual}`}
           placeholder='Número de Serie'
           style={{ width: '100%' }}
@@ -39,7 +39,7 @@ const Index = ({ filas, titulo, onChanged, onEdition, estado }) => {
                 : true
               : onEdition
           }
-          min={1}
+          maxLength={100}
           defaultValue={
             fila.series_componentes_ensamble !== 0
               ? fila.series_componentes_ensamble[actual] !== undefined
