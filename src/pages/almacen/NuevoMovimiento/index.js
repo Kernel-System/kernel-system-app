@@ -19,6 +19,7 @@ import {
   Typography,
 } from 'antd';
 import { http } from 'api';
+import { getItemsMovimiento } from 'api/compras/rmas';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
@@ -119,11 +120,9 @@ const Index = () => {
         onSetAlmacen(result.data.data.empleado[0].almacen);
       }
     });
-    // http
-    //   .get(`/items/devoluciones_proveedores/?fields=folio`, putToken)
-    //   .then((result) => {
-    //     onSetArreglo(result.data.data, setDevolucionesProv);
-    //   });
+    getItemsMovimiento(false, token).then((result) => {
+      onSetArreglo(result.data.data, setDevolucionesProv);
+    });
     http
       .get(`/items/info_devoluciones_clientes/?fields=id,diagnostico`, putToken)
       .then((result) => {
@@ -891,6 +890,43 @@ const Index = () => {
     return <span style={{ color: color }}>{texto}</span>;
   };
 
+  const onChangeDevolucionProv = (index) => {
+    const productosDevolucion = [];
+    const inventarios = [];
+    // devolucionesProv[index].productos_rma.forEach(
+    //   ({ producto_comprado: producto }) => {
+    //     const producto_catalogo = producto.producto_catalogo;
+    //     if (
+    //       producto_catalogo &&
+    //       producto_catalogo !== {} &&
+    //       producto_catalogo.tipo_de_venta !== 'Servicio'
+    //     ) {
+    //       const productoEnTabla = listProducts.find(
+    //         (prod) => prod.key === producto.id
+    //       );
+    //       const cantidad = 1;
+    //       const expand = true;
+    //       const series = productoEnTabla ? productoEnTabla.series : [];
+    //       const nuevoProducto = {
+    //         key: producto.id,
+    //         expand: expand,
+    //         titulo: producto.descripcion,
+    //         id: producto.id,
+    //         clave: producto.clave,
+    //         clave_unidad: producto.clave_unidad,
+    //         series: series,
+    //         productimage: '',
+    //         max: producto.cantidad - producto.cantidad_ingresada,
+    //         cantidad: cantidad,
+    //         codigo: producto_catalogo.codigo,
+    //       };
+    //       productosDevolucion.push(nuevoProducto);
+    //     }
+    //   }
+    // );
+    // setListProducts(productosDevolucion);
+  };
+
   const camposGenerales = (
     <>
       {concepto !== 'Entrada por transferencia' &&
@@ -957,11 +993,18 @@ const Index = () => {
             setConcepto(value);
           }}
         >
-          {Object.keys(conceptosMovimientos).map((concepto, indx) => (
-            <Option key={indx} value={concepto}>
-              {concepto}
-            </Option>
-          ))}
+          {Object.keys(conceptosMovimientos).map((concepto, indx) => {
+            if (
+              concepto === 'Devolución a cliente' ||
+              concepto === 'Producto ensamblado'
+            )
+              return null;
+            return (
+              <Option key={indx} value={concepto}>
+                {concepto}
+              </Option>
+            );
+          })}
         </Select>
       </Form.Item>
       <Form.Item
@@ -1157,18 +1200,41 @@ const Index = () => {
             showSearch
             style={{ width: '100%' }}
             placeholder='Justifica una salida por devolución a proveedor'
-            initialvalues=''
+            onChange={(value, all) => {
+              const index = all.index;
+              // setOcultarAgregar1(false);
+              // setCompraIndex(index);
+              //   onChangeDevolucionProv(index);
+            }}
           >
-            <Option key='' value=''>
-              Ninguna
-            </Option>
-            {devolucionesProv.map((dev) => {
-              return (
-                <Option key={dev.folio} value={dev.folio}>
-                  {dev.folio}
-                </Option>
-              );
-            })}
+            {devolucionesProv?.length ? (
+              devolucionesProv.map((dev, index) => {
+                return (
+                  <Option key={index} value={dev.id}>
+                    Folio{' '}
+                    <b
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      {dev.folio}
+                    </b>
+                    : del proveedor{' '}
+                    <b
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      {dev.compra.proveedor.rfc}
+                    </b>
+                  </Option>
+                );
+              })
+            ) : (
+              <Option key='' value=''>
+                Ninguna
+              </Option>
+            )}
           </Select>
         </Form.Item>
       ) : null}
@@ -1286,10 +1352,7 @@ const Index = () => {
           </Select>
         </Form.Item>
       ) : null}
-      {concepto !== 'Compra' &&
-      concepto !== 'Venta' &&
-      concepto !== 'Entrada por transferencia' &&
-      concepto !== 'Salida por transferencia' ? (
+      {false ? (
         <Row gutter={16} key='Facturas'>
           <Col xs={24} lg={12} key={1}>
             <Form.Item label='Tipo de Factura' name='tipo'>
