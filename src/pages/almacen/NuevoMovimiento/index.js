@@ -19,7 +19,7 @@ import {
   Typography,
 } from 'antd';
 import { http } from 'api';
-import { getItemsMovimiento } from 'api/compras/rmas';
+import { getItemsMovimiento, updateProductosRMA } from 'api/compras/rmas';
 import ModalProducto from 'components/transferencia/ModalTransferencia';
 import HeadingBack from 'components/UI/HeadingBack';
 import TextLabel from 'components/UI/TextLabel';
@@ -168,11 +168,16 @@ const Index = () => {
 
   const onSetAlmacen = (value) => {
     setAlmacen(value);
+    onSetProductos(productos, value);
   };
 
   useEffect(() => {
     setListProducts([]); //aqui
-    if (concepto !== 'Compra' && concepto !== 'Venta') {
+    if (
+      concepto !== 'Compra' &&
+      concepto !== 'Venta' &&
+      concepto !== 'Devolución a proveedor'
+    ) {
       http
         .get(
           `/items/productos?fields=*,imagenes.directus_files_id,inventario.*`,
@@ -185,21 +190,22 @@ const Index = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [almacen, concepto]);
 
-  const onSetProductos = (lista) => {
+  const onSetProductos = (lista, almacenParam) => {
     const newProductos = [];
+    const almacenComparar = almacenParam ?? almacen;
     lista.forEach((producto) => {
       const inventarios = [];
+
       producto.inventario.forEach((inventario) => {
-        if (esSuma(concepto)) {
-          inventarios.push(inventario);
-        } else if (
-          inventario.clave_almacen === almacen &&
-          inventario.cantidad !== 0
+        if (
+          esEntrada(concepto) ||
+          (inventario.clave_almacen === almacenComparar &&
+            inventario.cantidad !== 0)
         )
           inventarios.push(inventario);
       });
-      if (inventarios.length !== 0 || esSuma(concepto)) {
-        producto.inventario = inventarios;
+
+      if (inventarios.length || esEntrada(concepto)) {
         newProductos.push(producto);
       }
     });
@@ -264,9 +270,78 @@ const Index = () => {
     }
   };
 
+  const [productosActualizar, setProductosActualizar] = useState([]);
+
+  const verificarSeries = (producto, rma) => {
+    const series = producto.series.filter((serie) => !!serie);
+    const cantidadSeries = series.length;
+    if (cantidadSeries > 0 && cantidadSeries === producto.cantidad) {
+      if (rma) {
+        const newProductosActualizar = [];
+        for (const serie of series) {
+          const productosRMAConSeriePorEnviar = [];
+          for (const productoRMA of rma.productos_rma) {
+            if (
+              productoRMA.producto_comprado.producto_catalogo.codigo ===
+                producto.codigo &&
+              productoRMA.serie === serie &&
+              productoRMA.estado === 'pendiente_enviar'
+            )
+              productosRMAConSeriePorEnviar.push(productoRMA);
+          }
+          if (
+            !productosRMAConSeriePorEnviar.length &&
+            producto.cantidad > productosRMAConSeriePorEnviar.length
+          )
+            return false;
+          else newProductosActualizar.push(...productosRMAConSeriePorEnviar);
+        }
+        // const copiaProductosActualizar = productosActualizar.slice()
+        // console.log({copiaProductosActualizar})
+        // console.log({newProductosActualizar})
+        productosActualizar.push(...newProductosActualizar);
+        setProductosActualizar(productosActualizar);
+      }
+    } else return false;
+    return true;
+  };
+
+  const verificarProductos = (id_rma) => {
+    if (!listProducts.length) return false;
+    const cantidadTotal = listProducts.reduce(
+      (total, actual) => total + parseInt(actual.cantidad),
+      0
+    );
+    if (cantidadTotal <= 0) return false;
+    const newProductosActualizar = [];
+    for (const producto of listProducts) {
+      if (producto.cantidad > 0) {
+        const rma = devolucionesProv?.find((dev) => dev.id === id_rma);
+        if (producto.expand) {
+          if (!verificarSeries(producto, rma)) return false;
+        } else if (rma) {
+          const productosRMASinSeriePorEnviar = rma.productos_rma.filter(
+            (productoRMA) =>
+              productoRMA.serie === '' &&
+              productoRMA.estado === 'pendiente_enviar'
+          );
+          if (producto.cantidad > productosRMASinSeriePorEnviar.length)
+            return false;
+          else newProductosActualizar.push(...productosRMASinSeriePorEnviar);
+        }
+      }
+    }
+    if (id_rma) {
+      productosActualizar.push(...newProductosActualizar);
+      setProductosActualizar(productosActualizar);
+    }
+    return true;
+  };
+
   const onFinish = (values) => {
     if (switchVerificarConcepto(values.concepto, values)) {
-      if (verificarSeriesProductos()) {
+      if (verificarProductos(values.rma)) {
+        // console.log({ productosActualizar });
         const hide = message.loading('Agregando movimiento de almacén...', 0);
         http
           .post(
@@ -325,17 +400,30 @@ const Index = () => {
                   });
               }
             });
-            if (concepto === 'Compra')
+            if (concepto === 'Compra') {
               http.post(
                 '/custom/productos-compras/',
                 { productos: productosCoV },
                 putToken
               );
-            else if (concepto === 'Venta') {
+            } else if (concepto === 'Venta') {
               http.post(
                 '/custom/productos-ventas/',
                 { productos: productosCoV },
                 putToken
+              );
+            } else if (concepto === 'Devolución a proveedor') {
+              const idsProductosActualizar = productosActualizar.map(
+                ({ id }) => id
+              );
+              const valoresProductos = {
+                estado: 'pendiente_resolver',
+              };
+              console.log({ idsProductosActualizar });
+              updateProductosRMA(
+                idsProductosActualizar,
+                valoresProductos,
+                token
               );
             }
             http
@@ -383,7 +471,10 @@ const Index = () => {
               });
           });
       } else {
-        message.error('Falta llenar datos de productos');
+        message.error(
+          'LLene correctamente las cantidades o series de los productos'
+        );
+        setProductosActualizar([]);
       }
     } else {
       message.error('Falta especificar una justificación');
@@ -395,28 +486,6 @@ const Index = () => {
     message
       .success('El movimiento ha sido registrado exitosamente', 3)
       .then(() => history.goBack());
-  };
-
-  const verificarSeriesProductos = () => {
-    if (!listProducts.length) return false;
-    const cantidadTotal = listProducts.reduce(
-      (total, actual) => total + parseInt(actual.cantidad),
-      0
-    );
-    if (cantidadTotal <= 0) return false;
-    for (let i = 0; i < listProducts.length; i++) {
-      const producto = listProducts[i];
-      if (producto.expand && producto.cantidad > 0) {
-        if (producto.series.length > 0)
-          for (let j = 0; j < producto.series.length; j++) {
-            if (producto.series[j] === '') return false;
-          }
-        else return false;
-      }
-      if (listProducts.length - 1 === i) {
-        return true;
-      }
-    }
   };
 
   const onChangeCompraVenta = (index) => {
@@ -506,19 +575,11 @@ const Index = () => {
     }
   };
 
-  //+ Compra, Entrada por transferencia, Componente defectuoso
-  //- Venta, Devolución a cliente, Devolución a proveedor, Salida por transferencia, Componente para ensamble
-
-  const esSuma = (concepto) => {
-    if (
-      concepto === 'Compra' ||
-      concepto === 'Entrada por transferencia' ||
-      concepto === 'Componente defectuoso'
-    ) {
-      return true; //suma
-    } else {
-      return false; //resta
-    }
+  // ENTRADA: Compra, Entrada por transferencia, Componente defectuoso, Regreso de mercancía
+  // SALIDA: Venta, Devolución a cliente, Devolución a proveedor, Salida por transferencia, Componente para ensamble
+  const esEntrada = (concepto) => {
+    if (conceptosMovimientos[concepto] === 'ENTRADA') return true;
+    else return false;
   };
 
   const agregarInventarios = (values, hideLoading) => {
@@ -562,7 +623,7 @@ const Index = () => {
             .patch(
               `/items/inventario/${producto_inv.id}`,
               {
-                cantidad: esSuma(values.concepto)
+                cantidad: esEntrada(values.concepto)
                   ? producto_inv.cantidad + productosAgregados[index].cantidad
                   : producto_inv.cantidad - productosAgregados[index].cantidad,
                 estado: 'normal',
@@ -575,7 +636,7 @@ const Index = () => {
               putToken
             )
             .then((producto_inv_anl) => {
-              if (esSuma(values.concepto)) {
+              if (esEntrada(values.concepto)) {
                 let series = [];
                 productosAgregados[index].series.forEach((serie) => {
                   series.push({
@@ -639,14 +700,17 @@ const Index = () => {
 
   //#region busqueda de productos
   const onSearchChange = (value) => {
+    // console.log({ value });
     filtrarProductosPorTitulo(productos, value);
   };
 
-  const filtrarProductosPorTitulo = async (productos, value) => {
-    if (productos) {
-      setListProductsToShow(
-        productos.filter((item) => item.titulo.includes(value))
-      );
+  const filtrarProductosPorTitulo = async (listaProductos, value) => {
+    if (listaProductos) {
+      if (value)
+        setListProductsToShow(
+          listaProductos.filter((item) => item.titulo?.includes(value))
+        );
+      else setListProductsToShow(listaProductos);
     }
   };
 
@@ -718,7 +782,7 @@ const Index = () => {
       const producto = newData.find((prod) => prod.key === key);
       const cantidad = producto.cantidad;
       if (value < cantidad) {
-        producto.series.splice(cantidad - 2, value);
+        producto.series = producto.series.splice(cantidad - 2, value);
       }
       producto.cantidad = value;
       let newProduct = [];
@@ -879,52 +943,48 @@ const Index = () => {
     return total;
   };
 
-  const textoProductosPendientes = (total) => {
+  const totalProductosRMAPendientes = (productos) => {
+    const total = productos.reduce((total, current) => {
+      return total + (current.estado === 'pendiente_enviar');
+    }, 0);
+    return total;
+  };
+
+  const textoProductosPendientes = (
+    total,
+    textoSuccess = 'compra completada'
+  ) => {
     let color = 'inherit';
-    let texto = 'compra completada';
+    let texto = '';
     if (total) {
       color = 'red';
       const s = total > 1 ? 's' : '';
       texto = `${total} producto${s} pendiente${s}`;
-    }
+    } else texto = textoSuccess;
     return <span style={{ color: color }}>{texto}</span>;
   };
 
-  const onChangeDevolucionProv = (index) => {
-    const productosDevolucion = [];
-    const inventarios = [];
-    // devolucionesProv[index].productos_rma.forEach(
-    //   ({ producto_comprado: producto }) => {
-    //     const producto_catalogo = producto.producto_catalogo;
-    //     if (
-    //       producto_catalogo &&
-    //       producto_catalogo !== {} &&
-    //       producto_catalogo.tipo_de_venta !== 'Servicio'
-    //     ) {
-    //       const productoEnTabla = listProducts.find(
-    //         (prod) => prod.key === producto.id
-    //       );
-    //       const cantidad = 1;
-    //       const expand = true;
-    //       const series = productoEnTabla ? productoEnTabla.series : [];
-    //       const nuevoProducto = {
-    //         key: producto.id,
-    //         expand: expand,
-    //         titulo: producto.descripcion,
-    //         id: producto.id,
-    //         clave: producto.clave,
-    //         clave_unidad: producto.clave_unidad,
-    //         series: series,
-    //         productimage: '',
-    //         max: producto.cantidad - producto.cantidad_ingresada,
-    //         cantidad: cantidad,
-    //         codigo: producto_catalogo.codigo,
-    //       };
-    //       productosDevolucion.push(nuevoProducto);
-    //     }
-    //   }
-    // );
-    // setListProducts(productosDevolucion);
+  const onChangeDevolucionProv = (rma) => {
+    const productos_catalogo = [];
+    devolucionesProv
+      .find((dev) => dev.id === rma)
+      ?.productos_rma.forEach((productoRMA) => {
+        const producto_catalogo =
+          productoRMA.producto_comprado.producto_catalogo;
+        if (
+          productoRMA.estado === 'pendiente_enviar' &&
+          producto_catalogo &&
+          producto_catalogo !== {} &&
+          producto_catalogo.tipo_de_venta !== 'Servicio' &&
+          !productos_catalogo.find(
+            (prod) => prod.codigo === producto_catalogo.codigo
+          )
+        ) {
+          productos_catalogo.push(producto_catalogo);
+        }
+      });
+    setListProducts([]);
+    onSetProductos(productos_catalogo);
   };
 
   const camposGenerales = (
@@ -1200,11 +1260,8 @@ const Index = () => {
             showSearch
             style={{ width: '100%' }}
             placeholder='Justifica una salida por devolución a proveedor'
-            onChange={(value, all) => {
-              const index = all.index;
-              // setOcultarAgregar1(false);
-              // setCompraIndex(index);
-              //   onChangeDevolucionProv(index);
+            onChange={(value) => {
+              onChangeDevolucionProv(value);
             }}
           >
             {devolucionesProv?.length ? (
@@ -1226,7 +1283,12 @@ const Index = () => {
                       }}
                     >
                       {dev.compra.proveedor.rfc}
-                    </b>
+                    </b>{' '}
+                    -{' '}
+                    {textoProductosPendientes(
+                      totalProductosRMAPendientes(dev.productos_rma),
+                      'productos RMA enviados'
+                    )}
                   </Option>
                 );
               })
