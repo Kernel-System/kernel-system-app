@@ -69,7 +69,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
 
   const TicketFacturarItem2 = (
     <Menu.Item
-      key='ticket'
+      key='ticket2'
       icon={<FileDoneOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >

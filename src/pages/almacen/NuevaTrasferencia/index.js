@@ -23,7 +23,8 @@ import { useStoreState } from 'easy-peasy';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from 'react-router';
-
+import { getUserRole } from 'api/auth';
+import { useQuery } from 'react-query';
 const { Search } = Input;
 const { Option } = Select;
 
@@ -73,6 +74,8 @@ const Index = ({ tipo }) => {
   const [almacenes, setAlmacenes] = useState([]);
   const [empleado, setEmpleado] = useState('');
   const token = useStoreState((state) => state.user.token.access_token);
+  const rol = useQuery(['rol_empleado'], () => getUserRole(token))?.data?.data
+    ?.data.role.name;
   const putToken = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -82,10 +85,7 @@ const Index = ({ tipo }) => {
   useEffect(() => {
     http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
       onSetArreglo(result.data.data.empleado[0], setEmpleado);
-      if (
-        result.data.data.empleado[0].puesto ===
-        'd5432f92-7a74-4372-907c-9868507e0fd5'
-      ) {
+      if (rol === 'administrador') {
         onSetArreglo('Todo', setAlmacenDestino);
       } else {
         onSetArreglo(result.data.data.empleado[0].almacen, setAlmacenDestino);
@@ -223,7 +223,6 @@ const Index = ({ tipo }) => {
               estado: datos.estado,
               almacen_origen: datos.almacen_origen,
               almacen_destino: datos.almacen_destino,
-              factura: datos.factura,
               rfc_empleado: empleado.rfc,
             },
             putToken
@@ -276,7 +275,6 @@ const Index = ({ tipo }) => {
         `/items/solicitudes_transferencia/${match.params.id}`,
         {
           estado: datos.estado,
-          factura: datos.factura,
           fecha_estimada: datosTransferencia.fecha_estimada,
           comentario: datos.comentario,
         },
@@ -453,7 +451,6 @@ const Index = ({ tipo }) => {
           almacen_destino:
             tipoMuestra !== 'agregar' ? datosTransferencia.almacen_destino : '',
           //estado: tipoMuestra !== 'agregar' ? datosTransferencia.estado : 'Pendiente',
-          factura: datosTransferencia.factura,
           fecha_estimada: datosTransferencia.fecha_estimada,
         }}
         onFinish={tipoMuestra === 'agregar' ? onFinish : onFinishChange}

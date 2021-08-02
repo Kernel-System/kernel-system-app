@@ -267,7 +267,6 @@ const Index = () => {
         <Input disabled={bloquear} maxLength={13} />
       </Form.Item>
       <br />
-      <Title level={5}>Agregar Dirección</Title>
       <Row key='columnas' gutter={[16, 8]} style={{ marginBottom: '10px' }}>
         <Col
           className='gutter-row'

@@ -31,9 +31,7 @@ const TablaProductosRMA = ({ productos, setProductos }) => {
       title: 'Descripción',
       dataIndex: 'descripcion',
       ellipsis: true,
-      render: (text, record) => (
-        <div style={{ width: '400px' }}>{text}</div>
-      ),
+      render: (text, record) => <div style={{ width: '400px' }}>{text}</div>,
     },
     {
       title: 'Serie',

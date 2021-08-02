@@ -203,7 +203,7 @@ const Index = () => {
           mensaje='Asigna una clave.'
           placeholder='Clave'
           //required={false}
-          max={100}
+          max={10}
         />
         <Title level={5}>Nombre</Title>
         <InputForm

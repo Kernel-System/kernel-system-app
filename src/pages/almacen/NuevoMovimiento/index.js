@@ -29,6 +29,8 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 import { conceptosMovimientos } from 'utils/almacen';
+import { useQuery } from 'react-query';
+import { getUserRole } from 'api/auth';
 import './styles.css';
 
 const { Search } = Input;
@@ -102,6 +104,8 @@ const Index = () => {
   const history = useHistory();
   const [form] = Form.useForm();
   const token = useStoreState((state) => state.user.token.access_token);
+  const rol = useQuery(['rol_empleado'], () => getUserRole(token))?.data?.data
+    ?.data.role.name;
   const putToken = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -111,10 +115,7 @@ const Index = () => {
   useEffect(() => {
     http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
       setEmpleado(result.data.data.empleado[0]);
-      if (
-        result.data.data.empleado[0].puesto ===
-        'd5432f92-7a74-4372-907c-9868507e0fd5'
-      ) {
+      if (rol === 'administrador') {
         onSetAlmacen(1);
       } else {
         onSetAlmacen(result.data.data.empleado[0].almacen);
@@ -356,9 +357,7 @@ const Index = () => {
               no_transferencia: values.no_transferencia,
               rfc_empleado: empleado.rfc,
               clave_almacen:
-                empleado.puesto !== 'd5432f92-7a74-4372-907c-9868507e0fd5'
-                  ? empleado.almacen
-                  : values.almacen,
+                rol !== 'administrador' ? empleado.almacen : values.almacen,
               compras: values.compras,
               ventas: values.ventas,
               mostrar: true,
@@ -590,9 +589,7 @@ const Index = () => {
     http
       .get(
         `/items/inventario?filter[codigo_producto][_in]=${codigos.toString()}&filter[clave_almacen][_eq]=${
-          empleado.puesto !== 'd5432f92-7a74-4372-907c-9868507e0fd5'
-            ? empleado.almacen
-            : values.almacen
+          rol !== 'administrador' ? empleado.almacen : values.almacen
         }`,
         putToken
       )
@@ -628,9 +625,7 @@ const Index = () => {
                   : producto_inv.cantidad - productosAgregados[index].cantidad,
                 estado: 'normal',
                 clave_almacen:
-                  empleado.puesto !== 'd5432f92-7a74-4372-907c-9868507e0fd5'
-                    ? empleado.almacen
-                    : values.almacen,
+                  rol !== 'administrador' ? empleado.almacen : values.almacen,
                 codigo_producto: productosAgregados[index].codigo,
               },
               putToken
@@ -664,9 +659,7 @@ const Index = () => {
                 cantidad: producto.cantidad,
                 estado: 'normal',
                 clave_almacen:
-                  empleado.puesto !== 'd5432f92-7a74-4372-907c-9868507e0fd5'
-                    ? empleado.almacen
-                    : values.almacen,
+                  rol !== 'administrador' ? empleado.almacen : values.almacen,
                 codigo_producto: producto.codigo,
               },
               putToken
@@ -1362,7 +1355,7 @@ const Index = () => {
               return transferencia.estado === 'Confirmado' ||
                 transferencia.estado === 'Recibido' ||
                 transferencia.estado === 'Recibido con Detalles' ? (
-                empleado.puesto === 'd5432f92-7a74-4372-907c-9868507e0fd5' ? (
+                rol === 'administrador' ? (
                   transferencia.estado === 'Confirmado' &&
                   concepto === 'Salida por transferencia' ? (
                     <Option
