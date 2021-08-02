@@ -142,7 +142,9 @@ const Index = ({ onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {item[0].codigo_producto.titulo}
+                    {item[0].codigo_producto.codigo +
+                      ' - ' +
+                      item[0].codigo_producto.titulo}
                   </p>
                 }
                 description={
