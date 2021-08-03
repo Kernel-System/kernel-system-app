@@ -28,6 +28,7 @@ export const getItemsMovimiento = (sort, token) => {
 			, productos_rma.producto_comprado.producto_catalogo.clave
 			, productos_rma.producto_comprado.producto_catalogo.unidad_cfdi
       , productos_rma.producto_comprado.producto_catalogo.inventario.*
+      , productos_rma.producto_comprado.producto_catalogo.inventario.series_inventario.*
       &sort[]=${!sort || sort === 'recent' ? '-' : '+'}fecha`,
     token && {
       headers: { Authorization: `Bearer ${token}` },

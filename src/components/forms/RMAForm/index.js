@@ -351,6 +351,9 @@ const RMAForm = (props) => {
         productos={productos}
         setProductos={setProductos}
         form={form}
+        desabilitarEstado={
+          props.datosRMA.estado === 'Cerrado' || props.datosRMA.id === undefined
+        }
       ></TablaProductosRMA>
       <Item>
         <Button type='primary' htmlType='submit'>

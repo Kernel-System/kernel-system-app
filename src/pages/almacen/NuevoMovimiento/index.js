@@ -96,13 +96,14 @@ const Index = () => {
   const [compraIndex, setCompraIndex] = useState();
   const [ventaIndex, setVentaIndex] = useState();
   const [transferenciaIndex, setTransferenciaIndex] = useState();
-
+  const [productosInventario, setProductosInventario] = useState([]);
   const [ocultarAgregar1, setOcultarAgregar1] = useState(true);
   const [ocultarAgregar2, setOcultarAgregar2] = useState(true);
 
   const [visible, setVisible] = useState(false);
-  const history = useHistory();
+
   const [form] = Form.useForm();
+  const history = useHistory();
   const token = useStoreState((state) => state.user.token.access_token);
   const rol = useQuery(['rol_empleado'], () => getUserRole(token))?.data?.data
     ?.data.role.name;
@@ -147,7 +148,7 @@ const Index = () => {
       });
     http
       .get(
-        `/items/compras/?fields=*, productos_comprados.*, productos_comprados.producto_catalogo.*`,
+        `/items/compras/?fields=*, productos_comprados.*, productos_comprados.producto_catalogo.*&sort[]=-fecha_compra`,
         putToken
       )
       .then((result) => {
@@ -155,7 +156,10 @@ const Index = () => {
       });
     http
       .get(
-        `/items/ventas/?fields=*, id_cliente.rfc,productos_venta.*, productos_venta.codigo.*`,
+        `/items/ventas/?fields=*, id_cliente.rfc
+				, productos_venta.*, productos_venta.codigo.*, productos_venta.codigo.inventario.*
+				, productos_venta.codigo.inventario.series_inventario.*
+				&sort[]=-fecha_venta`,
         putToken
       )
       .then((result) => {
@@ -201,17 +205,19 @@ const Index = () => {
         if (
           esEntrada(concepto) ||
           (inventario.clave_almacen === almacenComparar &&
-            inventario.cantidad !== 0)
-        )
+            inventario.cantidad > 0)
+        ) {
           inventarios.push(inventario);
+        }
       });
 
       if (inventarios.length || esEntrada(concepto)) {
         newProductos.push(producto);
       }
     });
-    setProductos(newProductos);
+    if (almacenParam === undefined) setProductos(newProductos);
     setListProductsToShow(newProductos);
+    setProductosInventario(newProductos);
   };
 
   const onSetArreglo = (lista, asignar) => {
@@ -273,33 +279,69 @@ const Index = () => {
 
   const [productosActualizar, setProductosActualizar] = useState([]);
 
-  const verificarSeries = (producto, rma) => {
+  const verificarSeries = (producto, { rma, venta }) => {
     const series = producto.series.filter((serie) => !!serie);
     const cantidadSeries = series.length;
     if (cantidadSeries > 0 && cantidadSeries === producto.cantidad) {
-      if (rma) {
+      if (conceptosMovimientos[concepto] === 'SALIDA') {
         const newProductosActualizar = [];
         for (const serie of series) {
-          const productosRMAConSeriePorEnviar = [];
-          for (const productoRMA of rma.productos_rma) {
+          if (concepto === 'Devolución a proveedor') {
+            const productosRMAConSeriePorEnviar = [];
+            for (const productoRMA of rma.productos_rma) {
+              if (
+                productoRMA.producto_comprado.producto_catalogo.codigo ===
+                  producto.codigo &&
+                productoRMA.serie === serie &&
+                productoRMA.estado === 'pendiente_enviar'
+              ) {
+                productosRMAConSeriePorEnviar.push(productoRMA);
+                // verificar series de inventario
+                for (const inventario of productoRMA.producto_comprado
+                  .producto_catalogo.inventario) {
+                  if (inventario.clave_almacen === almacen) {
+                    const serieInventarioEncontrado = inventario?.series_inventario.find(
+                      (serieInventario) => {
+                        return serieInventario.serie === serie;
+                      }
+                    );
+                    if (!serieInventarioEncontrado) {
+                      message.error(
+                        'Las series no coinciden con el inventario'
+                      );
+                      return false;
+                    }
+                  }
+                }
+              }
+            }
             if (
-              productoRMA.producto_comprado.producto_catalogo.codigo ===
-                producto.codigo &&
-              productoRMA.serie === serie &&
-              productoRMA.estado === 'pendiente_enviar'
-            )
-              productosRMAConSeriePorEnviar.push(productoRMA);
+              !productosRMAConSeriePorEnviar.length &&
+              producto.cantidad > productosRMAConSeriePorEnviar.length
+            ) {
+              message.error(
+                'Las series no coinciden con lo definido en el RMA'
+              );
+              return false;
+            } else
+              newProductosActualizar.push(...productosRMAConSeriePorEnviar);
+          } else if (concepto === 'Venta') {
+            // verificar series de inventario
+            for (const productoVenta of venta.productos_venta) {
+              for (const inventario of productoVenta.codigo.inventario) {
+                if (inventario.clave_almacen === almacen) {
+                  const serieInventarioEncontrado = inventario?.series_inventario.find(
+                    (serieInventario) => serieInventario.serie === serie
+                  );
+                  if (!serieInventarioEncontrado) {
+                    message.error('Las series no coinciden con el inventario');
+                    return false;
+                  }
+                }
+              }
+            }
           }
-          if (
-            !productosRMAConSeriePorEnviar.length &&
-            producto.cantidad > productosRMAConSeriePorEnviar.length
-          )
-            return false;
-          else newProductosActualizar.push(...productosRMAConSeriePorEnviar);
         }
-        // const copiaProductosActualizar = productosActualizar.slice()
-        // console.log({copiaProductosActualizar})
-        // console.log({newProductosActualizar})
         productosActualizar.push(...newProductosActualizar);
         setProductosActualizar(productosActualizar);
       }
@@ -307,7 +349,7 @@ const Index = () => {
     return true;
   };
 
-  const verificarProductos = (id_rma) => {
+  const verificarProductos = ({ id_rma, no_venta }) => {
     if (!listProducts.length) return false;
     const cantidadTotal = listProducts.reduce(
       (total, actual) => total + parseInt(actual.cantidad),
@@ -317,18 +359,24 @@ const Index = () => {
     const newProductosActualizar = [];
     for (const producto of listProducts) {
       if (producto.cantidad > 0) {
-        const rma = devolucionesProv?.find((dev) => dev.id === id_rma);
+        const rma =
+          id_rma && devolucionesProv?.find((dev) => dev.id === id_rma);
+        const venta =
+          no_venta && ventas?.find((venta) => venta.no_venta === no_venta);
         if (producto.expand) {
-          if (!verificarSeries(producto, rma)) return false;
+          if (!verificarSeries(producto, { rma, venta })) return false;
         } else if (rma) {
           const productosRMASinSeriePorEnviar = rma.productos_rma.filter(
             (productoRMA) =>
               productoRMA.serie === '' &&
               productoRMA.estado === 'pendiente_enviar'
           );
-          if (producto.cantidad > productosRMASinSeriePorEnviar.length)
+          if (producto.cantidad > productosRMASinSeriePorEnviar.length) {
+            message.error(
+              'La cantidad de productos sin series no coinciden con el RMA'
+            );
             return false;
-          else newProductosActualizar.push(...productosRMASinSeriePorEnviar);
+          } else newProductosActualizar.push(...productosRMASinSeriePorEnviar);
         }
       }
     }
@@ -341,8 +389,7 @@ const Index = () => {
 
   const onFinish = (values) => {
     if (switchVerificarConcepto(values.concepto, values)) {
-      if (verificarProductos(values.rma)) {
-        // console.log({ productosActualizar });
+      if (verificarProductos({ id_rma: values.rma, no_venta: values.ventas })) {
         const hide = message.loading('Agregando movimiento de almacén...', 0);
         http
           .post(
@@ -544,7 +591,11 @@ const Index = () => {
           producto.cantidad_entregada < producto.cantidad &&
           producto_catalogo &&
           producto_catalogo !== {} &&
-          producto_catalogo.tipo_de_venta !== 'Servicio'
+          producto_catalogo.tipo_de_venta !== 'Servicio' &&
+          producto_catalogo.inventario.find(
+            (inventario) =>
+              inventario.clave_almacen === almacen && inventario.cantidad > 0
+          )
         ) {
           const productoEnTabla = listProducts.find(
             (prod) => prod.key === producto.id
@@ -693,8 +744,7 @@ const Index = () => {
 
   //#region busqueda de productos
   const onSearchChange = (value) => {
-    // console.log({ value });
-    filtrarProductosPorTitulo(productos, value);
+    filtrarProductosPorTitulo(productosInventario, value);
   };
 
   const filtrarProductosPorTitulo = async (listaProductos, value) => {
@@ -720,7 +770,7 @@ const Index = () => {
   const changeSerie = (value, key, actual) => {
     const lista = listProducts.slice();
     const prod = lista.find((prod) => prod.key === key);
-    prod.series[actual] = value;
+    if (prod && prod.series) prod.series[actual] = value;
     setListProducts(lista);
   };
 
@@ -874,7 +924,14 @@ const Index = () => {
   const addListItem = (item) => {
     const lista = JSON.parse(JSON.stringify(listProducts));
     const dato = lista.findIndex((producto) => producto.codigo === item.codigo);
-    if (dato === -1)
+    if (dato === -1) {
+      const inventarioAlmacen = item.inventario.filter(
+        (inventario) => inventario.clave_almacen === almacen
+      );
+      const max = inventarioAlmacen.reduce(
+        (sum, actual) => actual.cantidad + sum,
+        0
+      );
       lista.push({
         key: lista.length.toString(),
         expand: true,
@@ -883,15 +940,14 @@ const Index = () => {
         clave: item.clave,
         clave_unidad: item.unidad_cfdi,
         series: [],
-        max: item.inventario
-          .map((inventario) => inventario.cantidad)
-          .reduce((cantidad, sum) => cantidad + sum, 0),
+        max: max,
         productimage:
           item.imagenes.length !== 0
             ? `${process.env.REACT_APP_DIRECTUS_API_URL}/assets/${item.imagenes[0].directus_files_id}`
             : '',
-        cantidad: 1,
+        cantidad: max && 1,
       });
+    }
     setListProducts(lista);
   };
 
@@ -922,7 +978,7 @@ const Index = () => {
   };
   //#endregion
 
-  const totalProductosPendientes = (productos) => {
+  const totalProductosCompradosPendientes = (productos) => {
     const total = productos.reduce((total, current) => {
       const producto_catalogo = current.producto_catalogo;
       return (
@@ -932,6 +988,13 @@ const Index = () => {
           producto_catalogo.tipo_de_venta !== 'Servicio' &&
           current.cantidad > current.cantidad_ingresada)
       );
+    }, 0);
+    return total;
+  };
+
+  const totalProductosVentaPendientes = (productos) => {
+    const total = productos.reduce((total, current) => {
+      return total + (current.cantidad > current.cantidad_entregada);
     }, 0);
     return total;
   };
@@ -1139,7 +1202,9 @@ const Index = () => {
                     </b>{' '}
                     -{' '}
                     {textoProductosPendientes(
-                      totalProductosPendientes(compra.productos_comprados)
+                      totalProductosCompradosPendientes(
+                        compra.productos_comprados
+                      )
                     )}
                   </Option>
                 );
@@ -1200,8 +1265,12 @@ const Index = () => {
                     }}
                   >
                     {moment(new Date(venta.fecha_venta)).format(formatoFecha)}
-                  </b>
-                  {/* {`${venta.no_venta} : ${venta.fecha_venta}`} */}
+                  </b>{' '}
+                  -{' '}
+                  {textoProductosPendientes(
+                    totalProductosVentaPendientes(venta.productos_venta),
+                    'venta completada'
+                  )}
                 </Option>
               );
             })}
@@ -1456,8 +1525,6 @@ const Index = () => {
             </Form.Item>
           </Col>
         </Row>
-      ) : factura !== '' && tipo === 'facturas_internas' ? (
-        <TextLabel title={`Factura Interna folio: ${factura}}`} />
       ) : null}
     </>
   );
