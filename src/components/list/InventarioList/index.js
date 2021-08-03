@@ -22,7 +22,7 @@ const Index = ({ onClickItem }) => {
     const datos = data.data;
     const newAlmacenes = [];
     datos.forEach(({ clave_almacen }) => {
-      if (!newAlmacenes.some((alm) => alm.clave === clave_almacen.clave))
+      if (!newAlmacenes.some((alm) => alm.clave === clave_almacen?.clave))
         newAlmacenes.push({ ...clave_almacen });
     });
     const filteredresult = filtrarPorAlmacen(datos, searchValue);
@@ -40,7 +40,7 @@ const Index = ({ onClickItem }) => {
   const filtrarPorAlmacen = (inventario, clave) => {
     if (clave === 'Todo') return inventario?.slice();
     else
-      return inventario?.filter((item) => item.clave_almacen.clave === clave);
+      return inventario?.filter((item) => item.clave_almacen?.clave === clave);
   };
 
   const onSetInventarios = (inventario) => {
@@ -142,14 +142,16 @@ const Index = ({ onClickItem }) => {
                       margin: 0,
                     }}
                   >
-                    {item[0].codigo_producto.titulo}
+                    {item[0].codigo_producto.codigo +
+                      ' - ' +
+                      item[0].codigo_producto.titulo}
                   </p>
                 }
                 description={
                   searchValue !== 'Todo'
-                    ? `Almacén: ${item[0].clave_almacen.clave}`
+                    ? `Almacén: ${item[0].clave_almacen?.clave}`
                     : `Almacenes: ${item
-                        .map((inv) => inv.clave_almacen.clave)
+                        .map((inv) => inv.clave_almacen?.clave)
                         .toString()}`
                 }
               />
