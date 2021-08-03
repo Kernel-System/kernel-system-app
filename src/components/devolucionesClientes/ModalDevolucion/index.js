@@ -54,6 +54,7 @@ const Index = ({ visible, movimiento, hideModal }) => {
         newLista.push({ ...productoConImagenes, ...producto });
       }
     );
+    console.log(newLista);
     setImagenes(newLista);
   };
 
@@ -79,7 +80,11 @@ const Index = ({ visible, movimiento, hideModal }) => {
           <Item label='Almacén'>{movAlm?.clave_almacen}</Item>
           <Item label='Empleado'>{movAlm?.rfc_empleado?.nombre}</Item>
           <Item label='Diagnostico'>{movimiento?.diagnostico}</Item>
-          <Item label='Venta'>{movimiento?.no_venta}</Item>
+          {movimiento?.no_venta !== null ? (
+            <Item label='Venta'>{movimiento?.no_venta}</Item>
+          ) : (
+            <Item label='Ensamble'>{movimiento?.folio_ensamble}</Item>
+          )}
           <Item label='Movimiento'>{movAlm?.id}</Item>
           <Item label='Productos' span={2}>
             <BoughtProductsListWithSeries products={productosConImagenes} />

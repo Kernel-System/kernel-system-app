@@ -94,7 +94,7 @@ const Index = ({ tipo }) => {
     if (tipoMuestra !== 'agregar') {
       http
         .get(
-          `/items/solicitudes_transferencia/${match.params.id}?fields=*,productos_transferencia.*`,
+          `/items/solicitudes_transferencia/${match.params.id}?fields=*,productos_transferencia.*,movimientos_almacen`,
           putToken
         )
         .then((result) => {
@@ -103,6 +103,12 @@ const Index = ({ tipo }) => {
             result.data.data.estado === 'Rechazado' ||
             result.data.data.estado === 'Recibido con Detalles' ||
             result.data.data.estado === 'Recibido'
+          ) {
+            setTipoMuestra('mostrar');
+          }
+          if (
+            result.data.data.estado === 'Confirmado' &&
+            result.data.data.movimientos_almacen.length === 0
           ) {
             setTipoMuestra('mostrar');
           }
@@ -326,8 +332,8 @@ const Index = ({ tipo }) => {
       case 'Pendiente':
         return ['Confirmado', 'Rechazado'];
       case 'Confirmado':
-        return ['Tranferido'];
-      case 'Tranferido':
+        return ['Transferido'];
+      case 'Transferido':
         return ['Recibido', 'Recibido con Detalles'];
       default:
         return ['Pendiente'];
@@ -539,7 +545,7 @@ const Index = ({ tipo }) => {
                   )}
                 </Form.Item>
               </div>
-            ) : (
+            ) : datosTransferencia.estado === 'Confirmado' ? (
               <div>
                 <Title level={5}>Fecha Estimada</Title>
                 <Form.Item
@@ -562,6 +568,17 @@ const Index = ({ tipo }) => {
                     }
                     placeholder='Selecciona la fecha de entrega estimada'
                   />
+                </Form.Item>
+              </div>
+            ) : (
+              <div>
+                <Title level={5}>Fecha Estimada</Title>
+                <Form.Item>
+                  {datosTransferencia.fecha_estimada ? (
+                    datosTransferencia.fecha_estimada
+                  ) : (
+                    <Text>No hay una fecha asignada</Text>
+                  )}
                 </Form.Item>
               </div>
             )}
@@ -608,13 +625,13 @@ const Index = ({ tipo }) => {
           mensaje='Asignar una factura.'
           placeholder='Factura'
         /> */}
-        {datosTransferencia.estado === 'Tranferido' ? (
+        {datosTransferencia.estado === 'Transferido' ? (
           <>
             <Title level={5}>Comentario</Title>
             <InputForm
               titulo='comentario'
-              enable={datosTransferencia.estado !== 'Tranferido'}
-              required={datosTransferencia.estado === 'Tranferido'}
+              enable={datosTransferencia.estado !== 'Transferido'}
+              required={datosTransferencia.estado === 'Transferido'}
               max={100}
               mensaje='Agregar comentario.'
               placeholder='Comentario.'

@@ -22,7 +22,7 @@ const Index = () => {
 
   return (
     <>
-      <HeadingBack title={`Devoluciones a Clientes`} />
+      <HeadingBack title={`Devoluciones`} />
       <DevolucionesClientesList onClickItem={showModal} seeItem={showModal} />
       <Link to='/devolucion-clientes/nuevo'>
         <Button type='primary' icon={<PlusOutlined />}>

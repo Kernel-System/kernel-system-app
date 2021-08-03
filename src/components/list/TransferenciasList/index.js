@@ -51,7 +51,7 @@ const Index = () => {
         item.estado === 'Confirmado' //&& item.movimientos_almacen.length !== 0
       ) {
         return !almacenes.includes(item.almacen_origen);
-      } else if (item.estado === 'Pendiente' || item.estado === 'Tranferido') {
+      } else if (item.estado === 'Pendiente' || item.estado === 'Transferido') {
         return !almacenes.includes(item.almacen_destino);
       } else return true;
     } else {
@@ -59,7 +59,7 @@ const Index = () => {
         item.estado === 'Confirmado' //&& item.movimientos_almacen.length !== 0
       ) {
         return !(item.almacen_origen === almacen);
-      } else if (item.estado === 'Pendiente' || item.estado === 'Tranferido') {
+      } else if (item.estado === 'Pendiente' || item.estado === 'Transferido') {
         return !(item.almacen_destino === almacen);
       } else return true;
     }

@@ -95,10 +95,12 @@ const Index = () => {
   const [concepto, setConcepto] = useState('Compra');
   const [compraIndex, setCompraIndex] = useState();
   const [ventaIndex, setVentaIndex] = useState();
+  const [ensambleIndex, setEnsambleIndex] = useState();
   const [transferenciaIndex, setTransferenciaIndex] = useState();
 
   const [ocultarAgregar1, setOcultarAgregar1] = useState(true);
   const [ocultarAgregar2, setOcultarAgregar2] = useState(true);
+  const [ocultarEnsamble, setOcultarEnsamble] = useState(true);
 
   const [visible, setVisible] = useState(false);
   const history = useHistory();
@@ -113,14 +115,33 @@ const Index = () => {
   };
 
   useEffect(() => {
-    http.get(`/users/me/?fields=*,empleado.*`, putToken).then((result) => {
-      setEmpleado(result.data.data.empleado[0]);
-      if (rol === 'administrador') {
-        onSetAlmacen(1);
-      } else {
-        onSetAlmacen(result.data.data.empleado[0].almacen);
-      }
-    });
+    http
+      .get(`/users/me/?fields=*,empleado.*,role.name`, putToken)
+      .then((result) => {
+        setEmpleado(result.data.data.empleado[0]);
+        if (result.data.data.role.name === 'administrador') {
+          //
+          onSetAlmacen(1);
+          http
+            .get(
+              `/items/ordenes_ensamble/?filter[estado][_neq]=Ingresado en almacén&fields=folio,clave_almacen,descripcion,componentes_ensamble.*`,
+              putToken
+            )
+            .then((result) => {
+              onSetArreglo(result.data.data, setEnsambles);
+            });
+        } else {
+          onSetAlmacen(result.data.data.empleado[0].almacen);
+          http
+            .get(
+              `/items/ordenes_ensamble/?filter[clave_almacen][_eq]=${result.data.data.empleado[0].almacen}&filter[estado][_neq]=Ingresado en almacén&fields=folio,clave_almacen,descripcion,componentes_ensamble.*`,
+              putToken
+            )
+            .then((result) => {
+              onSetArreglo(result.data.data, setEnsambles);
+            });
+        }
+      });
     getItemsMovimiento(false, token).then((result) => {
       onSetArreglo(result.data.data, setDevolucionesProv);
     });
@@ -129,14 +150,7 @@ const Index = () => {
       .then((result) => {
         onSetArreglo(result.data.data, setDevolucionesClientes);
       });
-    http
-      .get(
-        `/items/ordenes_ensamble/?filter[estado][_neq]=Ingresado en almacén&fields=folio,descripcion`,
-        putToken
-      )
-      .then((result) => {
-        onSetArreglo(result.data.data, setEnsambles);
-      });
+
     http
       .get(
         `/items/solicitudes_transferencia/?fields=id,almacen_origen,almacen_destino,estado,productos_transferencia.*`,
@@ -173,7 +187,12 @@ const Index = () => {
 
   useEffect(() => {
     setListProducts([]); //aqui
-    if (concepto !== 'Compra' && concepto !== 'Venta') {
+    if (
+      concepto !== 'Compra' &&
+      concepto !== 'Venta' &&
+      concepto !== 'Entrada por transferencia' &&
+      concepto !== 'Salida por transferencia'
+    ) {
       http
         .get(
           `/items/productos?fields=*,imagenes.directus_files_id,inventario.*`,
@@ -265,128 +284,197 @@ const Index = () => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    console.log(values);
+    console.log(listProducts);
+    console.log(almacen);
     if (switchVerificarConcepto(values.concepto, values)) {
       if (verificarSeriesProductos()) {
         const hide = message.loading('Agregando movimiento de almacén...', 0);
-        http
-          .post(
-            `/items/movimientos_almacen/`,
-            {
-              fecha: obtenerFechaActual(),
-              concepto: values.concepto,
-              comentario: values.comentario,
-              rma: values.rma,
-              devolucion_clientes: values.devolucion_clientes,
-              folio_ensamble: values.folio_ensamble,
-              no_transferencia: values.no_transferencia,
-              rfc_empleado: empleado.rfc,
-              clave_almacen:
-                rol !== 'administrador' ? empleado.almacen : values.almacen,
-              compras: values.compras,
-              ventas: values.ventas,
-              mostrar: true,
-            },
-            putToken
-          )
-          .then((result) => {
-            if (
-              values.folio_factura !== undefined &&
-              values.folio_factura !== ''
-            ) {
-              //movimientos_almacen_factura
-              http.post(
-                `/items/movimientos_almacen_factura/`,
-                {
-                  movimientos_almacen_id: result.data.data.id,
-                  collection: tipo,
-                  item: values.folio_factura,
-                },
-                putToken
-              );
-            }
-            let productos = [];
-            let productosCoV = [];
-            listProducts.forEach((producto) => {
-              if (producto.cantidad > 0) {
-                productos.push({
-                  codigo: producto.codigo,
-                  clave: producto.clave,
-                  cantidad: producto.cantidad,
-                  titulo: producto.titulo,
-                  clave_unidad: producto.clave_unidad,
-                  id_movimiento: result.data.data.id,
-                });
-                if (concepto === 'Compra' || concepto === 'Venta')
-                  productosCoV.push({
-                    id: producto.id,
-                    cantidad: producto.cantidad,
-                  });
-              }
-            });
-            if (concepto === 'Compra')
-              http.post(
-                '/custom/productos-compras/',
-                { productos: productosCoV },
-                putToken
-              );
-            else if (concepto === 'Venta') {
-              http.post(
-                '/custom/productos-ventas/',
-                { productos: productosCoV },
-                putToken
-              );
-            }
-            http
-              .post(`/items/productos_movimiento/`, productos, putToken)
-              .then((result_productos) => {
-                let series = [];
-                let seriesVenta = [];
-                let num = 0;
-                listProducts.forEach((producto) => {
-                  if (producto.cantidad > 0) {
-                    const idMov = result_productos.data.data[num].id;
-                    num = num + 1;
-                    if (producto.series !== undefined)
+        if (concepto === 'Componente defectuoso') {
+          console.log(listProducts);
+          http
+            .post(
+              `/items/info_devoluciones_clientes`,
+              {
+                diagnostico: 'Componente Defectuoso',
+                folio_ensamble: values.folio_ensamble,
+              },
+              putToken
+            )
+            .then((result_info) => {
+              listProducts.forEach((producto, index) => {
+                http
+                  .post(
+                    `/items/devolucion_inventario`,
+                    {
+                      cantidad: producto.cantidad,
+                      clave_almacen: almacen,
+                      codigo_producto: producto.codigo,
+                      info_devolucion_clientes: result_info.data.data.id,
+                    },
+                    putToken
+                  )
+                  .then((result_dev_int1) => {
+                    if (producto?.series?.length !== 0) {
+                      let series = [];
                       producto.series.forEach((serie) => {
                         series.push({
                           serie: serie,
-                          producto_movimiento: idMov,
+                          devolucion_inventario: result_dev_int1.data.data.id,
+                          info_devolucion: result_info.data.data.id,
                         });
-                        if (concepto === 'Venta') {
-                          seriesVenta.push({
-                            serie: serie,
-                            producto_venta: producto.id,
-                          });
-                        }
                       });
-                  }
-                });
-                http
-                  .post(`/items/series_producto_movimiento/`, series, putToken)
-                  .then(() => {
-                    if (concepto === 'Venta' && series.length !== 0) {
                       http
                         .post(
-                          `/items/series_producto_venta/`,
-                          seriesVenta,
+                          `/items/devolucion_inventario_series`,
+                          series,
                           putToken
                         )
                         .then(() => {
-                          agregarInventarios(values, hide);
+                          if (listProducts.length - 1 === index) {
+                            generarMovimiento(
+                              values,
+                              result_info.data.data.id,
+                              hide
+                            );
+                          }
                         });
-                    } else {
-                      agregarInventarios(values, hide);
+                    } else if (listProducts.length - 1 === index) {
+                      generarMovimiento(values, result_info.data.data.id, hide);
                     }
                   });
               });
-          });
+            });
+        } else generarMovimiento(values, null, hide);
       } else {
         message.error('Falta llenar datos de productos');
       }
     } else {
       message.error('Falta especificar una justificación');
     }
+  };
+
+  const generarMovimiento = (values, devolucion, hide) => {
+    console.log(devolucion);
+    http
+      .post(
+        `/items/movimientos_almacen/`,
+        {
+          fecha: obtenerFechaActual(),
+          concepto: values.concepto,
+          comentario: values.comentario,
+          rma: values.rma,
+          devolucion_clientes: devolucion,
+          folio_ensamble: values.folio_ensamble,
+          no_transferencia: values.no_transferencia,
+          rfc_empleado: empleado.rfc,
+          clave_almacen: rol !== 'administrador' ? empleado.almacen : almacen,
+          compras: values.compras,
+          ventas: values.ventas,
+          mostrar: true,
+        },
+        putToken
+      )
+      .then((result) => {
+        if (values.folio_factura !== undefined && values.folio_factura !== '') {
+          //movimientos_almacen_factura
+          http.post(
+            `/items/movimientos_almacen_factura/`,
+            {
+              movimientos_almacen_id: result.data.data.id,
+              collection: tipo,
+              item: values.folio_factura,
+            },
+            putToken
+          );
+        }
+        let productos = [];
+        let productosCoV = [];
+        listProducts.forEach((producto) => {
+          if (producto.cantidad > 0) {
+            productos.push({
+              codigo: producto.codigo,
+              clave: producto.clave,
+              cantidad: producto.cantidad,
+              titulo: producto.titulo,
+              clave_unidad: producto.clave_unidad,
+              id_movimiento: result.data.data.id,
+            });
+            if (concepto === 'Compra' || concepto === 'Venta')
+              productosCoV.push({
+                id: producto.id,
+                cantidad: producto.cantidad,
+              });
+          }
+        });
+        if (concepto === 'Compra')
+          http.post(
+            '/custom/productos-compras/',
+            { productos: productosCoV },
+            putToken
+          );
+        else if (concepto === 'Venta') {
+          http.post(
+            '/custom/productos-ventas/',
+            { productos: productosCoV },
+            putToken
+          );
+        }
+        http
+          .post(`/items/productos_movimiento/`, productos, putToken)
+          .then((result_productos) => {
+            let series = [];
+            let seriesVenta = [];
+            let num = 0;
+            listProducts.forEach((producto) => {
+              if (producto.cantidad > 0) {
+                const idMov = result_productos.data.data[num].id;
+                num = num + 1;
+                if (producto.series !== undefined)
+                  producto.series.forEach((serie) => {
+                    series.push({
+                      serie: serie,
+                      producto_movimiento: idMov,
+                    });
+                    if (concepto === 'Venta') {
+                      seriesVenta.push({
+                        serie: serie,
+                        producto_venta: producto.id,
+                      });
+                    }
+                  });
+              }
+            });
+            http
+              .post(`/items/series_producto_movimiento/`, series, putToken)
+              .then(() => {
+                if (concepto === 'Venta' && series.length !== 0) {
+                  http
+                    .post(
+                      `/items/series_producto_venta/`,
+                      seriesVenta,
+                      putToken
+                    )
+                    .then(() => {
+                      if (
+                        concepto !== 'Componente defectuoso' &&
+                        devolucion === null
+                      )
+                        agregarInventarios(values, hide);
+                      else Mensaje(hide);
+                    });
+                } else {
+                  if (
+                    concepto !== 'Componente defectuoso' &&
+                    devolucion === null
+                  )
+                    agregarInventarios(values, hide);
+                  else Mensaje(hide);
+                }
+              });
+          });
+      });
   };
 
   const Mensaje = (hideLoading) => {
@@ -461,13 +549,17 @@ const Index = () => {
       });
       setListProducts(productos_comprados);
     } else {
+      console.log(ventas[index]);
       setTipo('facturas_internas');
       if (
         ventas[index]?.factura !== undefined &&
-        ventas[index]?.factura !== null
+        ventas[index]?.factura.length !== 0
       )
         setFactura(ventas[index].factura);
+      else if (ventas[index]?.facturas_globales !== null)
+        setFactura(ventas[index].facturas_globales);
       else setFactura('');
+
       const productos_comprados = [];
       ventas[index].productos_venta.forEach((producto) => {
         const producto_catalogo = producto.codigo;
@@ -505,6 +597,32 @@ const Index = () => {
     }
   };
 
+  const onChangeEnsamble = (index) => {
+    const componentes_ensamble = [];
+    console.log(index);
+    console.log(ensambles[index]);
+    if (index !== '') {
+      onSetAlmacen(ensambles[index].clave_almacen);
+      ensambles[index].componentes_ensamble.forEach((producto) => {
+        const nuevoProducto = {
+          key: producto.id,
+          expand: true,
+          titulo: producto.descripcion,
+          id: producto.id,
+          clave: producto.clave,
+          clave_unidad: producto.clave_unidad,
+          productimage: '',
+          series: [],
+          max: producto.cantidad,
+          cantidad: 1,
+          codigo: producto.codigo,
+        };
+        componentes_ensamble.push(nuevoProducto);
+      });
+    }
+    setListProducts(componentes_ensamble);
+  };
+
   //+ Compra, Entrada por transferencia, Componente defectuoso
   //- Venta, Devolución a cliente, Devolución a proveedor, Salida por transferencia, Componente para ensamble
 
@@ -528,7 +646,7 @@ const Index = () => {
     http
       .get(
         `/items/inventario?filter[codigo_producto][_in]=${codigos.toString()}&filter[clave_almacen][_eq]=${
-          rol !== 'administrador' ? empleado.almacen : values.almacen
+          rol !== 'administrador' ? empleado.almacen : almacen
         }`,
         putToken
       )
@@ -564,7 +682,7 @@ const Index = () => {
                   : producto_inv.cantidad - productosAgregados[index].cantidad,
                 estado: 'normal',
                 clave_almacen:
-                  rol !== 'administrador' ? empleado.almacen : values.almacen,
+                  rol !== 'administrador' ? empleado.almacen : almacen,
                 codigo_producto: productosAgregados[index].codigo,
               },
               putToken
@@ -598,7 +716,7 @@ const Index = () => {
                 cantidad: producto.cantidad,
                 estado: 'normal',
                 clave_almacen:
-                  rol !== 'administrador' ? empleado.almacen : values.almacen,
+                  rol !== 'administrador' ? empleado.almacen : almacen,
                 codigo_producto: producto.codigo,
               },
               putToken
@@ -833,10 +951,11 @@ const Index = () => {
 
   const addTransferenciaProducts = (index) => {
     const productos_comprados = [];
+    console.log(index);
     if (index !== undefined && index !== '') {
+      console.log('entre 2');
       transferencias[index].productos_transferencia.forEach(
         (producto, index) => {
-          const producto_catalogo = producto.codigo;
           const nuevoProducto = {
             key: index,
             expand: true,
@@ -848,11 +967,12 @@ const Index = () => {
             productimage: '',
             max: producto.cantidad,
             cantidad: 1,
-            codigo: producto_catalogo.codigo,
+            codigo: producto.codigo,
           };
           productos_comprados.push(nuevoProducto);
         }
       );
+      console.log(productos_comprados);
       setListProducts(productos_comprados);
     }
   };
@@ -923,7 +1043,8 @@ const Index = () => {
   const camposGenerales = (
     <>
       {concepto !== 'Entrada por transferencia' &&
-      concepto !== 'Salida por transferencia' ? (
+      concepto !== 'Salida por transferencia' &&
+      concepto !== 'Componente defectuoso' ? (
         <Form.Item
           label='Clave de Almacén'
           name='almacen'
@@ -1248,13 +1369,30 @@ const Index = () => {
             style={{ width: '100%' }}
             placeholder='Justifica un movimiento por ensamble'
             initialvalues=''
+            onChange={(value, all) => {
+              const index = all.index;
+              if (index === '') {
+                setOcultarEnsamble(true);
+              } else {
+                if (concepto !== 'Componente para ensamble') {
+                  setEnsambleIndex(index);
+                  onChangeEnsamble(index);
+                  onSetAlmacen(ensambles[index].clave_almacen);
+                }
+                setOcultarEnsamble(false);
+              }
+            }}
           >
-            <Option key='' value=''>
+            <Option key='' value='' index=''>
               Ninguna
             </Option>
-            {ensambles.map((ensamble) => {
+            {ensambles.map((ensamble, index) => {
               return (
-                <Option key={ensamble.folio} value={ensamble.folio}>
+                <Option
+                  key={ensamble.folio}
+                  value={ensamble.folio}
+                  index={index}
+                >
                   {`${ensamble.folio} : ${ensamble.descripcion}`}
                 </Option>
               );
@@ -1280,6 +1418,7 @@ const Index = () => {
             placeholder='Justifica un movimiento por transferencia'
             initialvalues=''
             onChange={(value, all) => {
+              console.log('aqui');
               const almacen = all.almacen;
               onSetAlmacen(almacen);
               setTransferenciaIndex(all.index);
@@ -1395,7 +1534,7 @@ const Index = () => {
           </Col>
         </Row>
       ) : factura !== '' && tipo === 'facturas_internas' ? (
-        <TextLabel title={`Factura Interna folio: ${factura}}`} />
+        <TextLabel title={`Factura Interna folio: ${factura}`} />
       ) : null}
     </>
   );
@@ -1461,6 +1600,17 @@ const Index = () => {
               <CaretDownFilled />
               {'Agregar todos los productos de la transferencia'}
             </Button>
+          ) : concepto === 'Componente defectuoso' ? (
+            <>
+              <Button
+                type='default'
+                onClick={() => onChangeEnsamble(ensambleIndex)}
+                disabled={ocultarEnsamble}
+              >
+                <CaretDownFilled />
+                {'Agregar todos los componentes del ensamble'}
+              </Button>
+            </>
           ) : (
             <Search
               placeholder='Buscar por producto de catálogo'

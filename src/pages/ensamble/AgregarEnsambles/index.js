@@ -177,7 +177,7 @@ const Index = () => {
   };
 
   const onFinish = (values) => {
-    //   console.log({values})
+    const hide = message.loading('Generando Ensamble...', 0);
     http
       .post(
         '/items/ordenes_ensamble',
@@ -212,6 +212,7 @@ const Index = () => {
         http
           .post('/items/componentes_ensamble', productos, putToken)
           .then((result2) => {
+            hide();
             message
               .success('El ensamble ha sido registrados exitosamente', 3)
               .then(() => history.goBack());

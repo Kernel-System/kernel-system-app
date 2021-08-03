@@ -98,6 +98,7 @@ const Index = ({ match }) => {
 
   const onFinish = () => {
     let estado = {};
+    const hide = message.loading('Modificando Ensamble...', 0);
     switch (list[0].estado) {
       case 'Ordenado':
         estado = {
@@ -128,9 +129,7 @@ const Index = ({ match }) => {
     }
     if (list[0].estado !== 'Ensamblado') {
       http
-        .patch(`/items/ordenes_ensamble/${match.params.id}`, estado, {
-          putToken,
-        })
+        .patch(`/items/ordenes_ensamble/${match.params.id}`, estado, putToken)
         .then((result_ensamble) => {
           console.log(result_ensamble);
           let series = [];
@@ -144,9 +143,7 @@ const Index = ({ match }) => {
           });
           if (list[0].estado === 'Ordenado')
             http
-              .post('/items/series_componentes_ensamble', series, {
-                putToken,
-              })
+              .post('/items/series_componentes_ensamble', series, putToken)
               .then((result2) => {
                 console.log(result2);
                 http
@@ -179,9 +176,11 @@ const Index = ({ match }) => {
                     });
                     console.log(componentes);
                     http
-                      .post(`/items/productos_movimiento/`, componentes, {
-                        putToken,
-                      })
+                      .post(
+                        `/items/productos_movimiento/`,
+                        componentes,
+                        putToken
+                      )
                       .then((result_com) => {
                         let series = [];
                         let num = 0;
@@ -209,9 +208,9 @@ const Index = ({ match }) => {
                               putToken
                             )
                             .then((result_series) => {
-                              agregarInventarios(list[0], false);
+                              agregarInventarios(list[0], false, hide);
                             });
-                        else agregarInventarios(list[0], false);
+                        else agregarInventarios(list[0], false, hide);
                       });
                   });
               });
@@ -279,7 +278,7 @@ const Index = ({ match }) => {
                               putToken
                             )
                             .then((result_ensamble) => {
-                              agregarInventarios(list[0], true);
+                              agregarInventarios(list[0], true, hide);
                             });
                         });
                     });
@@ -289,7 +288,7 @@ const Index = ({ match }) => {
     }
   };
 
-  const agregarInventarios = (list, introducir = false) => {
+  const agregarInventarios = (list, introducir = false, hide) => {
     let codigos = [];
     list.componentes_ensamble.forEach((producto) => {
       codigos.push(producto.codigo);
@@ -329,8 +328,11 @@ const Index = ({ match }) => {
                   series.push(serie);
                 });
                 if (series.length !== 0)
-                  http.delete(`/items/series_inventario`, series, putToken);
-                if (inventario.data.data.length - 1 === index) mensajeSuccess();
+                  series.forEach((serie) => {
+                    http.delete(`/items/series_inventario`, serie, putToken);
+                  });
+                if (inventario.data.data.length - 1 === index)
+                  mensajeSuccess(hide);
               });
           });
         } else {
@@ -367,7 +369,7 @@ const Index = ({ match }) => {
                         putToken
                       )
                       .then(() => {
-                        mensajeSuccess();
+                        mensajeSuccess(hide);
                       });
                   });
               } else {
@@ -397,36 +399,20 @@ const Index = ({ match }) => {
                         putToken
                       )
                       .then(() => {
-                        mensajeSuccess();
+                        mensajeSuccess(hide);
                       });
                   });
               }
             });
         }
         if (mostrarMensaje) {
-          mensajeSuccess();
+          mensajeSuccess(hide);
         }
       });
   };
 
-  const obtenerFecha = () => {
-    const date = new Date();
-    return (
-      date.getUTCFullYear() +
-      '-' +
-      ('00' + (date.getUTCMonth() + 1)).slice(-2) +
-      '-' +
-      ('00' + date.getUTCDate()).slice(-2) +
-      ' ' +
-      ('00' + date.getUTCHours()).slice(-2) +
-      ':' +
-      ('00' + date.getUTCMinutes()).slice(-2) +
-      ':' +
-      ('00' + date.getUTCSeconds()).slice(-2)
-    );
-  };
-
   const onFinishChange = () => {
+    const hide = message.loading('Modificando Ensamble...', 0);
     http
       .patch(
         `/items/ordenes_ensamble/${match.params.id}`,
@@ -437,11 +423,11 @@ const Index = ({ match }) => {
       )
       .then((resul) => {
         console.log(resul);
-        actualizarSeries();
+        actualizarSeries(hide);
       });
   };
 
-  const actualizarSeries = () => {
+  const actualizarSeries = (hide) => {
     let series = [];
     list[0].componentes_ensamble.map((componente) => {
       return componente.series_componentes_ensamble.map((serie) => {
@@ -456,11 +442,12 @@ const Index = ({ match }) => {
       .post('/custom/ensamble/', { series: series }, putToken)
       .then((result2) => {
         console.log(result2);
-        mensajeSuccess();
+        mensajeSuccess(hide);
       });
   };
 
-  const mensajeSuccess = () => {
+  const mensajeSuccess = (hide) => {
+    hide();
     message
       .success('Los cambios han sido registrados exitosamente', 3)
       .then(() => history.goBack());

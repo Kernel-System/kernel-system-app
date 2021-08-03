@@ -213,7 +213,7 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
       icon={<ExportOutlined />}
       onClick={!collapsed && ToggleCollapsed}
     >
-      <Link to='/devolucion-clientes'>Devoluciones a Clientes</Link>
+      <Link to='/devolucion-clientes'>Devoluciones</Link>
     </Menu.Item>
   );
 
