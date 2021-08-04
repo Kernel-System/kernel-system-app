@@ -15,7 +15,7 @@ const SolicitudesDeCompra = () => {
   const [filter, setFilter] = useState('todos');
   const [page, setPage] = useState(1);
   const solicitudes = useQuery(
-    ['solicitudes-de-compra', clienteRFC, filter],
+    ['solicitudes-de-compra', clienteRFC, page, filter],
     () => getSolicitudesCompra(clienteRFC, page, filter, token)
   );
   const solicitudesData = solicitudes.data?.data?.data;

@@ -94,8 +94,8 @@ const SolicitudCompraProductsTable = ({
             }}
           >
             <InputNumber
-              min={0}
-              max={100}
+              min={record.descuentoInicial}
+              max={record.descuentoInicial + 10}
               type='number'
               disabled={estado !== 'pendiente'}
               value={descuento_ofrecido}
@@ -114,10 +114,10 @@ const SolicitudCompraProductsTable = ({
               }}
               onBlur={({ target: { value } }) => {
                 let newValue;
-                if (value > 100) {
-                  newValue = 100;
-                } else if (value < 0 || value === '') {
-                  newValue = 0;
+                if (value > record.descuentoInicial + 10) {
+                  newValue = record.descuentoInicial + 10;
+                } else if (value < record.descuentoInicial || value === '') {
+                  newValue = record.descuentoInicial;
                 } else {
                   newValue = Math.ceil(value);
                 }
