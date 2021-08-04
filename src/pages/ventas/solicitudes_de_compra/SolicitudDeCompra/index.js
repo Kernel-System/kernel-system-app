@@ -63,6 +63,9 @@ const SolicitudDeCompra = () => {
     { cacheTime: 0 }
   );
   const solicitudData = solicitud.data?.data?.data;
+  const newSolicitudProducts = solicitudData?.productos_solicitados.map(
+    (product) => ({ ...product, descuentoInicial: product.descuento_ofrecido })
+  );
 
   const removeItem = (codigo) => {
     setNewProducts(
@@ -138,6 +141,7 @@ const SolicitudDeCompra = () => {
             cantidad: 1,
             codigo_producto: newProduct,
             descuento_ofrecido: newProduct.descuento,
+            descuentoInicial: newProduct.descuento,
             iva: newProduct.iva,
             precio_ofrecido: calcPrecioVariable(newProduct, 1),
           },
@@ -322,7 +326,7 @@ const SolicitudDeCompra = () => {
                 </Form>
               )}
               <SolicitudesCompraProductsTable
-                products={solicitudData.productos_solicitados}
+                products={newSolicitudProducts}
                 newProducts={newProducts}
                 setNewProducts={setNewProducts}
                 estado={solicitudData.estado}

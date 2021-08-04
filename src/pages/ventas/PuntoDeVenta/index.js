@@ -793,8 +793,9 @@ const PuntoDeVenta = () => {
               ? {
                   ...product,
                   cantidad: product.cantidad + 1,
+                  descuentoInicial: product.descuento,
                 }
-              : product
+              : { ...product, descuentoInicial: product.descuento }
           )
         );
       } else {
@@ -803,6 +804,7 @@ const PuntoDeVenta = () => {
           {
             ...newProduct,
             cantidad: 1,
+            descuentoInicial: newProduct.descuento,
           },
         ]);
       }
