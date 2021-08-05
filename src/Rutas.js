@@ -391,7 +391,7 @@ const Rutas = () => {
       >
         <NuevaTrasferencia tipo={'editar'} />
       </PrivateRoute>
-      {/* Pagos */}
+      {/* Pagos 
       <PrivateRoute
         allowedRoles={['cuentas por cobrar']}
         path='/cuentas'
@@ -417,7 +417,7 @@ const Rutas = () => {
         exact
       >
         <Pagos tipo={'facturas_externas'} />
-      </PrivateRoute>
+      </PrivateRoute>*/}
       {/* Productos */}
       <PrivateRoute
         allowedRoles={['encargado de compras', 'encargado de ventas']}

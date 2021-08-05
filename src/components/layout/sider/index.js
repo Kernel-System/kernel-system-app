@@ -387,7 +387,6 @@ const Index = ({ collapsed, ToggleCollapsed }) => {
             {InventarioMenuItem}
             {EnsamblesMenuItem}
             {ProductosMenuItem}
-            {CuentasMenuItem}
             {MovimientosAlmacenMenuItem}
             {TransferenciaMenuItem}
             {ComprasSubMenu}
