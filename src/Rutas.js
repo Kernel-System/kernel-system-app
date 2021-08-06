@@ -336,13 +336,14 @@ const Rutas = () => {
         component={ModificarEnsambles}
       />
       {/* Facturar ticket */}
-      <PrivateRoute
+      {/*<PrivateRoute
         //lel
         allowedRoles='*'
         path='/facturar-ticket2'
         exact
         component={FacturarTicket}
-      />
+      />*/}
+      <GuestRoute path='/facturar-ticket2' exact component={FacturarTicket} />
       <PrivateRoute
         //lel
         allowedRoles='*'
