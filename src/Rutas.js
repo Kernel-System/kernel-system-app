@@ -21,13 +21,15 @@ import FacturasExternas from 'pages/facturas/FacturasExternas';
 import FacturasInternas from 'pages/facturas/FacturasInternas';
 import FacturasGlobales from 'pages/facturas/GenerarFacturasGlobal';
 import Home from 'pages/Home';
-import Order from 'pages/orders/Order';
-import Orders from 'pages/orders/Orders';
+import Order from 'pages/Orders/Order';
+import Orders from 'pages/Orders/Orders';
 import Product from 'pages/Product';
 import Addresses from 'pages/profile/Addresses';
 import ChangePassword from 'pages/profile/ChangePassword';
 import NewAddress from 'pages/profile/NewAddress';
 import Profile from 'pages/profile/Profile';
+import RegistrarRMA from 'pages/rma/RegistrarRMA';
+import RMAs from 'pages/rma/RMAs';
 import Search from 'pages/Search';
 import PuntoDeVenta from 'pages/ventas/PuntoDeVenta';
 import SolicitudDeCompra from 'pages/ventas/solicitudes_de_compra/SolicitudDeCompra';
@@ -56,9 +58,6 @@ import PagoNuevo from './pages/pagos/PagoNuevo';
 import Pagos from './pages/pagos/Pagos';
 import AgregarProductos from './pages/productos/AgregarProductos';
 import Productos from './pages/productos/Productos';
-
-import RMAs from 'pages/rma/RMAs';
-import RegistrarRMA from 'pages/rma/RegistrarRMA';
 
 const asyncLogin = asyncComponent(() => import('pages/auth/Login'));
 

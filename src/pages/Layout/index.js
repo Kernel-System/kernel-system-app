@@ -1,8 +1,8 @@
 import { Layout } from 'antd';
-import Content from 'components/layout/Content';
-import Footer from 'components/layout/Footer';
-import Header from 'components/layout/Header';
-import Sider from 'components/layout/Sider';
+import Content from 'components/layout/content';
+import Footer from 'components/layout/footer';
+import Header from 'components/layout/header';
+import Sider from 'components/layout/sider';
 import { useStoreState } from 'easy-peasy';
 import React, { useState } from 'react';
 
