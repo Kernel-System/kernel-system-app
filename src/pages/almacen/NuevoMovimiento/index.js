@@ -475,7 +475,6 @@ const Index = () => {
   };
 
   const generarMovimiento = (values, devolucion, hide) => {
-    console.log(devolucion);
     http
       .post(
         `/items/movimientos_almacen/`,
