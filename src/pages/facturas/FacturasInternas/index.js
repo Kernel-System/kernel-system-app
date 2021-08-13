@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import LectorFacturas from 'components/shared/facturas/LectorFacturas';
 import ListaFacturas from 'components/list/FacturasInternasList';
 import Descripciones from 'components/descriptions/FacturaDescriptions';
+import { httpSAT } from 'api';
 import * as CRUD from 'api/ventas/facturas_internas';
 
 const Index = (props) => {
@@ -105,6 +106,18 @@ const Index = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [listElement, setListElement] = useState({});
 
+  const descargarFactura = (id) => {
+    httpSAT.get(`/cfdi/pdf/issued/${id}`).then((result_pdf) => {
+      const linkSource =
+        'data:application/pdf;base64,' + result_pdf.data.Content;
+      const downloadLink = document.createElement('a');
+      const fileName = `${id}.pdf`;
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    });
+  };
+
   return (
     <>
       <ListaFacturas
@@ -126,7 +139,18 @@ const Index = (props) => {
       <Modal
         title={listElement.nombre_receptor ?? listElement.rfc_receptor}
         visible={isModalVisible}
-        footer={null}
+        footer={
+          listElement.id_api ? (
+            <Button
+              type='link'
+              onClick={() => {
+                descargarFactura(listElement.id_api);
+              }}
+            >
+              Descargar Factura
+            </Button>
+          ) : null
+        }
         onCancel={handleCancel}
         width='70%'
       >
